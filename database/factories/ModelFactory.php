@@ -22,3 +22,23 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'remember_token' => str_random(10),
     ];
 });
+
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
+$factory->define(App\Models\App::class, function (Faker\Generator $faker) {
+    static $name;
+
+    $faker->addProvider(new \Xvladqt\Faker\LoremFlickrProvider($faker));
+
+    $name = $faker->unique()->regexify('[a-z]{3,20}$');
+
+    return [
+        'name' => $name,
+        'package_name' => "com.quick.$name",
+        'description' => $faker->unique()->text(),
+        'type' => $faker->unique()->word(),
+        'icon_url' => $faker->imageUrl(50, 50, ['cats', 'dogs']),
+        'repository_url' => $faker->unique()->url,
+        'user_documentation_url' => $faker->unique()->url,
+        'developer_documentation_url' => $faker->unique()->url,
+    ];
+});

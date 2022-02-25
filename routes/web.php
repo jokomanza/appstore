@@ -21,3 +21,13 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/developers', 'HomeController@index')->name('developer.index');
+
+Route::get('/apps', 'AppController@index')->name('app.index');
+
+Route::get('/app/{id}', 'AppController@show')->name('app.show');
+
+Route::get('/app', 'AppController@create')->name('app.create');
+
+Route::post('/app', 'AppController@store')->name('app.store');
