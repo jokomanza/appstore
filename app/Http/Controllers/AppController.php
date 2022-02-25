@@ -53,9 +53,7 @@ class AppController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->all();
-        
-        
+        dd($request->all());
     }
 
     /**
