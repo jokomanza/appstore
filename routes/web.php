@@ -26,8 +26,15 @@ Route::get('/developers', 'HomeController@index')->name('developer.index');
 
 Route::get('/apps', 'AppController@index')->name('app.index');
 
-Route::get('/app/{id}', 'AppController@show')->name('app.show');
-
 Route::get('/app', 'AppController@create')->name('app.create');
 
 Route::post('/app', 'AppController@store')->name('app.store');
+
+Route::put('/app/{id}', 'AppController@update')->name('app.update');
+
+Route::delete('/app/{id}', 'AppController@destroy')->name('app.destroy');
+
+Route::get('/app/{id}', 'AppController@show')->name('app.show');
+
+Route::get('/app/{id}/edit', 'AppController@edit')->name('app.edit');
+

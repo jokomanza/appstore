@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class App extends Model
 {
-    protected $casts = [
+	protected $casts = [
 		'name' => 'character varying',
 		'package_name' => 'character varying',
 		'description' => 'character varying',
@@ -49,4 +49,24 @@ class App extends Model
 		'user_documentation_url',
 		'developer_documentation_url'
 	];
+
+	/**
+	 * Save this to database
+	 * 
+	 * @return boolean
+	 */
+	public function saveData()
+	{
+		return $this->save();
+	}
+
+	/**
+	 * Update this data
+	 * 
+	 * @return boolean
+	 */
+	public function updateData()
+	{
+		return $this->update();
+	}
 }

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateAppRequest;
 use App\Interfaces\AppRepositoryInterface;
+use App\Interfaces\AppServiceInterface;
 use App\Models\App;
 use App\Repositories\AppRepository;
 use Illuminate\Http\Request;
@@ -14,17 +16,20 @@ use Psy\Util\Json;
  * Class App Controller
  * 
  * @property AppRepositoryInterface $appRepository
+ * @property AppServiceInterface $appService
  * 
  * @package App\Http\Controllers
  */
 class AppController extends Controller
 {
     private $appRepository;
+    private $appService;
 
     // AppRepositoryInterface $appRepository
-    public function __construct(AppRepositoryInterface $appRepository)
+    public function __construct(AppRepositoryInterface $appRepository, AppServiceInterface $appService)
     {
         $this->appRepository = $appRepository;
+        $this->appService = $appService;
     }
 
     /**
@@ -51,94 +56,34 @@ class AppController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\CreateAppRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateAppRequest $request)
     {
-        // dd($request->file('user_documentation_file'));
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|min:3|max:30',
-            'package_name' => 'required|string|regex:/com.quick.[a-z0-9]{3,30}$/',
-            'description' => 'required|string|max:300',
-            'repository_url' => 'required|url',
-            'icon_file' => 'nullable|mimes:jpeg,jpg,png|max:10000',
-            'user_documentation_file' => 'nullable|mimes:pdf|max:10000',
-            'developer_documentation_file' => 'nullable|mimes:pdf|max:10000',
-        ]);
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator->messages())->withInput();
+        $time = time();
+
+        try {
+            $iconUrl = $this->appService->handleUploadedIcon($request->package_name, $request->file('icon_file'), $time);
+            $userDocUrl = $this->appService->handleUploadedUserDocumentation($request->package_name, $request->file('user_documentation_file'), $time);
+            $devDocUrl = $this->appService->handleUploadedDeveloperDocumentation($request->package_name, $request->file('developer_documentation_file'), $time);
+
+
+            $app = new App();
+            $app->fill($request->all());
+            $app->icon_url = $iconUrl;
+            $app->user_documentation_url = $userDocUrl;
+            $app->developer_documentation_url = $devDocUrl;
+
+            if ($app->save()) {
+                return redirect()->route('app.show', $app->id);
+            } else throw new \Exception("failed to save app");
+        } catch (\Exception $e) {
+            $this->appService->handleUploadedFileWhenFailed($request->package_name, $time);
+
+            return back()->withErrors($e->getMessage())->withInput();
         }
-
-        $app = App::where('name', $request->name)
-            ->orWhere('package_name', $request->package_name)
-            ->first();
-        if (!empty($app))
-            return back()->withErrors(['name' => "App with that name already exists"]);
-
-        DB::beginTransaction();
-
-        $app = new App();
-        $app->fill($request->all());
-
-        if ($request->hasfile('user_documentation_file')) {
-            $storedUserDoc = $app->package_name . '.user_documentation_file.' . time() . '.pdf';
-            if (!$request->file('user_documentation_file')->move(public_path('/storage/'), $storedUserDoc)) {
-                if (isset($storedUserDoc)) @unlink(public_path('/storage/') . $storedUserDoc);
-
-                return back()->withErrors(['user_documentation_file' => 'failed to save user documentation pdf file']);
-            }
-        }
-
-        if ($request->hasfile('developer_documentation_file')) {
-            $storedDevDoc = $app->package_name . '.developer_documentation_file.' . time() . '.pdf';
-            if (!$request->file('developer_documentation_file')->move(public_path('/storage/'), $storedDevDoc)) {
-                if (isset($storedUserDoc)) @unlink(public_path('/storage/') . $storedUserDoc);
-                if (isset($storedDevDoc)) @unlink(public_path('/storage/') . $storedDevDoc);
-
-                return back()->withErrors(['developer_documentation_file' => 'failed to save developer documentation pdf file']);
-            }
-        }
-
-        if ($request->hasfile('icon_file')) {
-            $extension = $request->file('icon_file')->getClientOriginalExtension();
-
-            $storedIconName = $app->package_name . '.default_icon.' . time() . ".$extension";
-            if (!$request->file('icon_file')->move(public_path('/storage/'), $storedIconName)) {
-                if (isset($storedUserDoc)) @unlink(public_path('/storage/') . $storedUserDoc);
-                if (isset($storedDevDoc)) @unlink(public_path('/storage/') . $storedDevDoc);
-                if (isset($storedIconName)) @unlink(public_path('/storage/') . $storedIconName);
-
-                return back()->withErrors(['icon_file' => 'failed to save icon file']);
-            }
-        }
-
-        if (isset($storedUserDoc)) {
-            $app->user_documentation_url = $storedUserDoc;
-        }
-        if (isset($storedDevDoc)) {
-            $app->developer_documentation_url = $storedDevDoc;
-        }
-        if (isset($storedIconName)) {
-            $app->icon_url = $storedIconName;
-        }
-
-        if (!$app->save()) {
-            DB::rollback();
-
-            // Delete uploaded file if failed to saving app
-            if (isset($storedUserDoc)) {
-                @unlink(public_path('/storage/') . $storedUserDoc);
-            }
-            if (isset($storedDevDoc)) {
-                @unlink(public_path('/storage/') . $storedDevDoc);
-            }
-            return back()->withErrors(['process' => "Failed to save the app"]);
-        }
-
-        DB::commit();
-        return response()->json($app);
     }
 
     /**
@@ -149,7 +94,11 @@ class AppController extends Controller
      */
     public function show($id)
     {
-        $data = $this->appRepository->getAppById($id);
+        try {
+            $data = $this->appRepository->getAppById($id);
+        } catch(\Exception $e) {
+            return view('errors.404');
+        }
 
         return view('apps.show', ['data' => $data]);
     }
@@ -162,7 +111,9 @@ class AppController extends Controller
      */
     public function edit($id)
     {
-        //
+        $data = $this->appRepository->getAppById($id);
+
+        return view('apps.edit', ['data' => $data]);
     }
 
     /**
@@ -174,7 +125,46 @@ class AppController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+
+        $time = time();
+
+        try {
+            $iconUrl = $this->appService->handleUploadedIcon($request->package_name, $request->file('icon_file'), $time);
+            $userDocUrl = $this->appService->handleUploadedUserDocumentation($request->package_name, $request->file('user_documentation_file'), $time);
+            $devDocUrl = $this->appService->handleUploadedDeveloperDocumentation($request->package_name, $request->file('developer_documentation_file'), $time);
+
+            $app = App::find($id);
+            $app->fill($request->all());
+            if ($iconUrl) {
+                $oldIcon = $app->icon_url;
+                $app->icon_url = $iconUrl;
+            }
+            if ($userDocUrl) {
+                $oldUserDoc = $app->user_documentation_url;
+                $app->user_documentation_url = $userDocUrl;
+            }
+            if ($devDocUrl) {
+                $oldDevDoc = $app->developer_documentation_url;
+                $app->developer_documentation_url = $devDocUrl;
+            }
+
+            if (!$app->isDirty()) {
+                return back()->withInput()->withErrors("Data has not changed");
+            }
+
+            if ($app->update()) {
+
+                @unlink(public_path('/storage/') . $oldIcon);
+                @unlink(public_path('/storage/') . $oldUserDoc);
+                @unlink(public_path('/storage/') . $oldDevDoc);
+
+                return redirect()->route('app.show', $app->id);
+            } else throw new \Exception("Failed to update data");
+        } catch (\Exception $e) {
+            $this->appService->handleUploadedFileWhenFailed($request->package_name, $time);
+
+            return back()->withErrors($e->getMessage())->withInput();
+        }
     }
 
     /**
@@ -185,6 +175,8 @@ class AppController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if ($this->appRepository->deleteApp($id)) {
+            return redirect()->route('app.index');
+        } else return back()->withErrors('Failed to delete data');
     }
 }

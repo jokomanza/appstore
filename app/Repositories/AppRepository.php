@@ -25,7 +25,7 @@ class AppRepository implements AppRepositoryInterface
     
     public function deleteApp($appId)
     {
-        App::destroy($appId);
+        return App::destroy($appId);
     }
     
     public function createApp(array $appDetails)
