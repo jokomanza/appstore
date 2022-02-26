@@ -16,9 +16,13 @@
 
             <br />
             <!-- form validasi -->
-            <form action="{{ route('app.create') }}" method="post">
+            <form action="{{ route('app.store') }}" method="post" enctype="multipart/form-data">
                 {{ csrf_field() }}
 
+                <div class="form-group">
+                    <label for="icon_file">Default Icon</label>
+                    <input class="form-control" type="file" name="icon_file" value="{{ old('icon_file') }}">
+                </div>
                 <div class="form-group">
                     <label for="name">Name</label>
                     <input class="form-control" type="text" name="name" value="{{ old('name') }}">
@@ -32,16 +36,20 @@
                     <input class="form-control" type="text" name="type" value="{{ old('type') }}">
                 </div>
                 <div class="form-group">
+                    <label for="description">Description</label>
+                    <input class="form-control" type="text" name="description" value="{{ old('description') }}">
+                </div>
+                <div class="form-group">
                     <label for="repository_url">Repository URL</label>
                     <input class="form-control" type="text" name="repository_url" value="{{ old('repository_url') }}">
                 </div>
                 <div class="form-group">
-                    <label for="user_documentation">User Documentation</label>
-                    <input class="form-control" type="file" name="user_documentation" value="{{ old('user_documentation') }}">
+                    <label for="user_documentation_file">User Documentation</label>
+                    <input class="form-control" type="file" name="user_documentation_file" value="{{ old('user_documentation_file') }}">
                 </div>
                 <div class="form-group">
-                    <label for="developer_documentation">Developer Documentation</label>
-                    <input class="form-control" type="file" name="developer_documentation" value="{{ old('developer_documentation') }}">
+                    <label for="developer_documentation_file">Developer Documentation</label>
+                    <input class="form-control" type="file" name="developer_documentation_file" value="{{ old('developer_documentation_file') }}">
                 </div>
                 <div class="form-group">
                     <input class="btn btn-primary" type="submit" value="Create">
