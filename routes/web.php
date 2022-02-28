@@ -22,6 +22,10 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
+Route::get('/docs', 'HomeController@index')->name('docs');
+
+Route::get('/user', 'HomeController@index')->name('user.index');
+
 Route::get('/developers', 'HomeController@index')->name('developer.index');
 
 Route::get('/apps', 'AppController@index')->name('app.index');

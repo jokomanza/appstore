@@ -17,7 +17,7 @@ class CreateUsersTable extends Migration
             $table->string('registration_number');
             $table->string('name');
             $table->string('email')->unique();
-            $table->enum('access_level', [1, 2, 3]);
+            $table->enum('access_level', [1, 2, 3])->default(1);
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

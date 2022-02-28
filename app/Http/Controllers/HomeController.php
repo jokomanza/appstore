@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\App;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,6 +24,16 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $recentApps = App::orderBy('updated_at', 'DESC')->limit(5)->get();
+        $appsCount = App::count();
+        $developersCount = 2;
+        return view(
+            'home',
+            [
+                'recentApps' => $recentApps,
+                'appsCount' => $appsCount,
+                'developersCount' => $developersCount,
+            ]
+        );
     }
 }
