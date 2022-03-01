@@ -8,8 +8,8 @@ interface AppServiceInterface
      * Handle uploaded icon
      * 
      * @param string $packageName
-     * @param icon $icon
-     * @param time $currentTime
+     * @param \Illuminate\Http\UploadedFile $icon
+     * @param int $currentTime Current timestamp
      * 
      * @return string Return saved file url when $icon not null, otherwise null
      */
@@ -19,8 +19,8 @@ interface AppServiceInterface
      * Handle uploaded user documentation file
      * 
      * @param string $packageName
-     * @param icon $userDoc
-     * @param time $currentTime
+     * @param \Illuminate\Http\UploadedFile $userDoc
+     * @param int $currentTime Current timestamp
      * 
      * @return string Return saved file url when $userDoc not null, otherwise null
      */
@@ -30,8 +30,8 @@ interface AppServiceInterface
      * Handle uploaded developer documentation file
      * 
      * @param string $packageName
-     * @param icon $developerDoc
-     * @param time $currentTime
+     * @param \Illuminate\Http\UploadedFile $developerDoc
+     * @param int $currentTime Current timestamp
      * 
      * @return string Return saved file url when $developerDoc not null, otherwise null
      */
@@ -41,7 +41,7 @@ interface AppServiceInterface
      * Handle uploaded file when operation failed
      * 
      * @param string $packageName
-     * @param time $currentTime
+     * @param int $currentTime Current timestamp
      * 
      * @return void
      */

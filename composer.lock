@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "71a77e1969416fadc2de613c328af6f0",
+    "content-hash": "811719fd636164365076822feed66c17",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -3820,6 +3820,61 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/2.2.4"
             },
             "time": "2021-12-08T09:12:39+00:00"
+        },
+        {
+            "name": "tufanbarisyildirim/php-apk-parser",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tufanbarisyildirim/php-apk-parser.git",
+                "reference": "27369fef34184a6a50479dfaf03d35af0201d22e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tufanbarisyildirim/php-apk-parser/zipball/27369fef34184a6a50479dfaf03d35af0201d22e",
+                "reference": "27369fef34184a6a50479dfaf03d35af0201d22e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-libxml": "*",
+                "ext-mbstring": "*",
+                "ext-simplexml": "*",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "ApkParser": "lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tufan Baris YILDIRIM",
+                    "email": "tufanbarisyildirim@gmail.com",
+                    "homepage": "http://tufanbarisyildirim.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Read basic info about an application from .apk file.",
+            "homepage": "https://github.com/tufanbarisyildirim/php-apk-parser",
+            "keywords": [
+                "android",
+                "apk",
+                "parser"
+            ],
+            "support": {
+                "issues": "https://github.com/tufanbarisyildirim/php-apk-parser/issues",
+                "source": "https://github.com/tufanbarisyildirim/php-apk-parser/tree/2.0.1"
+            },
+            "time": "2019-02-13T08:25:39+00:00"
         },
         {
             "name": "twbs/bootstrap",

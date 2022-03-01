@@ -69,4 +69,9 @@ class App extends Model
 	{
 		return $this->update();
 	}
+
+	public function app_versions()
+	{
+		return $this->hasMany(AppVersion::class);
+	}
 }

@@ -15,7 +15,7 @@
             <div class="col-12 col-lg-9">
                 <div class="row">
                     <div class="col-6 col-lg-3 col-md-6">
-                        <div class="card">
+                        <div class="card" onclick="location.href='{{ route('app.index') }}';" style="cursor: pointer;">
                             <div class="card-body px-3 py-4-5">
                                 <div class="row">
                                     <div class="col-md-4">
@@ -32,7 +32,7 @@
                         </div>
                     </div>
                     <div class="col-6 col-lg-3 col-md-6">
-                        <div class="card">
+                        <div class="card" onclick="location.href='{{ route('developer.index') }}';" style="cursor: pointer;">
                             <div class="card-body px-3 py-4-5">
                                 <div class="row">
                                     <div class="col-md-4">
@@ -106,9 +106,11 @@
                     <div class="card-content pb-4">
 
                         @foreach ($recentApps as $app)
-                            <div class="recent-message d-flex px-4 py-3">
+                            <div onclick="location.href='{{ route('app.show', $app->id) }}';" style="cursor: pointer;"
+                                class="recent-message d-flex px-4 py-3 ripple">
                                 <div class="avatar avatar-lg">
-                                    <img src="{{ asset("storage/$app->icon_url") }}">
+                                    <img
+                                        src="{{ str_contains($app->icon_url, 'http') ? $app->icon_url : asset("storage/$app->icon_url") }}">
                                 </div>
                                 <div class="name ms-4">
                                     <h5 class="mb-1">{{ $app->name }}</h5>
@@ -118,23 +120,13 @@
                         @endforeach
 
                         <div class="px-4">
-                            <button class='btn btn-block btn-xl btn-light-primary font-bold mt-3'>
-                                Show more</button>
+                            <a href="{{ route('app.index') }}"
+                                class='btn btn-block btn-xl btn-light-primary font-bold mt-3'>
+                                Show more</a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-    </div>
-
-    <div class="container">
-        <ul>
-            <li>
-                <a href="{{ route('app.index') }}">Apps</a>
-            </li>
-            <li>
-                <a href="{{ route('developer.index') }}">Developers</a>
-            </li>
-        </ul>
     </div>
 @endsection

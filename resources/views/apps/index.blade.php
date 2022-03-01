@@ -17,132 +17,95 @@
                 <div class="col-12 col-md-6 order-md-2 order-first">
                     <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Alert</li>
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Apps</li>
                         </ol>
                     </nav>
                 </div>
             </div>
         </div>
+
+        <section class="section">
+            <div class="card">
+                <div class="card-header">
+                    Jquery Datatable
+                </div>
+                <div class="card-body">
+                    <table class="table" id="table1">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>City</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Graiden</td>
+                                <td>vehicula.aliquet@semconsequat.co.uk</td>
+                                <td>076 4820 8838</td>
+                                <td>Offenburg</td>
+                                <td>
+                                    <span class="badge bg-success">Active</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Dale</td>
+                                <td>fringilla.euismod.enim@quam.ca</td>
+                                <td>0500 527693</td>
+                                <td>New Quay</td>
+                                <td>
+                                    <span class="badge bg-success">Active</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
         <section class="section">
             <div class="row" id="basic-table">
-                <div class="col-12 col-md-6">
+                <div class="col-md-12">
                     <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Table with outer spacing</h4>
-                        </div>
                         <div class="card-content">
                             <div class="card-body">
-                                <p class="card-text">Using the most basic table up, here’s how
-                                    <code>.table</code>-based tables look in Bootstrap. You can use any example
-                                    of below table for your table and it can be use with any type of bootstrap
-                                    tables.
-                                </p>
-                                <!-- Table with outer spacing -->
-                                <div class="table-responsive">
-                                    <table class="table table-lg">
-                                        <thead>
-                                            <tr>
-                                                <th>NAME</th>
-                                                <th>RATE</th>
-                                                <th>SKILL</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="text-bold-500">Michael Right</td>
-                                                <td>$15/hr</td>
-                                                <td class="text-bold-500">UI/UX</td>
+                                @if ($data->isEmpty())
+                                    <p class="mt-4 text-warning">There no apps to show, add a new one with Create
+                                        menu.</p>
+                                @else
+                                    <div class="table-responsive">
+                                        <table class="table table-lg">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>Name</th>
+                                                    <th>Package Name</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($data->items() as $key => $value)
+                                                    <tr>
+                                                        <td><img src="{{ str_contains($value->icon_url, 'http') ? $value->icon_url : asset("storage/$value->icon_url") }}"
+                                                                width="50" height="50"></td>
+                                                        <td class="text-bold-500">{{ $value->name }}</td>
+                                                        <td>{{ $value->package_name }}</td>
+                                                        <td class="text-bold-500"><a class="btn btn-primary"
+                                                                href="{{ url("app/$value->id/") }}">View</a></td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                        <div class="d-flex justify-content-center">
+                                            {!! $data->links('pagination::bootstrap-4') !!}
+                                        </div>
+                                    </div>
+                                @endif
 
-                                            </tr>
-                                            <tr>
-                                                <td class="text-bold-500">Morgan Vanblum</td>
-                                                <td>$13/hr</td>
-                                                <td class="text-bold-500">Graphic concepts</td>
-
-                                            </tr>
-                                            <tr>
-                                                <td class="text-bold-500">Tiffani Blogz</td>
-                                                <td>$15/hr</td>
-                                                <td class="text-bold-500">Animation</td>
-
-                                            </tr>
-                                            <tr>
-                                                <td class="text-bold-500">Ashley Boul</td>
-                                                <td>$15/hr</td>
-                                                <td class="text-bold-500">Animation</td>
-
-                                            </tr>
-                                            <tr>
-                                                <td class="text-bold-500">Mikkey Mice</td>
-                                                <td>$15/hr</td>
-                                                <td class="text-bold-500">Animation</td>
-
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Table without outer spacing</h4>
-                        </div>
-                        <div class="card-content">
-                            <div class="card-body">
-                                <p class="card-text">Using the most basic table up, here’s how
-                                    <code>.table</code>-based tables look in Bootstrap. You can use any example
-                                    of below table for your table and it can be use with any type of bootstrap
-                                    tables.
-                                </p>
-                            </div>
-
-                            <!-- Table with no outer spacing -->
-                            <div class="table-responsive">
-                                <table class="table mb-0 table-lg">
-                                    <thead>
-                                        <tr>
-                                            <th>NAME</th>
-                                            <th>RATE</th>
-                                            <th>SKILL</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="text-bold-500">Michael Right</td>
-                                            <td>$15/hr</td>
-                                            <td class="text-bold-500">UI/UX</td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-bold-500">Morgan Vanblum</td>
-                                            <td>$13/hr</td>
-                                            <td class="text-bold-500">Graphic concepts</td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-bold-500">Tiffani Blogz</td>
-                                            <td>$15/hr</td>
-                                            <td class="text-bold-500">Animation</td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-bold-500">Ashley Boul</td>
-                                            <td>$15/hr</td>
-                                            <td class="text-bold-500">Animation</td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-bold-500">Mikkey Mice</td>
-                                            <td>$15/hr</td>
-                                            <td class="text-bold-500">Animation</td>
-
-                                        </tr>
-                                    </tbody>
-                                </table>
                             </div>
                         </div>
                     </div>
@@ -150,32 +113,9 @@
             </div>
         </section>
     </div>
-    {{-- <div class="container"> --}}
-    <h1 class="mt-5 mb-3">Apps</h1>
-    <p>This is menu for managing all android apps in CV. Karya Hidup Sentosa Company.</p>
-    <a class="btn btn-secondary" href="{{ route('app.create') }}">Create new</a>
 
-    @if ($data->isEmpty())
-        <p class="mt-4 text-warning">There no apps to show, add a new one with pressing Create new button.</p>
-    @endif
-    @foreach ($data->items() as $row)
-        <div class="row">
-            <div>
-                <img src="{{ str_contains($row->icon_url, 'http') ? $row->icon_url : asset("storage/$row->icon_url") }}"
-                    width="50" height="50">
-            </div>
-            <p>Name : {{ $row->name }}</p>
-            <p>Package Name : {{ $row->package_name }}</p>
-            <div>
-                <a class="btn btn-primary" href="{{ url("app/$row->id/") }}">View</a>
-            </div>
-            <br>
-            <br>
-        </div>
-    @endforeach
-
-    <div class="d-flex justify-content-center">
-        {!! $data->links() !!}
-    </div>
-    {{-- </div> --}}
+    <script>
+        // Jquery Datatable
+        let jquery_datatable = $("#table1").DataTable()
+    </script>
 @endsection

@@ -42,3 +42,15 @@ Route::get('/app/{id}', 'AppController@show')->name('app.show');
 
 Route::get('/app/{id}/edit', 'AppController@edit')->name('app.edit');
 
+
+Route::get('/app/{id}/version', 'AppVersionController@create')->name('version.create');
+
+Route::post('/app/{id}/version', 'AppVersionController@store')->name('version.store');
+
+Route::put('/app/{id}/version/{idVersion}', 'AppVersionController@update')->name('version.update');
+
+Route::delete('/app/{id}/version/{idVersion}', 'AppVersionController@destroy')->name('version.destroy');
+
+Route::get('/app/{id}/version/{idVersion}', 'AppVersionController@show')->name('version.show');
+
+Route::get('/app/{id}/version/{idVersion}/edit', 'AppVersionController@edit')->name('version.edit');

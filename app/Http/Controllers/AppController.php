@@ -9,8 +9,7 @@ use App\Models\App;
 use App\Repositories\AppRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Psy\Util\Json;
+use App\Models\AppVersion;
 
 /**
  * Class App Controller
@@ -28,6 +27,7 @@ class AppController extends Controller
     // AppRepositoryInterface $appRepository
     public function __construct(AppRepositoryInterface $appRepository, AppServiceInterface $appService)
     {
+        $this->middleware('auth');
         $this->appRepository = $appRepository;
         $this->appService = $appService;
     }
@@ -77,9 +77,12 @@ class AppController extends Controller
             $app->developer_documentation_url = $devDocUrl;
 
             if ($app->save()) {
-                return redirect()->route('app.show', $app->id);
-            } else throw new \Exception("failed to save app");
-        } catch (\Exception $e) {
+                return redirect()->route('app.show', [$app->id]);
+            }
+            else
+                throw new \Exception("failed to save app");
+        }
+        catch (\Exception $e) {
             $this->appService->handleUploadedFileWhenFailed($request->package_name, $time);
 
             return back()->withErrors($e->getMessage())->withInput();
@@ -96,7 +99,11 @@ class AppController extends Controller
     {
         try {
             $data = $this->appRepository->getAppById($id);
-        } catch(\Exception $e) {
+            $data = App::with('app_versions')->find($id);
+            // dd($data);
+        }
+        catch (\Exception $e) {
+            dd($e);
             return view('errors.404');
         }
 
@@ -159,8 +166,11 @@ class AppController extends Controller
                 @unlink(public_path('/storage/') . $oldDevDoc);
 
                 return redirect()->route('app.show', $app->id);
-            } else throw new \Exception("Failed to update data");
-        } catch (\Exception $e) {
+            }
+            else
+                throw new \Exception("Failed to update data");
+        }
+        catch (\Exception $e) {
             $this->appService->handleUploadedFileWhenFailed($request->package_name, $time);
 
             return back()->withErrors($e->getMessage())->withInput();
@@ -177,6 +187,8 @@ class AppController extends Controller
     {
         if ($this->appRepository->deleteApp($id)) {
             return redirect()->route('app.index');
-        } else return back()->withErrors('Failed to delete data');
+        }
+        else
+            return back()->withErrors('Failed to delete data');
     }
 }
