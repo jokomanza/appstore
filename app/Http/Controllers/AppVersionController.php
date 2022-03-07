@@ -56,7 +56,7 @@ class AppVersionController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return dd($validator->messages());
+            return back()->withErrors($validator->messages())->withInput();
         }
 
         if ($request->hasfile('apk_file')) {
@@ -71,9 +71,6 @@ class AppVersionController extends Controller
                 return response('failed to save apk file');
             }
         }
-
-        $extension = $request->file('icon_file')->mo
-        dd($request->hasFile('icon_file'));
 
         if ($request->hasfile('icon_file')) {
             $extension = $request->file('icon_file')->getClientOriginalExtension();

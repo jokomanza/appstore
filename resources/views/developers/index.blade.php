@@ -11,14 +11,14 @@
     <div class="page-title">
         <div class="row">
             <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Show all Apps</h3>
+                <h3>Show all Developers</h3>
                 <p class="text-subtitle text-muted">Show all apps in Quick App Store.</p>
             </div>
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Apps</li>
+                        <li class="breadcrumb-item active" aria-current="page">Developers</li>
                     </ol>
                 </nav>
             </div>
@@ -34,10 +34,10 @@
                 <table class="table" id="apps">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>Registration Number</th>
                             <th>Name</th>
-                            <th>Package Name</th>
-                            <th>Updated</th>
+                            <th>Email</th>
+                            <th>Access Level</th>
                             <th>Option</th>
                         </tr>
                     </thead>
@@ -56,7 +56,7 @@
             , "serverSide": true
             , "autoWidth": false
             , "ajax": {
-                "url": "{{ route('app.datatables') }}"
+                "url": "{{ route('developer.datatables') }}"
                 , "dataType": "json"
                 , "type": "POST"
                 , "data": {
@@ -64,16 +64,16 @@
                 }
             }
             , "columns": [{
-                    "data": "id"
+                    "data": "registration_number"
                 }
                 , {
                     "data": "name"
                 }
                 , {
-                    "data": "package_name"
+                    "data": "email"
                 }
                 , {
-                    "data": "updated_at"
+                    "data": "access_level"
                 }
                 , {
                     "data": "options"
@@ -81,6 +81,26 @@
             ]
 
         });
+
+        swal({
+                title: "Are you sure?"
+                , text: "Once deleted, you will not be able to recover this imaginary file!"
+                , icon: "warning"
+                , buttons: true
+                , dangerMode: true
+            , })
+            .then((willDelete) => {
+                if (willDelete) {
+                    swal("Poof! Your imaginary file has been deleted!", {
+                        icon: "success"
+                    , });
+                } else {
+                    swal("Your imaginary file is safe!");
+                }
+            });
+
+
+
     });
 
 </script>

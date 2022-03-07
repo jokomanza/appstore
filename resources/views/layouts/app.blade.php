@@ -12,13 +12,13 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/app.css?v=2') }}" rel="stylesheet">
     <link href="{{ asset('css/theme.css') }}" rel="stylesheet">
-    {{-- <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet"> --}}
-    {{-- <link href="{{ asset('css/fontawsome/all.css') }}" rel="stylesheet"> --}}
+    <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
-    {{-- <script src="{{ asset('js/bootbox.js') }}"></scrip> --}}
+    <script src="{{ asset('js/autosize.js') }}"></script>
+    <script src="{{ asset('js/sweetalert.min.js') }}"></script>
 
     <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap5.datatables.css') }}" />
 
@@ -69,26 +69,17 @@
                             </ul>
                         </li>
 
-                        <li class="sidebar-item  has-sub">
+                        <li class="sidebar-item  has-sub  {{ Route::is('developer.*') ? 'active' : '' }}">
                             <a href="#" class='sidebar-link'>
                                 <i class="bi bi-collection-fill"></i>
                                 <span>Developer</span>
                             </a>
-                            <ul class="submenu ">
-                                <li class="submenu-item ">
-                                    <a href="extra-component-avatar.html">Avatar</a>
+                            <ul class="submenu {{ Route::is('developer.*') ? 'active' : '' }}">
+                                <li class="submenu-item {{ Route::is('developer.index') ? 'active' : '' }}">
+                                    <a href="{{ route('developer.index') }}">All</a>
                                 </li>
-                                <li class="submenu-item ">
-                                    <a href="extra-component-sweetalert.html">Sweet Alert</a>
-                                </li>
-                                <li class="submenu-item ">
-                                    <a href="extra-component-toastify.html">Toastify</a>
-                                </li>
-                                <li class="submenu-item ">
-                                    <a href="extra-component-rating.html">Rating</a>
-                                </li>
-                                <li class="submenu-item ">
-                                    <a href="extra-component-divider.html">Divider</a>
+                                <li class="submenu-item  {{ Route::is('developer.create') ? 'active' : '' }}">
+                                    <a href="{{ route('developer.create') }}">Create</a>
                                 </li>
                             </ul>
                         </li>
@@ -267,11 +258,11 @@
                                     <div class="user-menu d-flex">
                                         <div class="user-name text-end me-3">
                                             <h6 class="mb-0 text-gray-600">{{ Auth::user()->name }}</h6>
-                                            <p class="mb-0 text-sm text-gray-600">Administrator</p>
+                                            <p class="mb-0 text-sm text-gray-600">Level {{ Auth::user()->access_level }}</p>
                                         </div>
                                         <div class="user-img d-flex align-items-center">
                                             <div class="avatar avatar-md">
-                                                <img src="assets/images/faces/1.jpg">
+                                                <img src="{{ asset('images/user1.png') }}">
                                             </div>
                                         </div>
                                     </div>

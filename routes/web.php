@@ -20,13 +20,29 @@ Route::get('/', function () {
 
 Auth::routes();
 
+/*
+|--------------------------------------------------------------------------
+| Home endpoints
+|--------------------------------------------------------------------------
+|
+| 
+*/
+
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/docs', 'HomeController@index')->name('docs');
 
 Route::get('/user', 'HomeController@index')->name('user.index');
 
-Route::get('/developers', 'HomeController@index')->name('developer.index');
+/*
+|--------------------------------------------------------------------------
+| Apps endpoints
+|--------------------------------------------------------------------------
+|
+| 
+*/
+
+Route::post('apps/datatables', 'Api\ApiController@getAppsDataTable')->name('app.datatables');
 
 Route::get('/apps', 'AppController@index')->name('app.index');
 
@@ -42,7 +58,6 @@ Route::get('/app/{id}', 'AppController@show')->name('app.show');
 
 Route::get('/app/{id}/edit', 'AppController@edit')->name('app.edit');
 
-
 Route::get('/app/{id}/version', 'AppVersionController@create')->name('version.create');
 
 Route::post('/app/{id}/version', 'AppVersionController@store')->name('version.store');
@@ -54,3 +69,22 @@ Route::delete('/app/{id}/version/{idVersion}', 'AppVersionController@destroy')->
 Route::get('/app/{id}/version/{idVersion}', 'AppVersionController@show')->name('version.show');
 
 Route::get('/app/{id}/version/{idVersion}/edit', 'AppVersionController@edit')->name('version.edit');
+
+
+/*
+|--------------------------------------------------------------------------
+| Developers endpoints
+|--------------------------------------------------------------------------
+|
+| 
+*/
+
+Route::post('developers/datatables', 'Api\ApiController@getDevelopersDataTable')->name('developer.datatables');
+
+Route::get('/developers', 'DeveloperController@index')->name('developer.index');
+
+Route::get('/developer', 'DeveloperController@create')->name('developer.create');
+
+Route::post('/developer', 'DeveloperController@store')->name('developer.store');
+
+
