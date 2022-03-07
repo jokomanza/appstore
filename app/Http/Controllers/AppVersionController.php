@@ -72,6 +72,9 @@ class AppVersionController extends Controller
             }
         }
 
+        $extension = $request->file('icon_file')->mo
+        dd($request->hasFile('icon_file'));
+
         if ($request->hasfile('icon_file')) {
             $extension = $request->file('icon_file')->getClientOriginalExtension();
 
@@ -152,7 +155,7 @@ class AppVersionController extends Controller
 
         DB::commit();
 
-        return view('version.index');
+        return view('apps.index');
     }
 
     /**

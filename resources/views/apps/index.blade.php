@@ -46,50 +46,6 @@
         </div>
 
     </section>
-
-    <section class="section">
-        <div class="row" id="basic-table">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-content">
-                        <div class="card-body">
-                            @if ($data->isEmpty())
-                            <p class="mt-4 text-warning">There no apps to show, add a new one with Create
-                                menu.</p>
-                            @else
-                            <div class="table-responsive">
-                                <table class="table table-lg">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Name</th>
-                                            <th>Package Name</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($data->items() as $key => $value)
-                                        <tr>
-                                            <td><img src="{{ str_contains($value->icon_url, 'http') ? $value->icon_url : asset("storage/$value->icon_url") }}" width="50" height="50"></td>
-                                            <td class="text-bold-500">{{ $value->name }}</td>
-                                            <td>{{ $value->package_name }}</td>
-                                            <td class="text-bold-500"><a class="btn btn-primary" href="{{ url("app/$value->id/") }}">View</a></td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                                <div class="d-flex justify-content-center">
-                                    {!! $data->links('pagination::bootstrap-4') !!}
-                                </div>
-                            </div>
-                            @endif
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 </div>
 
 <script>

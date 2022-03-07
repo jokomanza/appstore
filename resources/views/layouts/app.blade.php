@@ -20,9 +20,9 @@
     <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
     {{-- <script src="{{ asset('js/bootbox.js') }}"></scrip> --}}
 
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.11.5/b-2.2.2/datatables.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap5.datatables.css') }}" />
 
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.11.5/b-2.2.2/datatables.min.js"></script>
+    <script type="text/javascript" src="{{ asset('js/datatables.js') }}"></script>
 
 
 </head>

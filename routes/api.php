@@ -37,14 +37,14 @@ Route::post('apps/datatables', function (Request $request) {
     else {
         $search = $request->input('search.value');
 
-        $posts = App::where('id', 'LIKE', "%{$search}%")
-            ->orWhere('title', 'LIKE', "%{$search}%")
+        $posts = App::where('package_name', 'LIKE', "%$search%")
+            ->orWhere('name', 'LIKE', "%$search%")
             ->offset($start)
             ->limit($limit)
             ->orderBy($order, $dir)
             ->get();
-        $totalFiltered = App::where('id', 'LIKE', "%{$search}%")
-            ->orWhere('title', 'LIKE', "%{$search}%")
+        $totalFiltered = App::where('package_name','LIKE', "%$search%")
+            ->orWhere('name', 'LIKE', "%$search%")
             ->count();
     }
     $data = array();
@@ -56,8 +56,8 @@ Route::post('apps/datatables', function (Request $request) {
             $nestedData['name'] = $post->name;
             $nestedData['package_name'] = $post->package_name;
             $nestedData['updated_at'] = (new Carbon($post->updated_at))->diffForHumans();
-            $nestedData['options'] = "&emsp;<a href='{$show}' title='SHOW' ><span class='glyphicon glyphicon-list'></span></a>
-                      &emsp;<a href='{$edit}' title='EDIT' ><span class='glyphicon glyphicon-edit'></span></a>";
+            $nestedData['options'] = "&emsp;<a href='$show' class='btn btn-secondary'>Show</a>
+                      &emsp;<a href='$edit' class='btn btn-success' >Edit</a>";
             $data[] = $nestedData;
         }
     }
