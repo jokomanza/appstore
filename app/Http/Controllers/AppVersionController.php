@@ -152,7 +152,7 @@ class AppVersionController extends Controller
 
         DB::commit();
 
-        return view('apps.index');
+        return redirect()->route('app.show', [$id]);
     }
 
     /**

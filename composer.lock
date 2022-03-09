@@ -4,8 +4,52 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a046a330ff9f74064958c6a691aa4107",
+    "content-hash": "a7e13c7fc98430b04868d3bcd1fc88e2",
     "packages": [
+        {
+            "name": "dees040/laravel-api-responses",
+            "version": "0.2.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dees040/laravel-api-responses.git",
+                "reference": "b1fd9def4730736e09a61064f130033447a04571"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dees040/laravel-api-responses/zipball/b1fd9def4730736e09a61064f130033447a04571",
+                "reference": "b1fd9def4730736e09a61064f130033447a04571",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "~5.0|~6.0|~7.0|~8.0|~9.0",
+                "illuminate/routing": "~5.0|~6.0|~7.0|~8.0|~9.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "responses.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "dees040",
+                    "email": "d.oomens@hotmail.nl"
+                }
+            ],
+            "description": "Helper methods for Laravel API Responses",
+            "support": {
+                "issues": "https://github.com/dees040/laravel-api-responses/issues",
+                "source": "https://github.com/dees040/laravel-api-responses/tree/0.2.7"
+            },
+            "time": "2022-02-10T06:55:43+00:00"
+        },
         {
             "name": "defuse/php-encryption",
             "version": "v2.3.1",
