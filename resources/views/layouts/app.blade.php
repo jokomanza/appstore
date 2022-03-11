@@ -14,11 +14,12 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css?v=2') }}" rel="stylesheet">
     <link href="{{ asset('css/theme.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
+    <link href="{{ asset('select2-4.0.13/css/select2.css') }}" rel="stylesheet">
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('js/autosize.js') }}"></script>
     <script src="{{ asset('js/sweetalert.min.js') }}"></script>
+    <script src="{{ asset('select2-4.0.13/js/select2.full.min.js') }}"></script>
 
     <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap5.datatables.css') }}" />
 

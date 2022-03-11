@@ -10,6 +10,10 @@ use App\Repositories\AppRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\AppVersion;
+use App\User;
+use App\Models\Developer;
+use App\Http\Requests\AddDeveloperRequest;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class App Controller
@@ -89,6 +93,26 @@ class AppController extends Controller
         }
     }
 
+    public function addDeveloper(AddDeveloperRequest $request)
+    {
+        try {
+
+            $developer = new Developer();
+            $developer->fill($request->all());
+
+            if ($developer->save()) {
+                return redirect()->route('app.show', [$request->app_id]);
+            }
+            else {
+                dd(false);
+                throw new \Exception("failed to add developer");
+            }
+        }
+        catch (\Exception $e) {
+            return back()->withErrors($e->getMessage())->withInput();
+        }
+    }
+
     /**
      * Display the specified resource.
      *
@@ -98,16 +122,22 @@ class AppController extends Controller
     public function show($id)
     {
         try {
+            $maxAccessLevel = Auth::user()->access_level;
+
             $data = $this->appRepository->getAppById($id);
             $data = App::with('app_versions')->find($id);
-            // dd($data);
+            $developers = Developer::with('user')->where('app_id', $id)->get();
+            $allowedDevelopers = User::where('access_level', '<=', $maxAccessLevel)->get(['registration_number'])
+            ->map(function ($value) {
+                return [$value->registration_number => $value->registration_number];
+            });
+            // dd($developers);
         }
         catch (\Exception $e) {
-            dd($e);
             return view('errors.404');
         }
 
-        return view('apps.show', ['data' => $data]);
+        return view('apps.show', ['data' => $data, 'developers' => $developers, 'allowedDevelopers' => $allowedDevelopers]);
     }
 
     /**
@@ -187,6 +217,21 @@ class AppController extends Controller
     {
         if ($this->appRepository->deleteApp($id)) {
             return redirect()->route('app.index');
+        }
+        else
+            return back()->withErrors('Failed to delete data');
+    }
+
+    public function removeDeveloper($id, $registrationNumber)
+    {
+        $developer = Developer::where(['app_id' => $id, 'user_registration_number' => $registrationNumber])->first();
+
+        if (!isset($developer)) {
+            return back()->withErrors('developer not found');
+        }
+
+        if ($developer->delete()) {
+            return redirect()->route('app.show', [$id]);
         }
         else
             return back()->withErrors('Failed to delete data');

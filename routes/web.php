@@ -52,6 +52,10 @@ Route::post('/app', 'AppController@store')->name('app.store');
 
 Route::put('/app/{id}', 'AppController@update')->name('app.update');
 
+Route::post('/app/{id}/developer', 'AppController@addDeveloper')->name('app.developer.store');
+
+Route::delete('/app/{id}/developer/{registrationNumber}', 'AppController@removeDeveloper')->name('app.developer.destroy');
+
 Route::delete('/app/{id}', 'AppController@destroy')->name('app.destroy');
 
 Route::get('/app/{id}', 'AppController@show')->name('app.show');

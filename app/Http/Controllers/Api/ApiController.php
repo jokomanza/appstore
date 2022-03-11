@@ -12,6 +12,7 @@ use App\Models\AppVersion;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Developer;
 
 class ApiController extends Controller
 {
@@ -80,6 +81,87 @@ class ApiController extends Controller
         }
 
         return ok($update);
+    }
+
+    public function getAllUpdate(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'apps' => 'required|array|min:1',
+            'apps.*.package_name' => 'required|string',
+            'apps.*.version_code' => 'required|numeric'
+        ]);
+
+        // dump($validator->messages());
+        // die;
+
+        if ($validator->fails()) {
+            return not_found('Validation fails', $validator->messages());
+        }
+
+        $hasUpdate = [];
+
+        foreach ($request->all()['apps'] as $key => $value) {
+
+            // dump($request->all());
+
+
+            $newest = AppVersion::with("app")->where('version_code', '>', $value['version_code'])
+                ->whereHas('app', function ($q) use ($value) {
+                $q->where('package_name', $value['package_name']);
+            })->orderBy('version_code', 'DESC')->first();
+
+            if (isset($newest)) {
+                $hasUpdate[] = $newest;
+            }
+        }
+
+        if (empty($hasUpdate)) {
+            return not_found("No update found");
+        }
+
+        foreach ($hasUpdate as $key => $value) {
+            $hasUpdate[$key]['updated'] = (new Carbon($value->updated_at))->diffForHumans();
+        }
+
+        return ok($hasUpdate);
+    }
+
+    public function getAppsDetails(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'apps' => 'required|array|min:1',
+            'apps.*.package_name' => 'required|string'
+        ]);
+
+        // dump($validator->messages());
+        // die;
+
+        if ($validator->fails()) {
+            return not_found('Validation fails', $validator->messages());
+        }
+
+        $data = [];
+
+        foreach ($request->all()['apps'] as $key => $value) {
+
+            // dump($request->all());
+
+            $app = App::where('package_name', $value['package_name'])
+                ->orderBy('updated_at', 'DESC')->first();
+
+            if (isset($app)) {
+                $data[] = $app;
+            }
+
+        }
+
+        if (empty($data)) {
+            return ok("no applications found in database");
+        }
+
+        return ok($data);
     }
 
     public function getUpdate(Request $request, $appId)
@@ -156,13 +238,39 @@ class ApiController extends Controller
                 ->orderBy('version_code', 'DESC')
                 ->first();
 
-            // $data[$key]['developers'] = Team::where('app_id', $value->id)->get(['registration_number']);
+            $data[$key]['developers'] = Developer::with('user')->where('app_id', $value->id)->get()
+                ->map(function ($value) {
+                return $value->user;
+            });
+
         }
 
         if ($data->first() == null)
             return not_found('Application data not found');
         else
             return ok($data);
+    }
+
+    public function getLatestApp($packageName)
+    {
+        // DB::enableQueryLog();
+
+        $data = App::where('package_name', $packageName)->first();
+
+        if (!isset($data)) {
+            return not_found();
+        }
+
+        $data['latest'] = AppVersion::where('app_id', $data->id)
+            ->orderBy('version_code', 'DESC')
+            ->first();
+
+        $data['developers'] = Developer::with('user')->where('app_id', $data->id)->get()
+            ->map(function ($value) {
+            return $value->user;
+        });
+
+        return ok($data);
     }
 
     public function getAppsDataTable(Request $request)
