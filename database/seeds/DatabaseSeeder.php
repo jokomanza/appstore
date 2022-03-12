@@ -2,6 +2,8 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\App;
+use Illuminate\Pagination\PaginationServiceProvider;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,24 +14,30 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call(UsersTableSeeder::class);
+        if (App::count() <= 500) {
+            factory(App::class , 100)->create();
+        }
 
-        factory(App\Models\App::class, 100)->create();
+        if (!DB::table('users')->where('registration_number', 'F2373')->first()) {
+            DB::table('users')->insert([
+                'registration_number' => 'F2373',
+                'name' => 'Joko Supriyanto',
+                'email' => 'joko_supriyanto@quick.com',
+                'access_level' => 3,
+                'password' => bcrypt('123456'),
+            ]);
+        }
 
-        DB::table('users')->insert([
-            'name' => 'Joko Supriyanto',
-            'email' => 'joko_supriyanto@quick.com',
-            'access_level' => 3,
-            'password' => bcrypt('123456'),
-        ]);
+        if (!DB::table('apps')->where('package_name', 'com.quick.quickappstore')->first()) {
+            $app = new App();
+            $app->name = 'Quick App Store';
+            $app->package_name = 'com.quick.quickappstore';
+            $app->description = 'Apliaksi mobile untuk sistem quick app store';
+            $app->type = 'Tool App';
+            $app->icon_url = 'https://google.com';
+            $app->repository_url = 'http:git.quick.com/production/quick-appstore-mobile.git';
 
-        DB::table('apps')->insert([
-            'name' => 'Quick App Store',
-            'package_name' => 'com.quick.quickappstore',
-            'description' => 'Aplikasi untuk mengelola semua aplikasi',
-            'type' => 'Tool App',
-            'icon_url' => 'https://google.com',
-            'repository_url' => 'http:git.quick.com/production/quick-appstore-mobile.git',
-        ]);
+            $app->save();
+        }
     }
 }

@@ -46,4 +46,14 @@ interface AppServiceInterface
      * @return void
      */
     public function handleUploadedFileWhenFailed($packageName, $currentTime);
+
+    /**
+     * Handle uploaded file when operation failed
+     * 
+     * @param \App\Models\App $application
+     * @param array $versions
+     * 
+     * @return void
+     */
+    public function handleDeletedApp(\App\Models\App $application, array $versions);
 }

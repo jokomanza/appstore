@@ -8,9 +8,20 @@ use App\Models\App;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\UpdateAppVersionRequest;
+use App\Interfaces\AppVersionServiceInterface;
+use App\Http\Requests\CreateAppVersionRequest;
 
 class AppVersionController extends Controller
 {
+    private $service;
+
+    public function __construct(AppVersionServiceInterface $service)
+    {
+        $this->middleware('auth');
+        $this->service = $service;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -24,7 +35,7 @@ class AppVersionController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View 
      */
     public function create($id)
     {
@@ -37,9 +48,9 @@ class AppVersionController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse 
      */
-    public function store(Request $request, $id)
+    public function store(CreateAppVersionRequest $request, $id)
     {
         // dd($request->all());
 
@@ -49,44 +60,16 @@ class AppVersionController extends Controller
             return view('errors.404');
         }
 
-        $validator = Validator::make($request->all(), [
-            'apk_file' => 'required|mimes:apk,jar,zip',
-            'icon_file' => 'required|image',
-            'description' => 'required|string|max:255',
-        ]);
+        $time = time();
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator->messages())->withInput();
-        }
-
-        if ($request->hasfile('apk_file')) {
-            $extension = $request->file('apk_file')->getClientOriginalExtension();
-            $storedApkSize = $request->file('apk_file')->getSize();
-
-            if ($extension != 'apk') {
-                return response('apk file must have *.apk extension');
-            }
-            $storedApkName = $app->package_name . '.' . time() . '.apk';
-            if (!$request->file('apk_file')->move(public_path('/storage/'), $storedApkName)) {
-                return response('failed to save apk file');
-            }
-        }
-
-        if ($request->hasfile('icon_file')) {
-            $extension = $request->file('icon_file')->getClientOriginalExtension();
-
-            $storedIconName = $app->package_name . '.icon.' . time() . ".$extension";
-            if (!$request->file('icon_file')->move(public_path('/storage/'), $storedIconName)) {
-                @unlink(public_path('/storage/') . $storedApkName);
-                @unlink(public_path('/storage/') . $storedIconName);
-                return response('failed to save icon file');
-            }
-        }
+        $storedApk = $this->service->handleUploadedApk($app->package_name, $request->file('apk_file'), $time);
+        $storedApkName = $storedApk['name'];
+        $storedApkSize = $storedApk['size'];
+        $storedIconName = $this->service->handleUploadedIcon($app->package_name, $request->file('icon_file'), $time);
 
         $apk = new \ApkParser\Parser(public_path('/storage/' . $storedApkName));
 
         $manifest = $apk->getManifest();
-        $permissions = $manifest->getPermissions();
         $package_name = $manifest->getPackageName();
         $version_code = $manifest->getVersionCode();
         $version_name = $manifest->getVersionName();
@@ -104,18 +87,18 @@ class AppVersionController extends Controller
 
         if (!empty(AppVersion::where(['app_id' => $id, 'version_code' => $version_code])->first())) {
             $additionalError['version_code'] = [
-                "Version number " . $version_code . " for app with id $id already exists"
+                "Version number " . $version_code . " for app $app->name already exists"
             ];
         }
         $maxVersionNumber = AppVersion::where(['app_id' => $id])->max('version_code');
         if ($maxVersionNumber >= $version_code) {
             $additionalError['version_code'] = [
-                "Version number " . $version_code . " for app with id $id must greater than $maxVersionNumber "
+                "Version number " . $version_code . " for app $app->name must greater than $maxVersionNumber "
             ];
         }
         if (!empty(AppVersion::where(['app_id' => $id, 'version_name' => $version_name])->first())) {
             $additionalError['version_name'] = [
-                "Version name " . $version_name . " for app with id $id already exists"
+                "Version name " . $version_name . " for app $app->name already exists"
             ];
         }
 
@@ -123,15 +106,17 @@ class AppVersionController extends Controller
             @unlink(public_path('/storage/') . $storedApkName);
             @unlink(public_path('/storage/') . $storedIconName);
             // dd($additionalError);
+
             return back()->withErrors($additionalError)->withInput();
         }
 
         $finalApkName = $package_name . '.' . $version_code . '.' . time() . '.apk';
+        $finalIconName = $package_name . '.' . $version_code . '.icon.' . time() . '.jpg';
         File::move(public_path('/storage/') . $storedApkName, public_path('/storage/') . $finalApkName);
+        File::move(public_path('/storage/') . $storedIconName, public_path('/storage/') . $finalIconName);
 
         $storedApkName = $finalApkName;
-
-        DB::beginTransaction();
+        $storedIconName = $finalIconName;
 
         $appVersion = new AppVersion();
         $appVersion->app_id = $id;
@@ -146,11 +131,9 @@ class AppVersionController extends Controller
         if (!$appVersion->save()) {
             @unlink(public_path('/storage/') . $storedApkName);
             @unlink(public_path('/storage/') . $storedIconName);
-            DB::rollback();
-            return response("failed to save app version");
+            
+            return back()->withErrors("failed to save app version");
         }
-
-        DB::commit();
 
         return redirect()->route('app.show', [$id]);
     }
@@ -159,7 +142,7 @@ class AppVersionController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\AppVersion  $appVersion
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function show($id, $idVersion)
     {
@@ -172,11 +155,18 @@ class AppVersionController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\AppVersion  $appVersion
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
-    public function edit(AppVersion $appVersion)
+    public function edit($id, $versionId)
     {
-    //
+        $app = App::find($id);
+        $version = AppVersion::where(['id' => $versionId, 'app_id' => $id])->first();
+
+        if (!isset($app) || !isset($version)) {
+            return view('errors.404');
+        }
+
+        return view('apps.versions.edit', compact('app', 'version'));
     }
 
     /**
@@ -184,27 +174,46 @@ class AppVersionController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\AppVersion  $appVersion
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function update(Request $request, AppVersion $appVersion)
+    public function update(UpdateAppVersionRequest $request, $id, $versionId)
     {
-    //
+        $version = AppVersion::where(['id' => $versionId, 'app_id' => $id])->first();
+
+        if (!isset($version)) {
+            return view('errors.404');
+        }
+
+        $version->description = $request->description;
+
+        if ($version->update()) {
+            return redirect()->route('version.show', [$id, $versionId]);
+        }
+        else {
+            return back()->withErrors('Failed to update data');
+        }
+
+
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\AppVersion  $appVersion
-     * @return \Illuminate\Http\Response
+     * @param  int  $id
+     * @param  int  $versionId
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($id, $versionId)
     {
+        $version = AppVersion::where(['app_id' => $id, 'id' => $versionId])->first();
 
-        if (!AppVersion::where(['app_id' => $id, 'id' => $versionId])->first()) {
+        if (!$version) {
             return back()->withErrors('Target version not found');
         }
-        if (AppVersion::destroy($versionId)) {
-            return redirect()->route('app.show', $id);
+
+        if ($version->delete()) {
+            $this->service->handleDeletedVersion($version);
+            return redirect()->route('app.show', [$id]);
         }
         else
             return back()->withErrors('Failed to delete data');

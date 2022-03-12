@@ -13,7 +13,7 @@
     <div class="page-title">
         <div class="row">
             <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Update app</h3>
+                <h3>Edit Application</h3>
                 <p class="text-subtitle text-muted">Update app data. Note that default icon, name, package
                     name, type and description are required.</p>
             </div>
@@ -22,7 +22,8 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('app.index') }}">Apps</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit {{ $data->name }}</li>
+                        <li class="breadcrumb-item"><a href="{{ route('app.show', $data->id) }}">{{$data->name}}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit</li>
                     </ol>
                 </nav>
             </div>
@@ -76,11 +77,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="description">Description</label>
-                                    <input class="form-control" type="text" name="description" value="{{ old('description') ? old('description') : $data->description }}">
+                                    <textarea class="form-control" type="text" name="description">{{ old('description') ? old('description') : $data->description }}</textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="repository_url">Repository URL</label>
-                                    <input class="form-control" type="text" name="repository_url" value="{{ old('repository_url') ? old('repository_url') : $data->repository_url }}">
+                                    <input class="form-control" type="url" name="repository_url" value="{{ old('repository_url') ? old('repository_url') : $data->repository_url }}" placeholder="http://git.quick.com/example.git">
                                 </div>
                                 <div class="form-group">
                                     <label for="user_documentation_file">User Documentation</label>
@@ -112,6 +113,10 @@
     </section>
 </div>
 
+<script>
+    autosize(document.querySelector('textarea'))
+
+</script>
 
 
 @endsection

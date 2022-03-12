@@ -63,4 +63,21 @@ class AppService implements AppServiceInterface
         @unlink(public_path('/storage/') . "$packageName.user_documentation.$currentTime.pdf");
         @unlink(public_path('/storage/') . "$packageName.developer_documentation.$currentTime.pdf");
     }
+    
+	function handleDeletedApp(\App\Models\App $application, array $versions) {
+
+        // Delete all related file to this application
+        @unlink(public_path('/storage/') . $application->icon_url);
+        if ($application->user_documentation_url) {
+            @unlink(public_path('/storage/') . $application->user_documentation_url);
+        }
+        if ($application->developer_documentation_url) {
+            @unlink(public_path('/storage/') . $application->developer_documentation_url);
+        }
+
+        foreach ($versions as $version) {
+            @unlink(public_path('/storage/') . $version->icon_url);
+            @unlink(public_path('/storage/') . $version->apk_file_url);
+        }
+	}
 }

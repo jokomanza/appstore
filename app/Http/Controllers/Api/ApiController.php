@@ -204,6 +204,28 @@ class ApiController extends Controller
         return ok($newest);
     }
 
+    public function checkUpdate(Request $request, $packageName, $versionCode)
+    {
+
+        $appVersion = AppVersion::with(['app' => function ($query) use ($packageName) {       
+            $query->where('package_name', '=', $packageName);
+        }])->where(['version_code' => $versionCode])->first();
+
+        if (!isset($appVersion)) {
+            return not_found("App version with app $packageName and version code $versionCode not found");
+        }
+
+        $newest = AppVersion::where('version_code', '>', $appVersion->version_code)->whereHas('app', function ($q) use ($packageName) {
+            $q->where('package_name', $packageName);
+        })->orderBy('version_code', 'DESC')->first();
+
+        if ($newest == null) {
+            return not_found();
+        }
+
+        return ok($newest);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -273,6 +295,35 @@ class ApiController extends Controller
         return ok($data);
     }
 
+    public function downloadClient(Request $request)
+    {
+
+        $app = App::where('package_name', 'com.quick.quickappstore')->first();
+
+        if (!isset($app))
+            return not_found('Application not found');
+
+        $latest = AppVersion::where('app_id', $app->id)->orderBy('version_code', 'DESC')->first();
+
+        if (!isset($latest))
+            return not_found('Latest version not found');
+
+        $path = public_path('storage/' . $latest->apk_file_url);
+
+        if (!File::exists($path)) {
+            return not_found('File not found');
+        }
+
+        $file = File::get($path);
+        $type = File::mimeType($path);
+
+        $response = Response::make($file, 200);
+        $response->header("Content-Type", 'application\vdn.android.package-archive');
+        $response->header('Content-Disposition', 'attachment; filename="' . $latest->apk_file_url . '"');
+
+        return $response;
+    }
+
     public function getAppsDataTable(Request $request)
     {
 
@@ -338,6 +389,7 @@ class ApiController extends Controller
     {
 
         $access_level = Auth::user()->access_level;
+        $current_reg_num = Auth::user()->registration_number;
 
         $columns = [
             0 => 'registration_number',
@@ -385,8 +437,8 @@ class ApiController extends Controller
                 $nestedData['email'] = $user->email;
                 $nestedData['access_level'] = $user->access_level;
                 if ($user->access_level <= $access_level) {
-                    $nestedData['options'] = "&emsp;<a href='$show' class='btn btn-danger'>Delete</a>
-                          &emsp;<a href='$edit' class='btn btn-success' >Edit</a>";
+                    $nestedData['options'] = ($current_reg_num != $user->registration_number ? "&emsp;<a href='$show' class='btn btn-danger'>Delete</a>" : '')
+                        . "&emsp;<a href='$edit' class='btn btn-success' >Edit</a>";
                 }
                 else {
                     $nestedData['options'] = "";

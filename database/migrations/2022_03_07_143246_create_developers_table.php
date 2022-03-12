@@ -22,10 +22,12 @@ class CreateDevelopersTable extends Migration
             $table->unique(['user_registration_number', 'app_id']);
             $table->foreign('app_id')
                 ->references('id')
-                ->on('apps');
+                ->on('apps')
+                ->onDelete('cascade');
             $table->foreign('user_registration_number')
                 ->references('registration_number')
-                ->on('users');
+                ->on('users')
+                ->onDelete('cascade');
 
         });
     }

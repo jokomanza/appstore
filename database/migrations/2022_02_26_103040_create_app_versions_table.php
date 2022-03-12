@@ -36,7 +36,8 @@ class CreateAppVersionsTable extends Migration
             $table->unique(['version_name', 'app_id']);
             $table->foreign('app_id')
                 ->references('id')
-                ->on('apps');
+                ->on('apps')
+                ->onDelete('cascade');
         });
     }
 

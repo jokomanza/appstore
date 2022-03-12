@@ -71,12 +71,12 @@
                             <br><br>
 
                             <div class="buttons">
-                                <a clas="col-1" href="{{ url("app/$data->id/edit") }}" class="btn btn-primary">Update</a>
-                                <form class="col-1" method="POST" action="{{ url("app/$data->id") }}">
+                                <a clas="col-1" href="{{ route('app.edit', $data->id) }}" class="btn btn-primary">Edit</a>
+                                <form class="col-1" method="POST" action="{{ route('app.destroy', $data->id) }}">
                                     {{ csrf_field() }}
                                     {{ method_field('DELETE') }}
 
-                                    <input type="submit" class="btn btn-danger" value="Delete">
+                                    <input type="submit" class="delete-application btn btn-danger" value="Delete">
                                 </form>
                             </div>
 
@@ -214,24 +214,25 @@
 
 
 <script>
-    $('.delete-application').click(function(e) {
-        // e.preventDefault() // Don't post the form, unless confirmed
-
-        bootbox.confirm({
-            size: "small"
-            , message: "Are you sure?"
-            , callback: function(result) {
-                /* result is a boolean; true = OK, false = Cancel*/
-            }
-        })
-
-        // if (confirm('Are you sure?')) {
-        //     // Post the form
-        //     $(e.target).closest('form').submit() // Post the surrounding form
-        // }
-    });
-
     $(document).ready(function() {
+        $('.delete-application').click(function(e) {
+            e.preventDefault() // Don't post the form, unless confirmed
+
+            swal({
+                    title: "Are you sure?"
+                    , text: "Once deleted, you will not be able to recover this app and all of those versions!"
+                    , icon: "warning"
+                    , buttons: true
+                    , dangerMode: true
+                , })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $(e.target).closest('form').submit() // Post the surrounding form
+                    } else {
+
+                    }
+                });
+        });
         $('.form-select').select2()
     })
 

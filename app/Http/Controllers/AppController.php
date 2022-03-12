@@ -215,7 +215,18 @@ class AppController extends Controller
      */
     public function destroy($id)
     {
+        $app = App::find($id);
+        
+        if (!isset($app)) {
+            return back()->withErrors('application not found');
+        }
+
+        $versions = AppVersion::where('app_id', $id)->get();
+
         if ($this->appRepository->deleteApp($id)) {
+            $this->appService->handleDeletedApp($app, $versions);
+
+            
             return redirect()->route('app.index');
         }
         else
