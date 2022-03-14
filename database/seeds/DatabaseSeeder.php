@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         if (App::count() <= 500) {
-            factory(App::class , 100)->create();
+            // factory(App::class , 100)->create();
         }
 
         if (!DB::table('users')->where('registration_number', 'F2373')->first()) {
