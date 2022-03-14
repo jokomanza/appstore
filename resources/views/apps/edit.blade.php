@@ -86,16 +86,14 @@
                                 <div class="form-group">
                                     <label for="user_documentation_file">User Documentation</label>
                                     @if ($data->user_documentation_url)
-                                    <a href="{{ str_contains($data->user_documentation_url, 'http')? $data->user_documentation_url : asset('/storage/' . $data->user_documentation_url) }}">Preveriously
-                                        user documentation</a>
+                                    <a href="{{ str_contains($data->user_documentation_url, 'http')? $data->user_documentation_url : asset('/storage/' . $data->user_documentation_url) }}">Previous user documentation</a>
                                     @endif
                                     <input class="form-control" type="file" name="user_documentation_file" value="{{ old('user_documentation_file') }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="developer_documentation_file">Developer Documentation</label>
                                     @if ($data->developer_documentation_url)
-                                    <a href="{{ str_contains($data->developer_documentation_url, 'http')? $data->developer_documentation_url: asset('/storage/' . $data->developer_documentation_url) }}">Preveriously
-                                        developer documentation</a>
+                                    <a href="{{ str_contains($data->developer_documentation_url, 'http')? $data->developer_documentation_url: asset('/storage/' . $data->developer_documentation_url) }}">Previous developer documentation</a>
                                     @endif
                                     <input class="form-control" type="file" name="developer_documentation_file" value="{{ old('developer_documentation_file') }}">
                                 </div>
