@@ -61,11 +61,9 @@ class ApiController extends Controller
             $requestValue = $value;
             if ($key == 'versionId') {
                 $appVersion = AppVersion::where(['id' => $value, 'app_id' => $appId])->first();
-            }
-            else if ($key == 'versionNumber') {
+            } else if ($key == 'versionNumber') {
                 $appVersion = AppVersion::where(['version_code' => $value, 'app_id' => $appId])->first();
-            }
-            else if ($key == 'versionName') {
+            } else if ($key == 'versionName') {
                 $appVersion = AppVersion::where(['version_name' => $value, 'app_id' => $appId])->first();
             }
         }
@@ -108,8 +106,8 @@ class ApiController extends Controller
 
             $newest = AppVersion::with("app")->where('version_code', '>', $value['version_code'])
                 ->whereHas('app', function ($q) use ($value) {
-                $q->where('package_name', $value['package_name']);
-            })->orderBy('version_code', 'DESC')->first();
+                    $q->where('package_name', $value['package_name']);
+                })->orderBy('version_code', 'DESC')->first();
 
             if (isset($newest)) {
                 $hasUpdate[] = $newest;
@@ -154,7 +152,6 @@ class ApiController extends Controller
             if (isset($app)) {
                 $data[] = $app;
             }
-
         }
 
         if (empty($data)) {
@@ -182,11 +179,9 @@ class ApiController extends Controller
             $requestValue = $value;
             if ($key == 'versionId') {
                 $appVersion = AppVersion::where(['id' => $value, 'app_id' => $appId])->first();
-            }
-            else if ($key == 'versionNumber') {
+            } else if ($key == 'versionNumber') {
                 $appVersion = AppVersion::where(['version_code' => $value, 'app_id' => $appId])->first();
-            }
-            else if ($key == 'versionName') {
+            } else if ($key == 'versionName') {
                 $appVersion = AppVersion::where(['version_name' => $value, 'app_id' => $appId])->first();
             }
         }
@@ -207,7 +202,7 @@ class ApiController extends Controller
     public function checkUpdate(Request $request, $packageName, $versionCode)
     {
 
-        $appVersion = AppVersion::with(['app' => function ($query) use ($packageName) {       
+        $appVersion = AppVersion::with(['app' => function ($query) use ($packageName) {
             $query->where('package_name', '=', $packageName);
         }])->where(['version_code' => $versionCode])->first();
 
@@ -250,8 +245,7 @@ class ApiController extends Controller
         if ($request->has('s') && trim($request->s) !== '') {
             $data = App::where('name', 'like', "%$request->s%")
                 ->orderBy('updated_at', 'DESC')->get();
-        }
-        else {
+        } else {
             $data = App::orderBy('updated_at', 'DESC')->get();
         }
 
@@ -262,9 +256,8 @@ class ApiController extends Controller
 
             $data[$key]['developers'] = Developer::with('user')->where('app_id', $value->id)->get()
                 ->map(function ($value) {
-                return $value->user;
-            });
-
+                    return $value->user;
+                });
         }
 
         if ($data->first() == null)
@@ -289,8 +282,8 @@ class ApiController extends Controller
 
         $data['developers'] = Developer::with('user')->where('app_id', $data->id)->get()
             ->map(function ($value) {
-            return $value->user;
-        });
+                return $value->user;
+            });
 
         return ok($data);
     }
@@ -334,7 +327,7 @@ class ApiController extends Controller
             3 => 'updated_at',
         ];
 
-        $totalData = App::count();
+        $totalData = App::where('package_name', '!=', 'com.quick.quickappstore')->count();
         $totalFiltered = $totalData;
 
         $limit = $request->input('length');
@@ -344,20 +337,22 @@ class ApiController extends Controller
 
         if (empty($request->input('search.value'))) {
             $apps = App::offset($start)
+                ->where('package_name', '!=', 'com.quick.quickappstore')
                 ->limit($limit)
                 ->orderBy($order, $dir)
                 ->get();
-        }
-        else {
+        } else {
             $search = $request->input('search.value');
 
             $apps = App::where('package_name', 'LIKE', "%$search%")
+                ->where('package_name', '!=', 'com.quick.quickappstore')
                 ->orWhere('name', 'LIKE', "%$search%")
                 ->offset($start)
                 ->limit($limit)
                 ->orderBy($order, $dir)
                 ->get();
             $totalFiltered = App::where('package_name', 'LIKE', "%$search%")
+                ->where('package_name', '!=', 'com.quick.quickappstore')
                 ->orWhere('name', 'LIKE', "%$search%")
                 ->count();
         }
@@ -375,7 +370,8 @@ class ApiController extends Controller
                 $data[] = $nestedData;
             }
         }
-        $json_data = array("draw" => intval($request->input('draw')),
+        $json_data = array(
+            "draw" => intval($request->input('draw')),
             "recordsTotal" => intval($totalData),
             "recordsFiltered" => intval($totalFiltered),
             "data" => $data
@@ -411,8 +407,7 @@ class ApiController extends Controller
                 ->limit($limit)
                 ->orderBy($order, $dir)
                 ->get();
-        }
-        else {
+        } else {
             $search = $request->input('search.value');
 
             $users = User::where('access_level', '<=', $access_level)->where('registration_number', 'LIKE', "%$search%")
@@ -439,14 +434,14 @@ class ApiController extends Controller
                 if ($user->access_level <= $access_level) {
                     $nestedData['options'] = ($current_reg_num != $user->registration_number ? "&emsp;<a href='$show' class='btn btn-danger'>Delete</a>" : '')
                         . "&emsp;<a href='$edit' class='btn btn-success' >Edit</a>";
-                }
-                else {
+                } else {
                     $nestedData['options'] = "";
                 }
                 $data[] = $nestedData;
             }
         }
-        $json_data = array("draw" => intval($request->input('draw')),
+        $json_data = array(
+            "draw" => intval($request->input('draw')),
             "recordsTotal" => intval($totalData),
             "recordsFiltered" => intval($totalFiltered),
             "data" => $data

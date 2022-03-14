@@ -83,6 +83,20 @@ Route::get('/app/{id}/version/{idVersion}/edit', 'AppVersionController@edit')->n
 | 
 */
 
+Route::get('/client', 'ClientController@index')->name('client.index');
+
+Route::get('/client/edit', 'ClientController@edit')->name('client.edit');
+
+Route::put('/client', 'ClientController@update')->name('client.update');
+
+/*
+|--------------------------------------------------------------------------
+| Developers endpoints
+|--------------------------------------------------------------------------
+|
+| 
+*/
+
 Route::post('developers/datatables', 'Api\ApiController@getDevelopersDataTable')->name('developer.datatables');
 
 Route::get('/developers', 'DeveloperController@index')->name('developer.index');
