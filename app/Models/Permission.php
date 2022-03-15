@@ -19,7 +19,7 @@ use App\User;
  *
  * @package App\Models
  */
-class Developer extends Model
+class Permission extends Model
 {
     protected $casts = [
 		'app_id' => 'int',
@@ -30,7 +30,8 @@ class Developer extends Model
 
 	protected $fillable = [
 		'app_id',
-		'user_registration_number'
+		'user_registration_number',
+		'type'
 	];
 
 	public function app()

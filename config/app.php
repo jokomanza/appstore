@@ -230,6 +230,8 @@ return [
         'Image' => Intervention\Image\Image::class,
         'Form' => Collective\Html\FormFacade::class,
         'Html' => Collective\Html\HtmlFacade::class,
+        'AppModel' => App\Models\App::class,
+        'Developer' => App\Models\Permission::class,
     ],
 
 ];

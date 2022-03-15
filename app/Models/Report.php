@@ -42,7 +42,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property character varying $package_name
  * @property character varying $app_version_name
  * @property character varying $app_version_code
- * @property int $application_id
+ * @property int $app_id
  * @property character varying $report_id
  * @property int $id
  * 
@@ -52,7 +52,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Report extends Model
 {
-	protected $table = 'report';
 
 	protected $casts = [
 		// 'updated_at' => 'timestamp without time zone',
@@ -118,12 +117,12 @@ class Report extends Model
 		'package_name',
 		'app_version_name',
 		'app_version_code',
-		'application_id',
+		'app_id',
 		'report_id'
 	];
 
-	public function application()
+	public function app()
 	{
-		return $this->belongsTo(Application::class);
+		return $this->belongsTo(App::class);
 	}
 }

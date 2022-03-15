@@ -5,18 +5,17 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\App;
-use App\Models\Permission;
 
-class User extends Authenticatable
+class Admin extends Authenticatable
 {
     use Notifiable;
 
-	protected $primaryKey = 'registration_number';
-	public $incrementing = false;
+    protected $primaryKey = 'registration_number';
+    public $incrementing = false;
 
     /**
      * The attributes that are mass assignable.
-	 * 
+     * 
      * @var array
      */
     protected $fillable = [
@@ -31,6 +30,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+    
 
     public function isDeveloperOf(App $app)
     {

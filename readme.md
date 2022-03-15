@@ -7,6 +7,29 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
 </p>
 
+## Config
+Anyway, a quick dirty hack you should not use would be to edit swiftmailer\swiftmailer\lib\classes\Swift\Transport\StreamBuffer.php. In _establishSocketConnection() line 253 replace:
+
+```php
+$options = array();
+```
+
+with something like this:
+
+```php
+$options = array('ssl' => array('allow_self_signed' => true, 'verify_peer' => false));
+```
+
+## Access Level
+### Level 1
+Developer
+
+### Level 2
+Owner
+
+### Level 3
+Admin
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as:

@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         if (App::count() <= 500) {
-            // factory(App::class , 100)->create();
+            factory(App::class , 100)->create();
         }
 
         if (!DB::table('users')->where('registration_number', 'F2373')->first()) {
@@ -23,7 +23,15 @@ class DatabaseSeeder extends Seeder
                 'registration_number' => 'F2373',
                 'name' => 'Joko Supriyanto',
                 'email' => 'joko_supriyanto@quick.com',
-                'access_level' => 3,
+                'password' => bcrypt('123456'),
+            ]);
+        }
+
+        if (!DB::table('admins')->where('registration_number', 'F2373')->first()) {
+            DB::table('admins')->insert([
+                'registration_number' => 'F2373',
+                'name' => 'Joko Supriyanto',
+                'email' => 'joko_supriyanto@quick.com',
                 'password' => bcrypt('123456'),
             ]);
         }
@@ -36,6 +44,7 @@ class DatabaseSeeder extends Seeder
             $app->type = 'Tool App';
             $app->icon_url = 'https://google.com';
             $app->repository_url = 'http:git.quick.com/production/quick-appstore-mobile.git';
+            $app->api_token = str_random(128);
 
             $app->save();
         }

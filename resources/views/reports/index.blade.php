@@ -1,116 +1,100 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
+
+<header class="mb-3">
+    <a href="#" class="burger-btn d-block d-xl-none">
+        <i class="bi bi-justify fs-3"></i>
+    </a>
+</header>
+
+<div class="page-heading">
+    <div class="page-title">
         <div class="row">
-            <div class="panel panel-primary">
-                <a href="{{ url()->previous() }}" class="btn btn-default hide">Back</a>
-                <div class="panel-heading">Reports for {{ $app->name }} ({{ $app->package_name }})</div>
-
-                <div class="panel-body">
-
-                    @if (session()->has('table-message'))
-                        <div class="alert alert-success">
-                            {{ session()->get('table-message') }}
-                        </div>
-                    @endif
-                    @if (session()->has('table-error'))
-                        <div class="alert alert-danger">
-                            {{ session()->get('table-error') }}
-                        </div>
-                    @endif
-
-                    <div class="table-responsive">
-                        <table id="dataTable" class="table table-responsive table-bordered table-hover mb-0"
-                            style="overflow-x: auto;">
-                            <thead>
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Reports</h3>
+                <p class="text-subtitle text-muted">All report.</p>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Reports</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Reports</h4>
+        </div>
+        <div class="card-content">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-lg" id="reports">
+                        <thead>
+                            <tr>
                                 <th>Date</th>
+                                <th>Application</th>
                                 <th>App Version</th>
                                 <th>Android Version</th>
                                 <th>Device</th>
                                 <th>Exception</th>
-                                <th>Delete</th>
-                            </thead>
-                            <tbody>
-                                @if ($data->count() == 0)
-                                    <tr>
-                                        <td colspan="5">No products to display.</td>
-                                    </tr>
-                                @endif
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
-                                @foreach ($data as $report)
-                                    <tr>
-                                        <td>
-                                            {{ $report->created_at->diffForHumans() }}
-                                        </td>
-                                        <td>
-                                            {{ $report->app_version_name }}
-                                        </td>
-                                        <td>
-                                            {{ $report->android_version }}
-                                        </td>
-                                        <td>
-                                            {{ $report->brand . ' ' . $report->phone_model }}
-                                        </td>
-                                        <td>
-                                            <a class="text-danger"
-                                                href="{{ url('/report/' .$report->report_id) }}">{{ $report->exception }}</a>
-                                        </td>
-                                        <td>
-                                            {{-- <i class="fa fa-trash"></i> --}}
-                                            <a href="#" data-id={{ $report->application_id }}
-                                                data-report-id={{ $report->report_id }}
-                                                class="button btn-sm btn-danger delete" data-toggle="modal"
-                                                data-target="#deleteReportsModal">Delete</a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {{ $data->links() }}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        <!-- Delete Warning Modal -->
-        <div class="modal modal-danger fade" id="deleteReportsModal" tabindex="-1" role="dialog" aria-labelledby="Delete"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <form action="{{ url('/report') }}" method="POST">
-                        {{ csrf_field() }}
-                        {{ method_field('DELETE') }}
-
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Delete Reports</h5>
-                        </div>
-                        <input type=hidden id="id" name="id">
-                        <input type=hidden id="report_id" name="report_id">
-                        <div class="modal-body">
-                            <p>Are you sure want to delete this Report ?</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-sm btn-danger">Yes, Delete Report</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <!-- End Delete Modal -->
     </div>
+</div>
 
-    <script>
-        $(document).ready(function() {
-            $(document).on('click', '.delete', function() {
-                let id = $(this).attr('data-id')
-                $('#id').val(id)
-                let reportId = $(this).attr('data-report-id')
-                $('#report_id').val(reportId)
-            })
+<script>
+    $(document).ready(function() {
 
-            $('#dataTable').DataTable({});
-        })
-    </script>
+        $('#reports').DataTable({
+            "processing": true
+            , "serverSide": true
+            , "autoWidth": false
+            , "ajax": {
+                "url": "{{ route('report.datatables') }}"
+                , "dataType": "json"
+                , "type": "POST"
+                , "data": {
+                    _token: "{{csrf_token()}}"
+                }
+            }
+            , "columns": [{
+                    "data": "date"
+                }
+                , {
+                    "data": "application"
+                }
+                , {
+                    "data": "app_version"
+                }
+                , {
+                    "data": "android_version"
+                }
+                , {
+                    "data": "device"
+                }
+                , {
+                    "data": "exception"
+                }
+                , {
+                    "data": "options"
+                }
+            ]
+
+        });
+    })
+
+</script>
+
 @endsection

@@ -1,56 +1,198 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <div class="col-md-3">
-            <div class="panel panel-primary">
-                <div class="panel-heading">Report for</div>
 
-                <div class="panel-body">
-                    <p> <strong>Package Name :</strong> {{ isset($package_name) ? $package_name : '' }}</p>
-                    <p> <strong>Version Code :</strong> {{ isset($app_version_code) ? $app_version_code : '' }}</p>
-                    <p> <strong>Brand : </strong> {{ isset($brand) ? $brand : '' }}</p>
-                    <p> <strong>Model : </strong> {{ isset($phone_model) ? $phone_model : '' }}</p>
-                </div>
+<header class="mb-3">
+    <a href="#" class="burger-btn d-block d-xl-none">
+        <i class="bi bi-justify fs-3"></i>
+    </a>
+</header>
 
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Report #{{ $report->id }}</h3>
+                <p class="text-subtitle text-muted">Report detail.</p>
             </div>
-        </div>
-        <div class="col-md-9">
-            <div class="panel panel-default">
-                <div class="panel-heading">Reports</div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
 
-                <div class="panel-body">
-                    <div class="table-responsive">
-                        <table class="table table-responsive table-bordered table-hover mb-0" style="overflow-x: auto;">
-                            <thead>
-                                <th>Report Id</th>
-                                <th>Installation Id</th>
-                                <th>Reported On</th>
-                            </thead>
-                            <tbody>
-                                @if ($data->count() == 0)
-                                    <tr>
-                                        <td colspan="5">No products to display.</td>
-                                    </tr>
-                                @endif
+                        @if(url()->previous() == route('client.index'))
+                        <li class="breadcrumb-item"><a href="{{ route('client.index') }}">Client</a></li>
+                        @elseif (url()->previous() == route('report.index'))
+                        <li class="breadcrumb-item"><a href="{{ route('report.index') }}">Reports</a></li>
+                        @else
+                        <li class="breadcrumb-item"><a href="{{ route('app.index') }}">Apps</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('app.show', [$report->app_id]) }}">{{ $report->app->name }}</a></li>
+                        @endif
 
-                                @foreach ($data as $report)
-                                    <tr>
-                                        <td>
-                                            <a class="text-primary"
-                                                href="{{ url('/report/detail?report_id=' . $report->report_id) }}">{{ $report->report_id }}</a>
-                                        </td>
-                                        <td>{{ $report->installation_id }}</td>
-                                        <td>{{ $report->created_at }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {{ $data->links() }}
-                </div>
+                        <li class="breadcrumb-item active" aria-current="page">Report {{ $report->id }}</li>
+                    </ol>
+                </nav>
             </div>
         </div>
     </div>
+    <section class="section">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">App Information</h4>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-body">
+
+                            <p>App Name : {{ $report->app->name }}</p>
+                            <p>Description : {{ $report->app->description }}</p>
+                            <p>Package Name : {{ $report->app->package_name }}</p>
+                            <p>Error Type : {{ $report->is_silent ? 'Silent Error' : 'Crash' }}</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Version Information</h4>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-body">
+
+                            <p>Version Code : {{ $report->app_version_code }}</p>
+                            <p>Version Name : {{ $report->app_version_name }}</p>
+                            <p>Debug : {{ $report->build_config['debug'] }}</p>
+                            <p>Build Type : {{ $report->build_config['build_type'] }}</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Device Information</h4>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-body">
+
+                            <p>Brand : {{ $report->brand }}</p>
+                            <p>Model : {{ $report->phone_model }}</p>
+                            <p>Android : {{ $report->android_version }}</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Miscellaneous Information</h4>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-body">
+
+                            <p>Files Path : {{ $report->file_path }}</p>
+                            <p>App Start Date : {{ $report->user_app_start_date }}</p>
+                            <p>App Crash Date : {{ $report->user_crash_date }}</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Full Report</h4>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-body">
+                            <a href="{{ route('report.show.full', $report->report_id) }}" target="__blank">See full report</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if(Auth::user()->access_level != 1)
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">More</h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body">
+
+                                <div class="buttons">
+                                    <form class="col-1" method="POST" action="{{ route('report.destroy', [$report->app->package_name, $report->id]) }}">
+                                        {{ csrf_field() }}
+                                        {{ method_field('DELETE') }}
+                                        @if(url()->previous() == route('client.index'))
+                                        <input type="text" name="redirect" hidden value="client.index">
+                                        @elseif (url()->previous() == route('report.index'))
+                                        <input type="text" name="redirect" hidden value="report.index">
+                                        @else
+                                        <input type="text" name="redirect" hidden value="app.index">
+                                        @endif
+
+                                        <input type="submit" class="delete-report btn btn-danger" value="Delete">
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+            
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Stack Trace</h4>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <pre>{{ $report->stack_trace }}</pre>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Log Cat</h4>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <pre>{{ $report->logcat }}</pre>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('.delete-report').click(function(e) {
+            e.preventDefault() // Don't post the form, unless confirmed
+
+            swal({
+                    title: "Are you sure?"
+                    , text: "Once deleted, you will not be able to recover this report!"
+                    , icon: "warning"
+                    , buttons: true
+                    , dangerMode: true
+                , })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $(e.target).closest('form').submit() // Post the surrounding form
+                    } else {
+
+                    }
+                });
+        });
+    })
+
+</script>
+
 @endsection

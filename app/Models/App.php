@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * Class App
@@ -24,8 +26,10 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class App extends Model
+class App extends Authenticatable
 {
+	use Notifiable;
+
 	protected $casts = [
 		'name' => 'character varying',
 		'package_name' => 'character varying',
@@ -51,6 +55,15 @@ class App extends Model
 	];
 
 	/**
+	 * The attributes that should be hidden for arrays.
+	 *
+	 * @var array
+	 */
+	protected $hidden = [
+		// 'api_token',
+	];
+
+	/**
 	 * Save this to database
 	 * 
 	 * @return boolean
@@ -73,5 +86,15 @@ class App extends Model
 	public function app_versions()
 	{
 		return $this->hasMany(AppVersion::class);
+	}
+
+	public function reports()
+	{
+		return $this->hasMany(Report::class);
+	}
+
+	public function developers()
+	{
+		return $this->hasMany(Developer::class);
 	}
 }

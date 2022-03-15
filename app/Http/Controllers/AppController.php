@@ -14,6 +14,10 @@ use App\User;
 use App\Models\Developer;
 use App\Http\Requests\AddDeveloperRequest;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Report;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Validation\UnauthorizedException;
+use App\Models\Permission;
 
 /**
  * Class App Controller
@@ -27,6 +31,7 @@ class AppController extends Controller
 {
     private $appRepository;
     private $appService;
+    private $isAppDeveloper;
 
     // AppRepositoryInterface $appRepository
     public function __construct(AppRepositoryInterface $appRepository, AppServiceInterface $appService)
@@ -54,6 +59,8 @@ class AppController extends Controller
      */
     public function create()
     {
+        if (Auth::user()->access_level == 1)
+            return view('errors.400', ['errorCode' => 401, 'message' => "Level 1 can't do this action"]);
         return view('apps.create');
     }
 
@@ -65,6 +72,8 @@ class AppController extends Controller
      */
     public function store(CreateAppRequest $request)
     {
+        if (Auth::user()->access_level == 1)
+            throw new UnauthorizedException();
 
         $time = time();
 
@@ -76,6 +85,7 @@ class AppController extends Controller
 
             $app = new App();
             $app->fill($request->all());
+            $app->api_token = str_random(128);
             $app->icon_url = $iconUrl;
             $app->user_documentation_url = $userDocUrl;
             $app->developer_documentation_url = $devDocUrl;
@@ -95,6 +105,10 @@ class AppController extends Controller
 
     public function addDeveloper(AddDeveloperRequest $request)
     {
+
+        if (Auth::user()->access_level == 1)
+            throw new UnauthorizedException();
+
         try {
 
             $developer = new Developer();
@@ -122,22 +136,26 @@ class AppController extends Controller
     public function show($id)
     {
         try {
+            
             $maxAccessLevel = Auth::user()->access_level;
+            
+            $app = App::with('app_versions')->where('package_name', '!=', 'com.quick.quickappstore')->where('id', $id)->firstOrFail();
 
-            $data = $this->appRepository->getAppById($id);
-            $data = App::with('app_versions')->find($id);
-            $developers = Developer::with('user')->where('app_id', $id)->get();
-            $allowedDevelopers = User::where('access_level', '<=', $maxAccessLevel)->get(['registration_number'])
-            ->map(function ($value) {
+            $isAppDeveloper = Auth::user()->isDeveloperOf($app);
+            $isAppOwner = Auth::user()->isOwnerOf($app);
+
+            $developers = Permission::with('user')->where('app_id', $id)->get();
+            $allowedDevelopers = User::get(['registration_number'])
+                ->map(function ($value) {
                 return [$value->registration_number => $value->registration_number];
             });
-            // dd($developers);
+            $reports = Report::where('app_id', $app->id)->get();
         }
         catch (\Exception $e) {
             return view('errors.404');
         }
 
-        return view('apps.show', ['data' => $data, 'developers' => $developers, 'allowedDevelopers' => $allowedDevelopers]);
+        return view('apps.show', compact('app', 'developers', 'allowedDevelopers', 'reports', 'isAppDeveloper', 'isAppOwner'));
     }
 
     /**
@@ -148,9 +166,12 @@ class AppController extends Controller
      */
     public function edit($id)
     {
-        $data = $this->appRepository->getAppById($id);
+        if (Developer::where(['app_id' => $id, 'user_registration_number' => Auth::user()->registration_number])->first() || Auth::user()->access_level == 3) {
 
-        return view('apps.edit', ['data' => $data]);
+            $data = $this->appRepository->getAppById($id);
+
+            return view('apps.edit', ['data' => $data]);
+        } else return view('errors.400');
     }
 
     /**
@@ -171,7 +192,14 @@ class AppController extends Controller
             $devDocUrl = $this->appService->handleUploadedDeveloperDocumentation($request->package_name, $request->file('developer_documentation_file'), $time);
 
             $app = App::find($id);
-            $app->fill($request->all());
+
+            if (Auth::user()->access_level == 1) {
+                $fields = $request->except('package_name');
+            }
+            else
+                $fields = $request->all();
+
+            $app->fill($fields);
             if ($iconUrl) {
                 $oldIcon = $app->icon_url;
                 $app->icon_url = $iconUrl;
@@ -215,8 +243,11 @@ class AppController extends Controller
      */
     public function destroy($id)
     {
+        if (Auth::user()->access_level == 1)
+            throw new UnauthorizedException();
+
         $app = App::find($id);
-        
+
         if (!isset($app)) {
             return back()->withErrors('application not found');
         }
@@ -226,7 +257,7 @@ class AppController extends Controller
         if ($this->appRepository->deleteApp($id)) {
             $this->appService->handleDeletedApp($app, $versions);
 
-            
+
             return redirect()->route('app.index');
         }
         else
@@ -235,6 +266,9 @@ class AppController extends Controller
 
     public function removeDeveloper($id, $registrationNumber)
     {
+        if (Auth::user()->access_level == 1)
+            throw new UnauthorizedException();
+
         $developer = Developer::where(['app_id' => $id, 'user_registration_number' => $registrationNumber])->first();
 
         if (!isset($developer)) {
@@ -247,4 +281,91 @@ class AppController extends Controller
         else
             return back()->withErrors('Failed to delete data');
     }
+
+
+    public function getReportsDataTables(Request $request, $id)
+    {
+        $access_level = Auth::user()->access_level;
+        $current_reg_num = Auth::user()->registration_number;
+
+        $app = App::find($id);
+
+        $columns = [
+            0 => 'created_at',
+            1 => 'app_version_name',
+            2 => 'android_version',
+            3 => 'device',
+            4 => 'exception',
+            5 => 'action',
+        ];
+
+        // if ($access_level == 1) {
+        //     $totalData = Report::with(['app'])->whereHas('app', function ($q) use ($value) {
+        //         $q->with('developers')->where('', $value['package_name']);
+        //     })->count();
+        // } else {
+        // }
+        $totalData = Report::with('app')->whereHas('app', function ($q) use ($id) {
+            $q->where('id', $id);
+        })->count();
+        $totalFiltered = $totalData;
+
+        $limit = $request->input('length');
+        $start = $request->input('start');
+        $order = $columns[$request->input('order.0.column')];
+        $dir = $request->input('order.0.dir');
+
+        if (empty($request->input('search.value'))) {
+            $reports = Report::with('app')->whereHas('app', function ($q) use ($id) {
+                $q->where('id', $id);
+            })->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+        }
+        else {
+            $search = $request->input('search.value');
+
+            $reports = Report::with('app')->whereHas('app', function ($q) use ($id) {
+                $q->where('id', $id);
+            })->where('app_version_name', 'LIKE', "%$search%")
+                ->orWhere('android_version', 'LIKE', "%$search%")
+                ->orWhere('brand', 'LIKE', "%$search%")
+                ->orWhere('exception', 'LIKE', "%$search%")
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+            $totalFiltered = Report::with('app')->whereHas('app', function ($q) use ($id) {
+                $q->where('id', $id);
+            })->where('app_version_name', 'LIKE', "%$search%")
+                ->orWhere('android_version', 'LIKE', "%$search%")
+                ->orWhere('brand', 'LIKE', "%$search%")
+                ->orWhere('exception', 'LIKE', "%$search%")
+                ->count();
+        }
+        $data = array();
+        if (!empty($reports)) {
+            foreach ($reports as $report) {
+                $edit = route('report.show', [$app->package_name, $report->id]);
+                $nestedData['date'] = $report->created_at->diffForHumans();
+                $nestedData['app_version'] = $report->app_version_name;
+                $nestedData['android_version'] = $report->android_version;
+                $nestedData['device'] = $report->brand . ' ' . $report->phone_model;
+                $nestedData['exception'] = $report->exception;
+
+                $nestedData['options'] = "<a href='$edit' class='btn btn-success' >Show</a>";
+                $data[] = $nestedData;
+            }
+        }
+        $json_data = array(
+            "draw" => intval($request->input('draw')),
+            "recordsTotal" => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $data
+        );
+
+        return response()->json($json_data);
+    }
+
 }

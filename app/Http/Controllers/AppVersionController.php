@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Requests\UpdateAppVersionRequest;
 use App\Interfaces\AppVersionServiceInterface;
 use App\Http\Requests\CreateAppVersionRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\UnauthorizedException;
 
 class AppVersionController extends Controller
 {
@@ -205,6 +207,8 @@ class AppVersionController extends Controller
      */
     public function destroy($id, $versionId)
     {
+        if (Auth::user()->access_level == 1) throw new UnauthorizedException();
+        
         $version = AppVersion::where(['app_id' => $id, 'id' => $versionId])->first();
 
         if (!$version) {

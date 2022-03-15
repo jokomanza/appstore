@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use App\Models\App;
 use Illuminate\Support\Facades\Route;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Artisan;
 
 /* |-------------------------------------------------------------------------- | API Routes |-------------------------------------------------------------------------- | | Here is where you can register API routes for your application. These | routes are loaded by the RouteServiceProvider within a group which | is assigned the "api" middleware group. Enjoy building your API! | */
 
@@ -34,3 +35,19 @@ Route::get("/app/{appId}/version/update", 'Api\ApiController@getUpdate');
 Route::post("/versions/update", 'Api\ApiController@getAllUpdate');
 
 Route::post("/apps/details", 'Api\ApiController@getAppsDetails');
+
+Route::get('/client/reports', 'Api\ReportController@index')->name('api.report.index');
+
+Route::post('/client/report', 'Api\ReportController@store')->name('api.report.store');
+
+Route::get('/clear', function () {
+
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('config:cache');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+
+    return ok("Cleared!");
+
+});

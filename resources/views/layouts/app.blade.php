@@ -32,14 +32,15 @@
 <body>
     <div id="app">
 
-        @if (!Auth::guest())
+        @if (Auth::guard('admin')->check())
             <div id="sidebar" class="active">
                 <div class="sidebar-wrapper active">
                     <div class="sidebar-header">
                         <div class="d-flex justify-content-between">
                             <div class="logo">
-                                <a href="{{ route('home') }}"><img src="assets/images/logo/logo.png" alt="App Store"
-                                        srcset=""></a>
+                                <a href="{{ route('home') }}"><img src="{{ asset('images/logo.png')}}" alt="App Store"
+                                        srcset="">
+                                        <h2><strong>Quick App Store</strong></h2></a>
                             </div>
                             <div class="toggler">
                                 <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
@@ -66,47 +67,46 @@
                                     <li class="submenu-item {{ Route::is('app.index') ? 'active' : '' }}">
                                         <a href="{{ route('app.index') }}">All</a>
                                     </li>
-                                    <li class="submenu-item {{ Route::is('app.create') ? 'active' : '' }}">
-                                        <a href="{{ route('app.create') }}">Create</a>
-                                    </li>
+                                    @if(Auth::user()->access_level > 1)
+                                        <li class="submenu-item {{ Route::is('app.create') ? 'active' : '' }}">
+                                            <a href="{{ route('app.create') }}">Create</a>
+                                        </li>
+                                    @endif
                                 </ul>
                             </li>
 
-                            <li class="sidebar-item  has-sub  {{ Route::is('developer.*') ? 'active' : '' }}">
-                                <a href="#" class='sidebar-link'>
-                                    <i class="bi bi-collection-fill"></i>
-                                    <span>Developer</span>
-                                </a>
-                                <ul class="submenu {{ Route::is('developer.*') ? 'active' : '' }}">
-                                    <li class="submenu-item {{ Route::is('developer.index') ? 'active' : '' }}">
-                                        <a href="{{ route('developer.index') }}">All</a>
-                                    </li>
-                                    <li class="submenu-item  {{ Route::is('developer.create') ? 'active' : '' }}">
-                                        <a href="{{ route('developer.create') }}">Create</a>
-                                    </li>
-                                </ul>
-                            </li>
+                            @if(Auth::guard('admin')->check())
+                                <li class="sidebar-item  has-sub  {{ Route::is('user.*') ? 'active' : '' }}">
+                                    <a href="#" class='sidebar-link'>
+                                        <i class="bi bi-collection-fill"></i>
+                                        <span>Users</span>
+                                    </a>
+                                    <ul class="submenu {{ Route::is('user.*') ? 'active' : '' }}">
+                                        <li class="submenu-item {{ Route::is('user.index') ? 'active' : '' }}">
+                                            <a href="{{ route('user.index') }}">All</a>
+                                        </li>
+                                        <li class="submenu-item  {{ Route::is('user.create') ? 'active' : '' }}">
+                                            <a href="{{ route('user.create') }}">Create</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            @endif
 
-                            <li class="sidebar-item {{ Route::is('client.index') ? 'active' : '' }} ">
-                                <a href="{{ route('client.index') }}" class='sidebar-link'>
-                                    <i class="bi bi-grid-fill"></i>
-                                    <span>Client Application</span>
-                                </a>
-                            </li>
+                            @if(Auth::user()->isDeveloperOf(AppModel::where('package_name', 'com.quick.quickappstore')->first()) || Auth::guard('admin')->check())
+                                <li class="sidebar-item {{ Route::is('client.index') ? 'active' : '' }} ">
+                                    <a href="{{ route('client.index') }}" class='sidebar-link'>
+                                        <i class="bi bi-grid-fill"></i>
+                                        <span>Client Application</span>
+                                    </a>
+                                </li>
+                            @endif
 
-                            <li class="sidebar-item  has-sub  {{ Route::is('developer.*') ? 'active' : '' }}">
-                                <a href="#" class='sidebar-link'>
+
+                            <li class="sidebar-item {{ Route::is('report.index') ? 'active' : '' }} ">
+                                <a href="{{ route('report.index') }}" class='sidebar-link'>
                                     <i class="bi bi-collection-fill"></i>
                                     <span>Crash Report</span>
                                 </a>
-                                <ul class="submenu {{ Route::is('developer.*') ? 'active' : '' }}">
-                                    <li class="submenu-item {{ Route::is('developer.index') ? 'active' : '' }}">
-                                        <a href="{{ route('developer.index') }}">All</a>
-                                    </li>
-                                    <li class="submenu-item  {{ Route::is('developer.create') ? 'active' : '' }}">
-                                        <a href="{{ route('developer.create') }}">Create</a>
-                                    </li>
-                                </ul>
                             </li>
 
                             <li class="sidebar-title">Other</li>
@@ -131,9 +131,6 @@
                 <header class='mb-3'>
                     <nav class="navbar navbar-expand navbar-light ">
                         <div class="container-fluid">
-                            {{-- <a href="#" class="burger-btn d-block">
-                            <i class="bi bi-justify fs-3"></i>
-                        </a> --}}
 
                             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -174,8 +171,8 @@
                                         <div class="user-menu d-flex">
                                             <div class="user-name text-end me-3">
                                                 <h6 class="mb-0 text-gray-600">{{ Auth::user()->name }}</h6>
-                                                <p class="mb-0 text-sm text-gray-600">Level
-                                                    {{ Auth::user()->access_level }}</p>
+                                                <p class="mb-0 text-sm text-gray-600">
+                                                    {{ Auth::guard('web')->check() ? 'User' : (Auth::guard('admin')->check() ? 'Admin' : 'Unauthorized' ) }}</p>
                                             </div>
                                             <div class="user-img d-flex align-items-center">
                                                 <div class="avatar avatar-md">

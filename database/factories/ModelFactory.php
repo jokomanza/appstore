@@ -40,5 +40,6 @@ $factory->define(App\Models\App::class, function (Faker\Generator $faker) {
         'repository_url' => $faker->unique()->url,
         'user_documentation_url' => $faker->unique()->url,
         'developer_documentation_url' => $faker->unique()->url,
+        'api_token' => str_random(128),
     ];
 });

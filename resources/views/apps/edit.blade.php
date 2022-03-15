@@ -69,7 +69,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="package_name">Package Name</label>
-                                    <input class="form-control" type="text" name="package_name" value="{{ old('package_name') ? old('package_name') : $data->package_name }}">
+                                    @if(Auth::user()->access_level == 1)
+                                        <input class="form-control" type="text" value="{{ $data->package_name }}" readonly="readonly">
+                                    @else
+                                        <input class="form-control" type="text" name="package_name" value="{{ old('package_name') ? old('package_name') : $data->package_name }}">
+                                    @endif
                                 </div>
                                 <div class="form-group">
                                     <label for="type">Type</label>

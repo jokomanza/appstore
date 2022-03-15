@@ -14,7 +14,7 @@ class CreateAppsTable extends Migration
     public function up()
     {
         Schema::create('apps', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->string('name', 30)
                 ->unique();
             $table->string('package_name', 30)
@@ -23,13 +23,14 @@ class CreateAppsTable extends Migration
             $table->string('type', 30);
             $table->string('icon_url', 120);
             $table->string('repository_url', 120)
-                ->nullable();
+            ->nullable();
             $table->string('user_documentation_url', 120)
-                ->nullable()
-                ->default(null);
+            ->nullable()
+            ->default(null);
             $table->string('developer_documentation_url', 120)
-                ->nullable()
-                ->default(null);
+            ->nullable()
+            ->default(null);
+            $table->string('api_token');
             $table->timestamps();
         });
     }

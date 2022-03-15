@@ -20,6 +20,11 @@ Route::get('/', function () {
 
 Auth::routes();
 
+Route::get('/admin/login', 'Auth\Admin\LoginController@showLoginForm')->name('admin.show');
+
+Route::post('/admin/login', 'Auth\Admin\LoginController@login')->name('admin.login');
+
+
 /*
 |--------------------------------------------------------------------------
 | Home endpoints
@@ -62,6 +67,8 @@ Route::get('/app/{id}', 'AppController@show')->name('app.show');
 
 Route::get('/app/{id}/edit', 'AppController@edit')->name('app.edit');
 
+Route::post('/app/{id}/reports/datatables', 'AppController@getReportsDataTables')->name('app.report.datatables');
+
 Route::get('/app/{id}/version', 'AppVersionController@create')->name('version.create');
 
 Route::post('/app/{id}/version', 'AppVersionController@store')->name('version.store');
@@ -73,6 +80,24 @@ Route::delete('/app/{id}/version/{idVersion}', 'AppVersionController@destroy')->
 Route::get('/app/{id}/version/{idVersion}', 'AppVersionController@show')->name('version.show');
 
 Route::get('/app/{id}/version/{idVersion}/edit', 'AppVersionController@edit')->name('version.edit');
+
+
+/*
+|--------------------------------------------------------------------------
+| Reports endpoints
+|--------------------------------------------------------------------------
+|
+| 
+*/
+Route::get('/reports', 'ReportController@index')->name('report.index');
+
+Route::get('/app/{packageName}/report/{id}', 'ReportController@show')->name('report.show');
+
+Route::post('/reports/datatables', 'ReportController@getDataTables')->name('report.datatables');
+
+Route::delete('/app/{packageName}/report/{id}', 'ReportController@destroy')->name('report.destroy');
+
+Route::get('/report/{reportId}', 'ReportController@showFull')->name('report.show.full');
 
 
 /*
@@ -97,12 +122,12 @@ Route::put('/client', 'ClientController@update')->name('client.update');
 | 
 */
 
-Route::post('developers/datatables', 'Api\ApiController@getDevelopersDataTable')->name('developer.datatables');
+Route::post('user/datatables', 'UserController@getDataTables')->name('user.datatables');
 
-Route::get('/developers', 'DeveloperController@index')->name('developer.index');
+Route::get('/users', 'UserController@index')->name('user.index');
 
-Route::get('/developer', 'DeveloperController@create')->name('developer.create');
+Route::get('/user', 'UserController@create')->name('user.create');
 
-Route::post('/developer', 'DeveloperController@store')->name('developer.store');
+Route::post('/user', 'UserController@store')->name('user.store');
 
 

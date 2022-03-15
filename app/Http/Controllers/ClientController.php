@@ -10,6 +10,7 @@ use App\User;
 use DomainException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Report;
 
 class ClientController extends Controller
 {
@@ -34,13 +35,13 @@ class ClientController extends Controller
             ->map(function ($value) {
                 return [$value->registration_number => $value->registration_number];
             });
-            // dd($developers);
+            $reports = Report::where('app_id', $data->id)->get();
         }
         catch (\Exception $e) {
             return view('errors.404');
         }
 
-        return view('clients.index', ['data' => $data, 'developers' => $developers, 'allowedDevelopers' => $allowedDevelopers]);
+        return view('clients.index', compact('data', 'developers', 'allowedDevelopers', 'reports'));
     }
 
     public function edit(Request $request)

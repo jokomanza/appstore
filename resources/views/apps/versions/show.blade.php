@@ -56,12 +56,14 @@
 
                             <div class="buttons">
                                 <a class="btn btn-primary" href="{{ route('version.edit', [$app->id, $version->id]) }}">Edit</a>
-                                <form class="col-1" method="POST" action="{{ route('version.destroy', [$app->id, $version->id]) }}">
-                                    {{ csrf_field() }}
-                                    {{ method_field('DELETE') }}
+                                @if(Auth::user()->access_level != 1)
+                                    <form class="col-1" method="POST" action="{{ route('version.destroy', [$app->id, $version->id]) }}">
+                                        {{ csrf_field() }}
+                                        {{ method_field('DELETE') }}
 
-                                    <input type="submit" class="delete-version btn btn-danger" value="Delete">
-                                </form>
+                                        <input type="submit" class="delete-version btn btn-danger" value="Delete">
+                                    </form>
+                                @endif
                             </div>
 
                         </div>

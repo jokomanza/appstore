@@ -33,7 +33,7 @@
                         </div>
                     </div>
                     <div class="col-6 col-lg-3 col-md-6">
-                        <div class="card" onclick="location.href='{{ route('developer.index') }}';"
+                        <div class="card" onclick="location.href='{{ route('user.index') }}';"
                             style="cursor: pointer;">
                             <div class="card-body px-3 py-4-5">
                                 <div class="row">
@@ -43,7 +43,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-8">
-                                        <h6 class="text-muted font-semibold">Developers</h6>
+                                        <h6 class="text-muted font-semibold">Users</h6>
                                         <h6 class="font-extrabold mb-0">{{ $developersCount }}</h6>
                                     </div>
                                 </div>
@@ -78,7 +78,7 @@
                                     </div>
                                     <div class="col-md-8">
                                         <h6 class="text-muted font-semibold">Error Reports</h6>
-                                        <h6 class="font-extrabold mb-0">112</h6>
+                                        <h6 class="font-extrabold mb-0">{{ $errorsCount }}</h6>
                                     </div>
                                 </div>
                             </div>
