@@ -32,7 +32,7 @@
 <body>
     <div id="app">
 
-        @if (Auth::guard('admin')->check())
+        @if (Auth::guard('guest:web')->check() || Auth::guard('guest:admin')->check())
             <div id="sidebar" class="active">
                 <div class="sidebar-wrapper active">
                     <div class="sidebar-header">

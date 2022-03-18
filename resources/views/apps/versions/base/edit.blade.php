@@ -1,13 +1,3 @@
-@extends('layouts.app')
-
-@section('content')
-
-<header class="mb-3">
-    <a href="#" class="burger-btn d-block d-xl-none">
-        <i class="bi bi-justify fs-3"></i>
-    </a>
-</header>
-
 <div class="page-heading">
     <div class="page-title">
         <div class="row">
@@ -20,8 +10,10 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('app.index') }}">Apps</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('app.show', $app->id) }}">{{ $app->name }}</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit Version {{ $version->version_name }}</li>
+                        <li class="breadcrumb-item"><a
+                                href="{{ route('app.show', $app->id) }}">{{ $app->name }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit Version
+                            {{ $version->version_name }}</li>
                     </ol>
                 </nav>
             </div>
@@ -39,24 +31,26 @@
 
                         <div class="row">
                             @if (count($errors) > 0)
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
                             @endif
 
                             <br />
 
-                            <form action="{{ route('version.update', [$app->id, $version->id]) }}" method="post" enctype="multipart/form-data">
+                            <form action="{{ route('version.update', [$app->id, $version->id]) }}" method="post"
+                                enctype="multipart/form-data">
                                 {{ method_field('PUT') }}
                                 {{ csrf_field() }}
 
                                 <div class="form-group">
                                     <label for="description">Description</label>
-                                    <textarea class="form-control" name="description">{{ old('description') ? old('description') : $version->description }}</textarea>
+                                    <textarea class="form-control"
+                                        name="description">{{ old('description') ? old('description') : $version->description }}</textarea>
                                 </div>
                                 <div class="form-group">
                                     <input class="btn btn-primary" type="submit" value="Update">
@@ -73,10 +67,8 @@
 </div>
 
 
-<script>
-    autosize(document.querySelector('textarea'))
-
-</script>
-
-
-@endsection
+@push('script')
+    <script>
+        autosize(document.querySelector('textarea'))
+    </script>
+@endpush

@@ -32,8 +32,10 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public function isDeveloperOf(App $app)
+    public function isDeveloperOf($app)
     {
+        if ($app == null) return false;
+
         return Permission::where(['user_registration_number' => $this->registration_number, 'app_id' => $app->id, 'type' => 'developer'])->first();
     }
 

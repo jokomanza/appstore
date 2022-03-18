@@ -36,7 +36,7 @@ $factory->define(App\Models\App::class, function (Faker\Generator $faker) {
         'package_name' => "com.quick.$name",
         'description' => $faker->unique()->text(),
         'type' => $faker->unique()->word(),
-        'icon_url' => $faker->imageUrl(50, 50, ['cats', 'dogs']),
+        'icon_url' => 'app.icon.default.png',
         'repository_url' => $faker->unique()->url,
         'user_documentation_url' => $faker->unique()->url,
         'developer_documentation_url' => $faker->unique()->url,

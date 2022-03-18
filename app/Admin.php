@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\App;
+use App\Models\Permission;
 
 class Admin extends Authenticatable
 {
@@ -32,8 +33,12 @@ class Admin extends Authenticatable
     ];
     
 
-    public function isDeveloperOf(App $app)
+    public function isDeveloperOf($app)
     {
+        if ($app == null) return false;
+
+        if ($app->package_name == 'com.quick.quickappstore') return true;
+
         return Permission::where(['user_registration_number' => $this->registration_number, 'app_id' => $app->id, 'type' => 'developer'])->first();
     }
 
