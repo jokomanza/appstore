@@ -64,7 +64,7 @@
                             <br><br>
 
                             <div class="buttons">
-                                @if ($isAppDeveloper)
+                                @if (($isClientApp && $isAppOwner) || $isAppOwner)
                                     <a clas="col-1"
                                         href="{{ $isClientApp ? route('admin.client.edit') : route($editAppRoute, $app->id) }}"
                                         class="btn btn-primary">Edit</a>

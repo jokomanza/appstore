@@ -1,10 +1,14 @@
 @extends('layouts.admin')
 
-@php($updateAppRoute = 'admin.app.update')
-
 @php($isAppDeveloper = false)
 @php($isAppOwner = true)
 @php($isClientApp = $app->package_name == 'com.quick.quickappstore')
+
+@if ($isClientApp)
+    @php($updateAppRoute = 'admin.client.update')
+@else
+    @php($updateAppRoute = 'admin.app.update')
+@endif
 
 @section('breadcrump')
     <ol class="breadcrumb">

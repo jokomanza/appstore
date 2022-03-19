@@ -141,10 +141,11 @@ class AppController extends Controller
                 $app = App::with('app_versions')->where('package_name', 'com.quick.quickappstore')->first();
             }
             else {
-                if ($id == null)
-                    return view('errors.404');
-
-                $app = App::with('app_versions')->where('package_name', '!=', 'com.quick.quickappstore')->where('id', $id)->firstOrFail();
+                if ($id == null) return view('errors.admin.404');
+                
+                $app = App::with('app_versions')->where('package_name', '!=', 'com.quick.quickappstore')->where('id', $id)->first();
+                
+                if ($app == null) return view('errors.admin.404');
             }
 
 
@@ -181,7 +182,7 @@ class AppController extends Controller
 
             $id = $request->id;
 
-            if ($id == null) return view('errors.404');
+            if ($id == null) return view('errors.admin.404');
 
             $app = $this->appRepository->getAppById($id);
         }
@@ -196,8 +197,15 @@ class AppController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
+        if ($request->routeIs('admin.client.update')) {
+            $app = App::where('package_name', 'com.quick.quickappstore')->first();
+        }
+        else {
+            $id = $request->id;
+            $app = App::find($id);
+        }
 
         $time = time();
 
@@ -206,7 +214,6 @@ class AppController extends Controller
             $userDocUrl = $this->appService->handleUploadedUserDocumentation($request->package_name, $request->file('user_documentation_file'), $time);
             $devDocUrl = $this->appService->handleUploadedDeveloperDocumentation($request->package_name, $request->file('developer_documentation_file'), $time);
 
-            $app = App::find($id);
 
             $fields = $request->all();
 
@@ -234,7 +241,8 @@ class AppController extends Controller
                 @unlink(public_path('/storage/') . $oldUserDoc);
                 @unlink(public_path('/storage/') . $oldDevDoc);
 
-                return redirect()->route('admin.app.show', $app->id);
+                if ($request->routeIs('admin.client.update')) return redirect()->route('admin.client.show');
+                else return redirect()->route('admin.app.show', $app->id);
             }
             else
                 throw new \Exception("Failed to update data");
