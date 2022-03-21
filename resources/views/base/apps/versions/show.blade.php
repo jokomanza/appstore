@@ -7,14 +7,7 @@
             </div>
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('app.index') }}">Apps</a></li>
-                        <li class="breadcrumb-item"><a
-                                href="{{ route('app.show', $app->id) }}">{{ $app->name }}</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Version {{ $version->version_name }}
-                        </li>
-                    </ol>
+                    @yield('breadcrumb')
                 </nav>
             </div>
         </div>
@@ -23,11 +16,18 @@
         <div class="row" id="basic-table">
             <div class="col-md-8">
                 <div class="card">
-                    {{-- <div class="card-header">
-                            <h4 class="card-title">Detail App</h4>
-                        </div> --}}
                     <div class="card-content">
                         <div class="card-body">
+
+                            @if (count($errors) > 0)
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
 
                             <div class="mb-4">
                                 <img src="{{ str_contains($version->icon_url, 'http') ? $version->icon_url : asset("storage/$version->icon_url") }}"
@@ -50,11 +50,16 @@
                             <br><br>
 
                             <div class="buttons">
-                                <a class="btn btn-primary"
-                                    href="{{ route('version.edit', [$app->id, $version->id]) }}">Edit</a>
-                                @if (Auth::user()->access_level != 1)
+                                @if ($isClientApp)
+                                    <a class="btn btn-primary"
+                                       href="{{ route($editVersionRoute, $version->version_name) }}">Edit</a>
+                                @else
+                                    <a class="btn btn-primary"
+                                       href="{{ route($editVersionRoute, [$app->package_name, $version->version_name]) }}">Edit</a>
+                                @endif
+                                @if ($isAppOwner)
                                     <form class="col-1" method="POST"
-                                        action="{{ route('version.destroy', [$app->id, $version->id]) }}">
+                                        action="{{ route($destroyVersionRoute, [$app->package_name, $version->version_name]) }}">
                                         {{ csrf_field() }}
                                         {{ method_field('DELETE') }}
 

@@ -33,7 +33,7 @@
 
                             <br />
 
-                            <form action="{{ route($updateAppRoute, [$app->id]) }}" method="post" enctype="multipart/form-data">
+                            <form action="{{ route($updateAppRoute, [$app->package_name]) }}" method="post" enctype="multipart/form-data">
                                 {{ method_field('PUT') }}
                                 {{ csrf_field() }}
 

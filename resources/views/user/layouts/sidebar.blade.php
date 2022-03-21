@@ -33,9 +33,6 @@
                         <li class="submenu-item {{ Route::is('user.app.index') ? 'active' : '' }}">
                             <a href="{{ route('user.app.index') }}">All</a>
                         </li>
-                        <li class="submenu-item {{ Route::is('app.create') ? 'active' : '' }}">
-                            <a href="{{ route('user.app.create') }}">Create</a>
-                        </li>
                     </ul>
                 </li>
 
@@ -43,13 +40,6 @@
                     <a href="{{ route('user.client.show') }}" class='sidebar-link'>
                         <i class="bi bi-grid-fill"></i>
                         <span>Client Application</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item {{ Route::is('report.index') ? 'active' : '' }} ">
-                    <a href="{{ route('user.report.index') }}" class='sidebar-link'>
-                        <i class="bi bi-collection-fill"></i>
-                        <span>Crash Report</span>
                     </a>
                 </li>
 

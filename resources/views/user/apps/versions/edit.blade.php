@@ -1,6 +1,6 @@
-@extends('admin.layouts.admin')
+@extends('user.layouts.user')
 
-@php($storeVersionRoute = 'admin.version.store')
+@php($storeVersionRoute = 'user.version.store')
 
 @section('content')
     @include('base.apps.versions.edit')

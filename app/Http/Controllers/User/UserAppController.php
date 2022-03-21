@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Http\Controllers\Base\BaseAppBaseController;
+use App\Http\Controllers\Base\BaseAppController;
 use App\Interfaces\AppRepositoryInterface;
 use App\Interfaces\AppServiceInterface;
 
@@ -14,7 +14,7 @@ use App\Interfaces\AppServiceInterface;
  * 
  * @package App\Http\Controllers
  */
-class UserAppController extends BaseAppBaseController
+class UserAppController extends BaseAppController
 {
     function getView()
     {

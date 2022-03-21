@@ -1,12 +1,3 @@
-@extends('layouts.app')
-
-@section('content')
-
-<header class="mb-3">
-    <a href="#" class="burger-btn d-block d-xl-none">
-        <i class="bi bi-justify fs-3"></i>
-    </a>
-</header>
 
 <div class="page-heading">
     <div class="page-title">
@@ -17,20 +8,7 @@
             </div>
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-
-                        @if(url()->previous() == route('client.index'))
-                        <li class="breadcrumb-item"><a href="{{ route('client.index') }}">Client</a></li>
-                        @elseif (url()->previous() == route('report.index'))
-                        <li class="breadcrumb-item"><a href="{{ route('report.index') }}">Reports</a></li>
-                        @else
-                        <li class="breadcrumb-item"><a href="{{ route('app.index') }}">Apps</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('app.show', [$report->app_id]) }}">{{ $report->app->name }}</a></li>
-                        @endif
-
-                        <li class="breadcrumb-item active" aria-current="page">Report {{ $report->id }}</li>
-                    </ol>
+                    @yield('breadcrumb')
                 </nav>
             </div>
         </div>
@@ -110,7 +88,7 @@
                     </div>
                     <div class="card-content">
                         <div class="card-body">
-                            <a href="{{ route('report.show.full', $report->report_id) }}" target="__blank">See full report</a>
+                            <a href="{{ route($fullReportRoute, $report->report_id) }}" target="__blank">See full report</a>
 
                         </div>
                     </div>
@@ -127,17 +105,9 @@
                             <div class="card-body">
 
                                 <div class="buttons">
-                                    <form class="col-1" method="POST" action="{{ route('report.destroy', [$report->app->package_name, $report->id]) }}">
+                                    <form class="col-1" method="POST" action="{{ route($destroyReportRoute, [$report->app->package_name, $report->id]) }}">
                                         {{ csrf_field() }}
                                         {{ method_field('DELETE') }}
-                                        @if(url()->previous() == route('client.index'))
-                                        <input type="text" name="redirect" hidden value="client.index">
-                                        @elseif (url()->previous() == route('report.index'))
-                                        <input type="text" name="redirect" hidden value="report.index">
-                                        @else
-                                        <input type="text" name="redirect" hidden value="app.index">
-                                        @endif
-
                                         <input type="submit" class="delete-report btn btn-danger" value="Delete">
                                     </form>
                                 </div>
@@ -194,5 +164,3 @@
     })
 
 </script>
-
-@endsection

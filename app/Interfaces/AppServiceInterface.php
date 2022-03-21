@@ -55,5 +55,5 @@ interface AppServiceInterface
      * 
      * @return void
      */
-    public function handleDeletedApp(\App\Models\App $application, array $versions);
+    public function handleDeletedApp(\App\Models\App $application, $versions);
 }

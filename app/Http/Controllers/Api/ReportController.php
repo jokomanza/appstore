@@ -1,32 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\Base\Api;
+namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Base\Controller;
-use App\Models\App;
-use Carbon\Carbon;
-use App\User;
-use Illuminate\Support\Facades\Auth;
-use App\Models\AppVersion;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Validator;
-use App\Models\Developer;
-use App\Http\Requests\Api\GetReportsRequest;
+use App\Admin;
+use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use App\Models\Report;
-use Illuminate\Support\Facades\Storage;
 use App\Notifications\NewReportNotification;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ReportController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:report-api')->except(['getDataTables']);
+        $this->middleware('auth:report-api');
     }
+
     public function index(Request $request)
     {
-
         $app = $request->user();
 
         $reports = Report::where('app_id', $app->id)->orderBy('created_at', 'DESC');
@@ -118,16 +112,16 @@ class ReportController extends Controller
 
         $crash->save();
 
-        $users = Developer::with('user')->where('app_id', $app->id)->get()->map(function ($value) {
+        $people = Permission::with('user')->where('app_id', $app->id)->get()->map(function ($value) {
             return $value->user;
         });
 
-        if (empty($users)) {
-            $users[] = User::find('F2373');
+        if (empty($people)) {
+            $people[] = Admin::all();
         }
 
-        foreach ($users as $user) {
-            $user->notify(new NewReportNotification($crash));
+        foreach ($people as $person) {
+            $person->notify(new NewReportNotification($crash));
         }
 
         return response()->json($request->all(), 200);

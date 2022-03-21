@@ -76,13 +76,6 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item {{ Route::is('admin.report.index') ? 'active' : '' }} ">
-                    <a href="{{ route('admin.report.index') }}" class='sidebar-link'>
-                        <i class="bi bi-collection-fill"></i>
-                        <span>Crash Report</span>
-                    </a>
-                </li>
-
                 <li class="sidebar-title">Other</li>
 
                 <li class="sidebar-item  ">

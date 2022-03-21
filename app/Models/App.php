@@ -77,4 +77,16 @@ class App extends Authenticatable
 	{
 		return $this->hasMany(Developer::class);
 	}
+
+    /**
+     * Get version from version name
+     *
+     * @param $versionName string
+     * @return AppVersion|null
+     */
+    public function getVersion($versionName) {
+        return AppVersion::where('app_id', $this->id)
+            ->where('version_name', $versionName)
+            ->first();
+    }
 }

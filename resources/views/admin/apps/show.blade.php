@@ -3,6 +3,7 @@
 @php($editAppRoute = 'admin.app.edit')
 @php($destroyAppRoute = 'admin.app.destroy')
 @php($showVersionRoute = 'admin.version.show')
+@php($showClientVersionRoute = 'admin.client.version.show')
 @php($createVersionRoute = 'admin.version.create')
 @php($destroyPermissionRoute = 'admin.app.developer.destroy')
 @php($storePermissionRoute = 'admin.app.developer.store')

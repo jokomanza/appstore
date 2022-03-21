@@ -64,7 +64,7 @@ class AppService implements AppServiceInterface
         @unlink(public_path('/storage/') . "$packageName.developer_documentation.$currentTime.pdf");
     }
     
-	function handleDeletedApp(\App\Models\App $application, array $versions) {
+	function handleDeletedApp(\App\Models\App $application, $versions) {
 
         // Delete all related file to this application
         @unlink(public_path('/storage/') . $application->icon_url);

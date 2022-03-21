@@ -1,18 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Base\Api;
+namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Base\Controller;
+use App\Http\Controllers\Controller;
 use App\Models\App;
-use Carbon\Carbon;
-use App\User;
-use Illuminate\Support\Facades\Auth;
 use App\Models\AppVersion;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Developer;
 
 class ApiController extends Controller
 {

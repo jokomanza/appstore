@@ -2,19 +2,23 @@
 
 namespace App\Http\Controllers\Base;
 
-use App\Http\Controllers\Admin\User\Controller;
-use App\Http\Controllers\Base\BaseController;
-use App\Models\AppVersion;
-use Illuminate\Http\Request;
-use App\Models\App;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\DB;
+use ApkParser\Exceptions\XmlParserException;
+use ApkParser\Parser;
+use App\Http\Controllers\Base\Controller;
+use App\Http\Requests\CreateAppVersionRequest;
 use App\Http\Requests\UpdateAppVersionRequest;
 use App\Interfaces\AppVersionServiceInterface;
-use App\Http\Requests\CreateAppVersionRequest;
+use App\Models\App;
+use App\Models\AppVersion;
+use Exception;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\UnauthorizedException;
+use Illuminate\Support\Facades\File;
+use Illuminate\View\View;
 
 abstract class BaseAppVersionController extends BaseController
 {
@@ -28,21 +32,25 @@ abstract class BaseAppVersionController extends BaseController
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
-    //
+        //
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\View\View 
+     * @return View
      */
-    public function create($packageName)
+    public function create(Request $request, $packageName = null)
     {
-        $app = App::where('package_name', $packageName)->first();
+        if ($request->routeIs($this->getView() . '.client.version.create')) {
+            $app = App::where('package_name', 'com.quick.quickappstore')->first();
+        } else {
+            $app = App::where('package_name', $packageName)->first();
+        }
 
         if (!$app) return view($this->getView() . '.errors.404');
 
@@ -52,8 +60,9 @@ abstract class BaseAppVersionController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse 
+     * @param Request $request
+     * @return View|RedirectResponse
+     * @throws XmlParserException
      */
     public function store(CreateAppVersionRequest $request, $id)
     {
@@ -72,7 +81,7 @@ abstract class BaseAppVersionController extends BaseController
         $storedApkSize = $storedApk['size'];
         $storedIconName = $this->service->handleUploadedIcon($app->package_name, $request->file('icon_file'), $time);
 
-        $apk = new \ApkParser\Parser(public_path('/storage/' . $storedApkName));
+        $apk = new Parser(public_path('/storage/' . $storedApkName));
 
         $manifest = $apk->getManifest();
         $package_name = $manifest->getPackageName();
@@ -136,7 +145,7 @@ abstract class BaseAppVersionController extends BaseController
         if (!$appVersion->save()) {
             @unlink(public_path('/storage/') . $storedApkName);
             @unlink(public_path('/storage/') . $storedIconName);
-            
+
             return back()->withErrors("failed to save app version");
         }
 
@@ -146,83 +155,117 @@ abstract class BaseAppVersionController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\AppVersion  $appVersion
-     * @return \Illuminate\View\View
+     * @param Request $request
+     * @param null $packageName
+     * @param $versionName
+     * @return Factory|Application|RedirectResponse|View
      */
-    public function show($id, $idVersion)
+    public function show(Request $request, $versionName, $packageName = null)
     {
-        $app = App::find($id);
-        $version = AppVersion::find($idVersion);
-        return view('apps.versions.show')->with(['app' => $app, 'version' => $version]);
+        if ($request->routeIs($this->getView() . '.client.version.show')) {
+            $app = App::where('package_name', 'com.quick.quickappstore')->first();
+        } else {
+            if ($packageName == 'com.quick.quickappstore') return view($this->getView() . '.errors.404');
+
+            $app = App::where('package_name', $packageName)
+                ->first();
+        }
+
+        if (!$app) return view($this->getView() . '.errors.404');
+
+        $version = $app->getVersion($versionName);
+        if (!$version) return view($this->getView() . '.errors.404', ['message' => 'version not found']);
+
+        $isAppDeveloper = Auth::user()->isDeveloperOf($app);
+        if ($this->getView() == 'admin') $isAppOwner = true;
+        else $isAppOwner = Auth::user()->isOwnerOf($app);
+
+        if (!$isAppDeveloper && !$isAppOwner) return back()->withErrors("You don't have permission to perform this action");
+
+        return view($this->getView() . '.apps.versions.show', compact('app', 'version', 'isAppDeveloper', 'isAppOwner'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\AppVersion  $appVersion
-     * @return \Illuminate\View\View
+     * @param Request $request
+     * @param $versionName
+     * @param null $packageName
+     * @return RedirectResponse|View
      */
-    public function edit($id, $versionId)
+    public function edit(Request $request, $versionName, $packageName = null)
     {
-        $app = App::find($id);
-        $version = AppVersion::where(['id' => $versionId, 'app_id' => $id])->first();
-
-        if (!isset($app) || !isset($version)) {
-            return view('errors.404');
+        if ($request->routeIs($this->getView() . '.client.version.edit')) {
+            $packageName = config('app.client_package_name');
         }
 
-        return view('apps.versions.edit', compact('app', 'version'));
+        $version = AppVersion::with('app')->where(['version_name' => $versionName])
+            ->whereHas('app', function ($q) use ($packageName) {
+                $q->where('package_name', $packageName);
+            })->first();
+
+        if (!$version) return back()->withErrors("App or Version not found");
+
+        $app = $version->app;
+
+        return view($this->getView() . '.apps.versions.edit', compact('app', 'version'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\AppVersion  $appVersion
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @param UpdateAppVersionRequest $request
+     * @param $versionName
+     * @param null $packageName
+     * @return RedirectResponse
      */
-    public function update(UpdateAppVersionRequest $request, $id, $versionId)
+    public function update(UpdateAppVersionRequest $request, $versionName, $packageName = null)
     {
-        $version = AppVersion::where(['id' => $versionId, 'app_id' => $id])->first();
-
-        if (!isset($version)) {
-            return view('errors.404');
+        if ($request->routeIs($this->getView() . '.client.version.update')) {
+            $packageName = config('app.client_package_name');
         }
+
+        $version = AppVersion::where(['version_name' => $versionName])
+            ->whereHas('app', function ($q) use ($packageName) {
+                $q->where('package_name', $packageName);
+            })->first();
+
+        if (!isset($version)) return back()->withErrors("Version not found");
 
         $version->description = $request->description;
 
         if ($version->update()) {
-            return redirect()->route('version.show', [$id, $versionId]);
-        }
-        else {
-            return back()->withErrors('Failed to update data');
-        }
-
-
+            if ($request->routeIs($this->getView() . '.client.version.update')) {
+                return redirect()->route($this->getView() . '.client.version.show', $versionName);
+            } else {
+                return redirect()->route($this->getView() . '.version.show', [$packageName, $versionName]);
+            }
+        } else return back()->withErrors('Failed to update data');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @param  int  $versionId
-     * @return \Illuminate\Http\RedirectResponse
+     * @param $packageName
+     * @param $versionName
+     * @return RedirectResponse
+     * @throws Exception
      */
-    public function destroy($id, $versionId)
+    public function destroy($packageName, $versionName)
     {
-        if (Auth::user()->access_level == 1) throw new UnauthorizedException();
-        
-        $version = AppVersion::where(['app_id' => $id, 'id' => $versionId])->first();
+        $version = AppVersion::where('version_name', $versionName)->whereHas('app', function ($q) use ($packageName) {
+            $q->where('package_name', $packageName);
+        })->first();
 
-        if (!$version) {
-            return back()->withErrors('Target version not found');
-        }
+        if (!$version) return back()->withErrors('Target version not found');
+
+        if ($this->getView() == 'admin') $isAppOwner = true;
+        else $isAppOwner = Auth::user()->isOwnerOf($app);
+        if (!$isAppOwner) return back()->withErrors("You can't delete this app version because you are not app owner");
 
         if ($version->delete()) {
             $this->service->handleDeletedVersion($version);
             return redirect()->route('app.show', [$id]);
-        }
-        else
-            return back()->withErrors('Failed to delete data');
+        } else return back()->withErrors('Failed to delete data');
     }
 }

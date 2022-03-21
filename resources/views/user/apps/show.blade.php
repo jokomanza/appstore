@@ -3,6 +3,7 @@
 @php($editAppRoute = 'user.app.edit')
 @php($destroyAppRoute = 'user.app.destroy')
 @php($showVersionRoute = 'user.version.show')
+@php($showClientVersionRoute = 'user.client.version.show')
 @php($createVersionRoute = 'user.version.create')
 @php($destroyPermissionRoute = 'user.app.developer.destroy')
 @php($storePermissionRoute = 'user.app.developer.store')
@@ -10,8 +11,6 @@
 
 @php($createClientVersionRoute = 'user.client.version.create')
 
-@php($isAppDeveloper = false)
-@php($isAppOwner = true)
 @php($isClientApp = $app->package_name == 'com.quick.quickappstore')
 
 @section('breadcrumb')
