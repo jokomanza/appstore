@@ -6,26 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-/**
- * Class App
- * 
- * @property int $id
- * @property character varying $name
- * @property character varying $package_name
- * @property character varying $description
- * @property character varying $type
- * @property character varying $icon_url
- * @property character varying|null $repository_url
- * @property character varying|null $user_documentation_url
- * @property character varying|null $developer_documentation_url
- * @property timestamp without time zone|null $created_at
- * @property timestamp without time zone|null $updated_at
- * 
- * @property Collection|Team[] $teams
- * @property Collection|AppVersion[] $app_versions
- *
- * @package App\Models
- */
 class App extends Authenticatable
 {
 	use Notifiable;

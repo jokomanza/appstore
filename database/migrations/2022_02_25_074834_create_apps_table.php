@@ -32,6 +32,8 @@ class CreateAppsTable extends Migration
             ->default(null);
             $table->string('api_token');
             $table->timestamps();
+
+            $table->index('package_name');
         });
     }
 

@@ -38,6 +38,7 @@ class CreateAppVersionsTable extends Migration
                 ->references('id')
                 ->on('apps')
                 ->onDelete('cascade');
+            $table->index('version_name');
         });
     }
 

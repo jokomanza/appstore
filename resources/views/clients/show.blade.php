@@ -1,9 +1,9 @@
 @auth('admin')
-    @extends('layouts.admin')
+    @extends('admin.layouts.admin')
 @endauth
 
 @auth('user')
-    @extends('layouts.user')
+    @extends('user.layouts.user')
 @endauth
 
 @section('content')

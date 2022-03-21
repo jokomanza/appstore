@@ -1,0 +1,181 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Admin;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateUserRequest;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use App\User;
+use Illuminate\Validation\UnauthorizedException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\View\View;
+
+class UserController extends Controller
+{
+    public function __construct() {
+        $this->middleware('auth:admin');
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Factory|Application|View
+     */
+    public function index()
+    {
+        return view('admin.users.index');
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return Application|Factory|View
+     */
+    public function create()
+    {
+        return view('admin.users.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param CreateUserRequest $request
+     * @return RedirectResponse
+     */
+    public function store(CreateUserRequest $request)
+    {
+        if (User::create([
+            'registration_number' => $request['registration_number'],
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'access_level' => $request['access_level'],
+            'password' => bcrypt($request['password']),
+        ])) {
+            return redirect()->route('admin.users.index');
+        } else {
+            return back()->withErrors("");
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param Request $request
+     * @param  int  $id
+     * @return Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function destroy($id)
+    {
+        //
+    }
+
+
+    public function getDataTables(Request $request)
+    {
+
+        $isAdmin = Auth::user() instanceof Admin;
+        $current_reg_num = Auth::user()->registration_number;
+
+        $columns = [
+            0 => 'registration_number',
+            1 => 'name',
+            2 => 'email',
+        ];
+
+        $totalData = User::count();
+        $totalFiltered = $totalData;
+
+        $limit = $request->input('length');
+        $start = $request->input('start');
+        $order = $columns[$request->input('order.0.column')];
+        $dir = $request->input('order.0.dir');
+
+        if (empty($request->input('search.value'))) {
+            $users = User::offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+        }
+        else {
+            $search = $request->input('search.value');
+
+            $users = User::where('registration_number', 'LIKE', "%$search%")
+                ->orWhere('name', 'LIKE', "%$search%")
+                ->orWhere('email', 'LIKE', "%$search%")
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+            $totalFiltered = User::where('registration_number', 'LIKE', "%$search%")
+                ->orWhere('name', 'LIKE', "%$search%")
+                ->orWhere('email', 'LIKE', "%$search%")
+                ->count();
+        }
+        $data = array();
+        if (!empty($users)) {
+            foreach ($users as $user) {
+                $show = route('admin.app.show', $user->id);
+                $edit = route('admin.app.edit', $user->id);
+                $nestedData['registration_number'] = $user->registration_number;
+                $nestedData['name'] = $user->name;
+                $nestedData['email'] = $user->email;
+//                if ($user->access_level <= $access_level) {
+//                    $nestedData['options'] = ($current_reg_num != $user->registration_number ? "&emsp;<a href='$show' class='btn btn-danger'>Delete</a>" : '')
+//                        . "&emsp;<a href='$edit' class='btn btn-success' >Edit</a>";
+//                }
+//                else {
+                    $nestedData['options'] = "";
+//                }
+                $data[] = $nestedData;
+            }
+        }
+        $json_data = array(
+            "draw" => intval($request->input('draw')),
+            "recordsTotal" => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $data
+        );
+
+        return response()->json($json_data);
+    }
+}
