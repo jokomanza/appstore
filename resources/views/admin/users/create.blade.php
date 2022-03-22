@@ -1,13 +1,6 @@
-@extends('layouts.app')
+@extends('admin.layouts.admin')
 
 @section('content')
-
-
-<header class="mb-3">
-    <a href="#" class="burger-btn d-block d-xl-none">
-        <i class="bi bi-justify fs-3"></i>
-    </a>
-</header>
 
 <div class="page-heading">
     <div class="page-title">
@@ -20,8 +13,8 @@
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('app.index') }}">Apps</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.home') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.app.index') }}">Apps</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Create New App</li>
                     </ol>
                 </nav>
@@ -51,7 +44,7 @@
 
                             <br />
 
-                            <form action="{{ route('developer.store') }}" method="post" enctype="multipart/form-data">
+                            <form action="{{ route('admin.user.store') }}" method="post" enctype="multipart/form-data">
                                 {{ csrf_field() }}
 
                                 <div class="form-group col-md-5">
@@ -74,10 +67,6 @@
                                 <div class="form-group col-md-5">
                                     <label class="mt-3 mb-2" for="email">Email</label>
                                     <input class="form-control" type="email" name="email" value="{{ old('email') }}" placeholder="user@quick.com" required autofocus>
-                                </div>
-                                <div class="form-group col-md-5">
-                                    <label class="mt-3 mb-2" for="access_level">Access Level</label>
-                                    {{ Form::select('access_level', $allowedAccessLevel, old('access_level'), ['class' => 'form-select', 'name' => 'access_level']) }}
                                 </div>
                                 <div class="form-group mt-3">
                                     <input class="btn btn-primary" type="submit" value="Create">

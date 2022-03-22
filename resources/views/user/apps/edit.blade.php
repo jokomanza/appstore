@@ -3,7 +3,7 @@
 @php($isClientApp = $app->package_name == 'com.quick.quickappstore')
 
 @if ($isClientApp)
-    @php($updateAppRoute = 'uer.client.update')
+    @php($updateAppRoute = 'user.client.update')
 @else
     @php($updateAppRoute = 'user.app.update')
 @endif

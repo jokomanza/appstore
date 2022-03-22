@@ -1,12 +1,13 @@
 @extends('user.layouts.user')
 
 @php($editAppRoute = 'user.app.edit')
+@php($editClientAppRoute = 'user.client.edit')
 @php($destroyAppRoute = 'user.app.destroy')
 @php($showVersionRoute = 'user.version.show')
 @php($showClientVersionRoute = 'user.client.version.show')
 @php($createVersionRoute = 'user.version.create')
-@php($destroyPermissionRoute = 'user.app.developer.destroy')
-@php($storePermissionRoute = 'user.app.developer.store')
+@php($destroyPermissionRoute = 'user.app.permission.destroy')
+@php($storePermissionRoute = 'user.app.permission.store')
 @php($reportDataTablesRoute = 'user.app.report.datatables')
 
 @php($createClientVersionRoute = 'user.client.version.create')

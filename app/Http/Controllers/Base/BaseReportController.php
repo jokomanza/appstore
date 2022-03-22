@@ -7,7 +7,6 @@ use App\Models\Report;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\UnauthorizedException;
 use Illuminate\View\View;
@@ -18,18 +17,28 @@ abstract class BaseReportController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Factory|Application|View
      */
-    public function show(Request $request, $packageName, $id)
+    public function show(Request $request,$id,$packageName = null)
     {
-        $report = Report::with('app')->whereHas('app', function ($q) use ($packageName) {
-            $q->where('package_name', $packageName);
-        })->where('id', $id)->firstOrFail();
+        if ($request->routeIs($this->getView() . '.client.report.show')) {
+            $report = Report::with('app')->whereHas('app', function ($q) use ($packageName) {
+                $q->where('package_name', config('app.client_package_name'));
+            })->where('id', $id)->first();
+        } else {
+            if ($packageName == null) return view($this->getView() . '.errors.404');
 
-        return view($this->getView() . '.reports.show', compact('report' ));
+            $report = Report::with('app')->whereHas('app', function ($q) use ($packageName) {
+                $q->where('package_name', $packageName)->where('package_name', '!=', config('app.client_package_name'));
+            })->where('id', $id)->first();
+
+        }
+        if ($report == null) return view($this->getView() . '.errors.404');
+
+        return view($this->getView() . '.reports.show', compact('report'));
     }
-    
+
     public function showFull($reportId)
     {
         $report = Report::with('app')->where('report_id', $reportId)->firstOrFail();
@@ -38,32 +47,45 @@ abstract class BaseReportController extends BaseController
         return view($this->getView() . '.reports.full', compact('report'));
     }
 
-    public function destroy(Request $request, $packageName, $id)
+    /**
+     * @throws \Exception
+     */
+    public function destroy(Request $request, $id, $packageName = null )
     {
-        if (Auth::user()->access_level == 1) throw new UnauthorizedException();
-        
-        $app = App::where('package_name', $packageName)->firstOrFail();
 
-        if (!isset($app)) {
-            return back()->withErrors('application not found');
+        if ($request->routeIs($this->getView() . '.client.report.destroy')) {
+            $packageName = config('app.client_package_name');
+        } else {
+            if ($packageName == null) return view($this->getView() . '.errors.404');
         }
 
-        $route = $request->get('redirect', 'report.index');
+        $app = App::where('package_name', $packageName)->first();
+
+        if (!isset($app)) return back()->withErrors('application not found');
+
+        $isClientApp = $app->package_name == config('app.client_package_name');
+
+        if ($this->getView() == 'admin') $isAppOwner = true;
+        else $isAppOwner = Auth::user()->isOwnerOf($app);
+        $isAppDeveloper = Auth::user()->isDeveloperOf($app);
+        if (!$isAppOwner && !$isAppDeveloper) return back()->withErrors("You can't delete this report because you are not owner or developer of this app");
 
         $version = Report::where(['app_id' => $app->id, 'id' => $id])->firstOrFail();
 
         if ($version->delete()) {
-            return redirect()->route($this->getView() . '.app.show', $packageName);
+            if ($isClientApp) return redirect()->route($this->getView() . '.client.show');
+            else return redirect()->route($this->getView() . '.app.show', $packageName);
         }
         else return back()->withErrors('Failed to delete data');
     }
-
 
     public function getDataTables(Request $request, $packageName)
     {
         $app = App::where('package_name', $packageName)->first();
 
         if (!$app) return not_found();
+
+        $isClientApp = $app->package_name == config('app.client_package_name');
 
         $columns = [
             0 => 'created_at',
@@ -115,7 +137,8 @@ abstract class BaseReportController extends BaseController
         $data = array();
         if (!empty($reports)) {
             foreach ($reports as $report) {
-                $edit = route($this->getView() . '.report.show', [$app->package_name, $report->id]);
+                if ($isClientApp) $edit = route($this->getView() . '.client.report.show', [$report->id]);
+                else $edit = route($this->getView() . '.report.show', [$app->package_name, $report->id]);
                 $nestedData['date'] = $report->created_at->diffForHumans();
                 $nestedData['app_version'] = $report->app_version_name;
                 $nestedData['android_version'] = $report->android_version;

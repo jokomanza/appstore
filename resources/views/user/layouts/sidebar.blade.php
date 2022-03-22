@@ -24,19 +24,14 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item  has-sub {{ Route::is('user.app.*') ? 'active' : '' }}">
-                    <a href="#" class='sidebar-link'>
+                <li class="sidebar-item {{ Route::is('user.app.*') ? 'active' : '' }}">
+                    <a href="{{ route('user.app.index') }}" class='sidebar-link'>
                         <i class="bi bi-stack"></i>
                         <span>Apps</span>
                     </a>
-                    <ul class="submenu {{ Route::is('user.app.*') ? 'active' : '' }}">
-                        <li class="submenu-item {{ Route::is('user.app.index') ? 'active' : '' }}">
-                            <a href="{{ route('user.app.index') }}">All</a>
-                        </li>
-                    </ul>
                 </li>
 
-                <li class="sidebar-item {{ Route::is('client.show') ? 'active' : '' }} ">
+                <li class="sidebar-item {{ Route::is('user.client.show') ? 'active' : '' }} ">
                     <a href="{{ route('user.client.show') }}" class='sidebar-link'>
                         <i class="bi bi-grid-fill"></i>
                         <span>Client Application</span>
@@ -45,10 +40,10 @@
 
                 <li class="sidebar-title">Other</li>
 
-                <li class="sidebar-item  ">
-                    <a href="{{ route('docs') }}" class='sidebar-link'>
+                <li class="sidebar-item  {{ Route::is('user.docs') ? 'active' : '' }}">
+                    <a href="{{ route('user.docs') }}" class='sidebar-link'>
                         <i class="fa fa-book"></i>
-                        <span>Documentation</span>
+                        <span>User Manual</span>
                     </a>
                 </li>
 

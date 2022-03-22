@@ -60,7 +60,8 @@ abstract class BaseAppVersionController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
+     * @param CreateAppVersionRequest $request
+     * @param $id
      * @return View|RedirectResponse
      * @throws XmlParserException
      */

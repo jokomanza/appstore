@@ -109,7 +109,7 @@ abstract class BaseAppController extends BaseController
             $permission->fill($request->all());
 
             if ($permission->save()) return back();
-            else throw new Exception("failed to add permission");
+            else throw new Exception("Failed to add permission");
         } catch (Exception $e) {
             if ($e->getCode() == 23505) return back()->withErrors('Data already exists');
 
@@ -121,19 +121,13 @@ abstract class BaseAppController extends BaseController
      * Display the specified resource.
      *
      * @param Request $request
+     * @param null $packageName
      * @return Factory|Application|RedirectResponse|View
      */
     public function show(Request $request, $packageName = null)
     {
         try {
-            if ($request->routeIs($this->getView() . '.client.show')) {
-                $app = App::with('app_versions')->where('package_name', 'com.quick.quickappstore')->first();
-            } else {
-                if ($packageName == null) return view($this->getView() . '.errors.404');
-
-                $app = App::with('app_versions')->where('package_name', '!=', 'com.quick.quickappstore')->where('package_name', $packageName)->first();
-                if ($app == null) return view($this->getView() . '.errors.404');
-            }
+            $app = $this->findApp($packageName);
 
             $isAppDeveloper = Auth::user()->isDeveloperOf($app);
             $isAppOwner = Auth::user()->isOwnerOf($app);
@@ -167,8 +161,9 @@ abstract class BaseAppController extends BaseController
             if ($packageName == null) return view($this->getView() . '.errors.404');
 
             $app = App::with('app_versions')->where('package_name', '!=', 'com.quick.quickappstore')->where('package_name', $packageName)->first();
-            if ($app == null) return view($this->getView() . '.errors.404');
         }
+
+        if ($app == null) return view($this->getView() . '.errors.404');
 
         $isAppDeveloper = Auth::user()->isDeveloperOf($app);
         if ($this->getView() == 'admin') $isAppOwner = true;
@@ -188,14 +183,15 @@ abstract class BaseAppController extends BaseController
      */
     public function update(Request $request, $packageName = null)
     {
-        if ($request->routeIs($this->getView() . '.client.show')) {
+        if ($request->routeIs($this->getView() . '.client.update')) {
             $app = App::with('app_versions')->where('package_name', 'com.quick.quickappstore')->first();
         } else {
             if ($packageName == null) return view($this->getView() . '.errors.404');
 
             $app = App::with('app_versions')->where('package_name', '!=', 'com.quick.quickappstore')->where('package_name', $packageName)->first();
-            if ($app == null) return view($this->getView() . '.errors.404');
         }
+
+        if ($app == null) return view($this->getView() . '.errors.404');
 
         $isAppDeveloper = Auth::user()->isDeveloperOf($app);
         if ($this->getView() == 'admin') $isAppOwner = true;
@@ -356,6 +352,26 @@ abstract class BaseAppController extends BaseController
         );
 
         return response()->json($result);
+    }
+
+
+    /**
+     * @param string $routeIs
+     * @param string $packageName
+     * @return App
+     */
+    private function findApp($routeIs, $packageName) {
+        if ($request->routeIs($this->getView() . '.client.show')) {
+            $app = App::with('app_versions')->where('package_name', 'com.quick.quickappstore')->first();
+        } else {
+            if ($packageName == null) return view($this->getView() . '.errors.404');
+
+            $app = App::with('app_versions')->where('package_name', '!=', 'com.quick.quickappstore')->where('package_name', $packageName)->first();
+        }
+
+        if ($app == null) return view($this->getView() . '.errors.404');
+
+        return $app;
     }
 
     private function validatePermission(App $app, $redirect = true)

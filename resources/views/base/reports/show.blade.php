@@ -1,4 +1,3 @@
-
 <div class="page-heading">
     <div class="page-title">
         <div class="row">
@@ -105,7 +104,7 @@
                             <div class="card-body">
 
                                 <div class="buttons">
-                                    <form class="col-1" method="POST" action="{{ route($destroyReportRoute, [$report->app->package_name, $report->id]) }}">
+                                    <form class="col-1" method="POST" action="{{ $isClientApp ? route($destroyReportRoute, $report->id) :  route($destroyReportRoute, [$report->app->package_name, $report->id]) }}">
                                         {{ csrf_field() }}
                                         {{ method_field('DELETE') }}
                                         <input type="submit" class="delete-report btn btn-danger" value="Delete">

@@ -84,7 +84,7 @@
                             <div class="buttons">
                                 @if (($isClientApp && $isAppOwner) || $isAppDeveloper || $isAppOwner)
                                     <a clas="col-1"
-                                       href="{{ $isClientApp ? route('admin.client.edit') : route($editAppRoute, $app->package_name) }}"
+                                       href="{{ $isClientApp ? route($editClientAppRoute) : route($editAppRoute, $app->package_name) }}"
                                        class="btn btn-primary">Edit</a>
                                 @endif
 
@@ -143,8 +143,10 @@
                                                     <a class="btn btn-success"
                                                        href="{{ asset("storage/$value->apk_file_url") }}">Download</a>
                                                     @if($isClientApp)
-                                                        <a class="btn btn-primary"
-                                                           href="{{ route($showClientVersionRoute, [$value->version_name]) }}">View</a>
+                                                        @if($isAppOwner || $isAppDeveloper)
+                                                            <a class="btn btn-primary"
+                                                               href="{{ route($showClientVersionRoute, [$value->version_name]) }}">View</a>
+                                                        @endif
                                                     @else
                                                         <a class="btn btn-primary"
                                                            href="{{ route($showVersionRoute, [$app->package_name, $value->version_name]) }}">View</a>
@@ -250,7 +252,7 @@
                     @if ($isAppOwner)
                         <h5>Add Person</h5>
 
-                        <form action="{{ route($storePermissionRoute, [$app->id]) }}" method="post"
+                        <form action="{{ route($storePermissionRoute, [$app->package_name]) }}" method="post"
                               enctype="multipart/form-data">
                             {{ csrf_field() }}
 

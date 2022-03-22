@@ -1,12 +1,13 @@
 @extends('admin.layouts.admin')
 
 @php($editAppRoute = 'admin.app.edit')
+@php($editClientAppRoute = 'admin.client.edit')
 @php($destroyAppRoute = 'admin.app.destroy')
 @php($showVersionRoute = 'admin.version.show')
 @php($showClientVersionRoute = 'admin.client.version.show')
 @php($createVersionRoute = 'admin.version.create')
-@php($destroyPermissionRoute = 'admin.app.developer.destroy')
-@php($storePermissionRoute = 'admin.app.developer.store')
+@php($destroyPermissionRoute = 'admin.app.permission.destroy')
+@php($storePermissionRoute = 'admin.app.permission.store')
 @php($reportDataTablesRoute = 'admin.app.report.datatables')
 
 @php($createClientVersionRoute = 'admin.client.version.create')

@@ -12,17 +12,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('test', function(Request $request) {
-    return response()->json($request->wantsJson());
-})->name('test')->httpsOnly();
 
-
-/**
- * Download latest client mobile apk 
- */
 Route::get('/client/download', 'Api\ApiController@downloadClient');
 
-Route::get('apps', 'Api\ApiController@getAllApps')->name('api.app.index');
+Route::get('apps', 'Api\ApiController@getAllApps');
 
 Route::get('app/{packageName}/latest', 'Api\ApiController@getLatestApp');
 
@@ -40,9 +33,9 @@ Route::post("/versions/update", 'Api\ApiController@getAllUpdate');
 
 Route::post("/apps/details", 'Api\ApiController@getAppsDetails');
 
-Route::get('/client/reports', 'Api\ReportController@index')->name('api.report.index');
+Route::get('/client/reports', 'Api\ReportController@index');
 
-Route::post('/client/report', 'Api\ReportController@store')->name('api.report.store');
+Route::post('/client/report', 'Api\ReportController@store');
 
 Route::get('/clear', function () {
 
@@ -52,6 +45,5 @@ Route::get('/clear', function () {
     Artisan::call('view:clear');
     Artisan::call('route:clear');
 
-    return ok("Cleared!");
-
+    return ok(['message' => 'Cleared!']);
 });

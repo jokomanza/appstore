@@ -78,10 +78,10 @@
 
                 <li class="sidebar-title">Other</li>
 
-                <li class="sidebar-item  ">
-                    <a href="{{ route('docs') }}" class='sidebar-link'>
+                <li class="sidebar-item {{ Route::is('admin.docs') ? 'active' : '' }}  ">
+                    <a href="{{ route('admin.docs') }}" class='sidebar-link'>
                         <i class="fa fa-book"></i>
-                        <span>Documentation</span>
+                        <span>User Manual</span>
                     </a>
                 </li>
 
