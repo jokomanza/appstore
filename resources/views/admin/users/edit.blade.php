@@ -1,28 +1,22 @@
-@extends('layouts.app')
+@extends('admin.layouts.admin')
 
 @section('content')
-
-
-<header class="mb-3">
-    <a href="#" class="burger-btn d-block d-xl-none">
-        <i class="bi bi-justify fs-3"></i>
-    </a>
-</header>
 
 <div class="page-heading">
     <div class="page-title">
         <div class="row">
             <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Update app</h3>
+                <h3>Update User</h3>
                 <p class="text-subtitle text-muted">Update app data. Note that default icon, name, package
                     name, type and description are required.</p>
             </div>
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('app.index') }}">Apps</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit {{ $data->name }}</li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.home') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.user.index') }}">Users</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.user.show', $user->registration_number) }}">{{ $user->registration_number }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit</li>
                     </ol>
                 </nav>
             </div>
@@ -51,57 +45,45 @@
 
                             <br />
 
-                            <form action="{{ url("app/$data->id") }}" method="post" enctype="multipart/form-data">
-                                {{ method_field('PUT') }}
-                                {{ csrf_field() }}
 
-                                <div class="form-group">
-                                    <label for="icon_file">Default Icon</label>
-                                    <div>
-                                        <img src="{{ str_contains($data->icon_url, 'http') ? $data->icon_url : asset("storage/$data->icon_url") }}" width="50" height="50">
+                                <form action="{{ route('admin.user.update', $user->registration_number)  }}" method="post"
+                                      enctype="multipart/form-data">
+                                    {{ method_field('PUT') }}
+                                    {{ csrf_field() }}
+
+                                    <div class="form-group">
+                                        <label for="icon_file">Profile Picture</label>
+                                        <div>
+                                            <img src="{{asset("images/user1.png") }}"
+                                                 width="100" height="100">
+                                        </div>
                                     </div>
-                                    <input class="form-control" type="file" name="icon_file" value="{{ old('icon_file') }}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="name">Name</label>
-                                    <input class="form-control" type="text" name="name" value="{{ old('name') ? old('name') : $data->name }}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="package_name">Package Name</label>
-                                    <input class="form-control" type="text" name="package_name" value="{{ old('package_name') ? old('package_name') : $data->package_name }}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="type">Type</label>
-                                    <input class="form-control" type="text" name="type" value="{{ old('type') ? old('type') : $data->type }}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="description">Description</label>
-                                    <input class="form-control" type="text" name="description" value="{{ old('description') ? old('description') : $data->description }}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="repository_url">Repository URL</label>
-                                    <input class="form-control" type="text" name="repository_url" value="{{ old('repository_url') ? old('repository_url') : $data->repository_url }}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="user_documentation_file">User Documentation</label>
-                                    @if ($data->user_documentation_url)
-                                    <a href="{{ str_contains($data->user_documentation_url, 'http')? $data->user_documentation_url : asset('/storage/' . $data->user_documentation_url) }}">Preveriously
-                                        user documentation</a>
-                                    @endif
-                                    <input class="form-control" type="file" name="user_documentation_file" value="{{ old('user_documentation_file') }}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="developer_documentation_file">Developer Documentation</label>
-                                    @if ($data->developer_documentation_url)
-                                    <a href="{{ str_contains($data->developer_documentation_url, 'http')? $data->developer_documentation_url: asset('/storage/' . $data->developer_documentation_url) }}">Preveriously
-                                        developer documentation</a>
-                                    @endif
-                                    <input class="form-control" type="file" name="developer_documentation_file" value="{{ old('developer_documentation_file') }}">
-                                </div>
-                                <div class="form-group">
-                                    <input class="btn btn-primary" type="submit" value="Update">
-                                </div>
-                            </form>
+                                    <div class="form-group">
+                                        <label for="name">Name</label>
+                                        <input class="form-control" type="text" name="name"
+                                               value="{{ old('name') ? old('name') : $user->name }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label >Registration Number</label>
+                                        <input class="form-control" type="text"
+                                               value="{{ $user->registration_number }}" readonly="readonly">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input class="form-control" type="email" name="email"
+                                               value="{{ old('email') ? old('email') : $user->email }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Status</label>
+                                        <input class="form-control" type="text"
+                                               value="{{  $user instanceof \App\Admin ? 'Admin' : 'User' }}"
+                                               readonly="readonly">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input class="btn btn-primary" type="submit" value="Update">
+                                    </div>
+                                </form>
 
 
                         </div>

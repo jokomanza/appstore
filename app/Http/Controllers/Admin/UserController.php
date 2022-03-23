@@ -2,24 +2,23 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateUserRequest;
+use App\Http\Requests\UpdateUserRequest;
+use App\Models\Permission;
+use App\User;
+use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use App\User;
-use Illuminate\Validation\UnauthorizedException;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         $this->middleware('auth:admin');
     }
 
@@ -31,16 +30,6 @@ class UserController extends Controller
     public function index()
     {
         return view('admin.users.index');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Application|Factory|View
-     */
-    public function create()
-    {
-        return view('admin.users.create');
     }
 
     /**
@@ -56,66 +45,117 @@ class UserController extends Controller
             'name' => $request['name'],
             'email' => $request['email'],
             'access_level' => $request['access_level'],
-            'password' => bcrypt($request['password']),
-        ])) {
-            return redirect()->route('admin.users.index');
-        } else {
-            return back()->withErrors("");
-        }
+            'password' => bcrypt('123456'),
+        ])) return redirect()->route('admin.user.index');
+        else return back()->withErrors("");
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return Application|Factory|View
+     */
+    public function create()
+    {
+        return view('admin.users.create');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return Response
+     * @param Request $request
+     * @param $registrationNumber
+     * @return Application|Factory|View
      */
-    public function show($id)
+    public function show(Request $request, $registrationNumber)
     {
-        //
+        $user = User::find($registrationNumber);
+
+        if ($user == null) return view('admin.errors.404');
+
+        $apps = Permission::with('app')->where('user_registration_number', $user->registration_number)->get();
+
+        return view('admin.users.show', compact('user', 'apps'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return Response
+     * @param Request $request
+     * @param $registrationNumber
+     * @return Application|Factory|View
      */
-    public function edit($id)
+    public function edit(Request $request, $registrationNumber)
     {
-        //
+        $user = User::find($registrationNumber);
+
+        if ($user == null) return view('admin.errors.404');
+
+        return view('admin.users.edit', compact('user'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param  int  $id
-     * @return Response
+     * @param $registrationNumber
+     * @return Factory|Application|RedirectResponse|View
      */
-    public function update(Request $request, $id)
+    public function resetPassword(Request $request, $registrationNumber)
     {
-        //
+        $user = User::find($registrationNumber);
+
+        if ($user == null) return view('admin.errors.404');
+
+        $user->password = bcrypt('123456');
+
+        if ($user->update()) return back();
+        else return back()->withErrors('Failed to reset user password');
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param UpdateUserRequest $request
+     * @param $registrationNumber
+     * @return Factory|Application|RedirectResponse|View
+     */
+    public function update(UpdateUserRequest $request, $registrationNumber)
+    {
+        $user = User::find($registrationNumber);
+
+        if ($user == null) return view('admin.errors.404');
+
+        $user->fill($request->all());
+
+        if ($user->update()) return redirect()->route('admin.user.show', $registrationNumber);
+        else return back()->withErrors('Failed to update user');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return Response
+     * @param $registrationNumber
+     * @return Factory|Application|RedirectResponse|View
+     * @throws Exception
      */
-    public function destroy($id)
+    public function destroy($registrationNumber)
     {
-        //
+        $user = User::find($registrationNumber);
+
+        if ($user == null) return view('admin.errors.404');
+
+        if ($user->delete()) return redirect()->route('admin.user.index');
+        else return back()->withErrors("Failed to delete user account");
     }
 
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getDataTables(Request $request)
     {
-
-        $isAdmin = Auth::user() instanceof Admin;
-        $current_reg_num = Auth::user()->registration_number;
-
         $columns = [
             0 => 'registration_number',
             1 => 'name',
@@ -135,8 +175,7 @@ class UserController extends Controller
                 ->limit($limit)
                 ->orderBy($order, $dir)
                 ->get();
-        }
-        else {
+        } else {
             $search = $request->input('search.value');
 
             $users = User::where('registration_number', 'LIKE', "%$search%")
@@ -151,21 +190,16 @@ class UserController extends Controller
                 ->orWhere('email', 'LIKE', "%$search%")
                 ->count();
         }
+
         $data = array();
         if (!empty($users)) {
             foreach ($users as $user) {
-                $show = route('admin.app.show', $user->id);
-                $edit = route('admin.app.edit', $user->id);
+                $show = route('admin.user.show', $user->registration_number);
                 $nestedData['registration_number'] = $user->registration_number;
                 $nestedData['name'] = $user->name;
                 $nestedData['email'] = $user->email;
-//                if ($user->access_level <= $access_level) {
-//                    $nestedData['options'] = ($current_reg_num != $user->registration_number ? "&emsp;<a href='$show' class='btn btn-danger'>Delete</a>" : '')
-//                        . "&emsp;<a href='$edit' class='btn btn-success' >Edit</a>";
-//                }
-//                else {
-                    $nestedData['options'] = "";
-//                }
+                $nestedData['options'] = "<a href='$show' class='btn btn-success' >Show</a>";
+
                 $data[] = $nestedData;
             }
         }

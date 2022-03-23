@@ -290,19 +290,15 @@ class ApiController extends Controller
 
         $app = App::where('package_name', 'com.quick.quickappstore')->first();
 
-        if (!isset($app))
-            return not_found('Application not found');
+        if (!isset($app)) return not_found('Client application not found, contact developer.');
 
         $latest = AppVersion::where('app_id', $app->id)->orderBy('version_code', 'DESC')->first();
 
-        if (!isset($latest))
-            return not_found('Latest version not found');
+        if (!isset($latest)) return not_found("Client application doesn't have latest version");
 
-        $path = public_path('storage/' . $latest->apk_file_url);
+        $path = asset('storage/' . $latest->apk_file_url);
 
-        if (!File::exists($path)) {
-            return not_found('File not found');
-        }
+        if (!File::exists($path)) return not_found('File not found');
 
         $file = File::get($path);
         $type = File::mimeType($path);
@@ -312,68 +308,5 @@ class ApiController extends Controller
         $response->header('Content-Disposition', 'attachment; filename="' . $latest->apk_file_url . '"');
 
         return $response;
-    }
-
-    public function getAppsDataTable(Request $request)
-    {
-
-        $columns = [
-            0 => 'id',
-            1 => 'name',
-            2 => 'package_name',
-            3 => 'updated_at',
-        ];
-
-        $totalData = App::where('package_name', '!=', 'com.quick.quickappstore')->count();
-        $totalFiltered = $totalData;
-
-        $limit = $request->input('length');
-        $start = $request->input('start');
-        $order = $columns[$request->input('order.0.column')];
-        $dir = $request->input('order.0.dir');
-
-        if (empty($request->input('search.value'))) {
-            $apps = App::offset($start)
-                ->where('package_name', '!=', 'com.quick.quickappstore')
-                ->limit($limit)
-                ->orderBy($order, $dir)
-                ->get();
-        } else {
-            $search = $request->input('search.value');
-
-            $apps = App::where('package_name', 'LIKE', "%$search%")
-                ->where('package_name', '!=', 'com.quick.quickappstore')
-                ->orWhere('name', 'LIKE', "%$search%")
-                ->offset($start)
-                ->limit($limit)
-                ->orderBy($order, $dir)
-                ->get();
-            $totalFiltered = App::where('package_name', 'LIKE', "%$search%")
-                ->where('package_name', '!=', 'com.quick.quickappstore')
-                ->orWhere('name', 'LIKE', "%$search%")
-                ->count();
-        }
-        $data = array();
-        if (!empty($apps)) {
-            foreach ($apps as $app) {
-                $show = route('app.show', $app->id);
-                $edit = route('app.edit', $app->id);
-                $nestedData['id'] = $app->id;
-                $nestedData['name'] = $app->name;
-                $nestedData['package_name'] = $app->package_name;
-                $nestedData['updated_at'] = (new Carbon($app->updated_at))->diffForHumans();
-                $nestedData['options'] = "&emsp;<a href='$show' class='btn btn-secondary'>Show</a>
-                      &emsp;<a href='$edit' class='btn btn-success' >Edit</a>";
-                $data[] = $nestedData;
-            }
-        }
-        $json_data = array(
-            "draw" => intval($request->input('draw')),
-            "recordsTotal" => intval($totalData),
-            "recordsFiltered" => intval($totalFiltered),
-            "data" => $data
-        );
-
-        return response()->json($json_data);
     }
 }

@@ -85,6 +85,21 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ Route::is('admin.profile.*') ? 'active' : '' }}  ">
+                    <a href="{{ route('admin.profile.show') }}" class='sidebar-link'>
+                        <i class="fa fa-book"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+
+
+                <li class="sidebar-item {{ Route::is('admin.setting.*') ? 'active' : '' }}  ">
+                    <a href="{{ route('admin.setting.index') }}" class='sidebar-link'>
+                        <i class="fa fa-book"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+
             </ul>
         </div>
         <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>

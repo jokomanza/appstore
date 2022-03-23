@@ -12,3 +12,10 @@ if (!function_exists('isClientDeveloper')) {
         })->first());
     }
 }
+
+if (!function_exists('isClientApp')) {
+    function isClientApp(\App\Models\App $app)
+    {
+        return $app->package_name == config('app.client_package_name');
+    }
+}

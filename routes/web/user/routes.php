@@ -4,6 +4,27 @@
 use Illuminate\Support\Facades\Route;
 
 
+// profile
+/*----------------------------------------------------------------------------------------------------------------*/
+Route::get('/profile', 'UserProfileController@show')
+    ->name('profile.show');
+
+Route::get('/profile/edit', 'UserProfileController@edit')
+    ->name('profile.edit');
+
+Route::put('/profile', 'UserProfileController@update')
+    ->name('profile.update');
+
+Route::delete('/profile', 'UserProfileController@destroy')
+    ->name('profile.destroy');
+
+Route::get('/profile/password/edit', 'UserProfileController@editPassword')
+    ->name('profile.password.edit');
+
+Route::put('/profile/password', 'UserProfileController@updatePassword')
+    ->name('profile.password.update');
+
+
 // auth
 /*----------------------------------------------------------------------------------------------------------------*/
 Route::get('/login', 'Auth\UserLoginController@showLoginForm')
@@ -14,7 +35,6 @@ Route::post('/login', 'Auth\UserLoginController@login')
 
 Route::post('/logout', 'Auth\UserLoginController@logout')
     ->name('logout');
-
 
 // dashboard
 /*----------------------------------------------------------------------------------------------------------------*/

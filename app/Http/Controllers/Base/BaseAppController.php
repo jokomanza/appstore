@@ -127,7 +127,7 @@ abstract class BaseAppController extends BaseController
     public function show(Request $request, $packageName = null)
     {
         try {
-            $app = $this->findApp($packageName);
+            $app = $this->findApp($request->routeIs($this->getView() . '.client.show'), $packageName);
 
             $isAppDeveloper = Auth::user()->isDeveloperOf($app);
             $isAppOwner = Auth::user()->isOwnerOf($app);
@@ -183,13 +183,7 @@ abstract class BaseAppController extends BaseController
      */
     public function update(Request $request, $packageName = null)
     {
-        if ($request->routeIs($this->getView() . '.client.update')) {
-            $app = App::with('app_versions')->where('package_name', 'com.quick.quickappstore')->first();
-        } else {
-            if ($packageName == null) return view($this->getView() . '.errors.404');
-
-            $app = App::with('app_versions')->where('package_name', '!=', 'com.quick.quickappstore')->where('package_name', $packageName)->first();
-        }
+        $app = $this->findApp($request->routeIs($this->getView() . '.client.update'), $packageName);
 
         if ($app == null) return view($this->getView() . '.errors.404');
 
@@ -249,11 +243,9 @@ abstract class BaseAppController extends BaseController
      */
     public function destroy(Request $request, $packageName)
     {
-        $app = App::where('package_name', $packageName)->first();
+        $app = $this->findApp(false, $packageName);
 
-        if (!isset($app)) return back()->withErrors('application not found');
-
-        if ($app->package_name == config('app.client_package_name')) return back()->withErrors("You can't delete client app");
+        if ($app == null) return back()->withErrors("Application not found");
 
         if ($this->getView() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
@@ -334,6 +326,9 @@ abstract class BaseAppController extends BaseController
                 $isAppDeveloper = Auth::user()->isDeveloperOf($app);
                 $isAppOwner = Auth::user()->isOwnerOf($app);
 
+                $iconUrl = asset('storage/' . $app->icon_url);
+
+                $nestedData['icon'] = "&emsp;<img src='$iconUrl' width='50' height='50' alt='App icon'>";
                 $nestedData['id'] = $app->id;
                 $nestedData['name'] = $app->name;
                 $nestedData['package_name'] = $app->package_name;
@@ -356,20 +351,20 @@ abstract class BaseAppController extends BaseController
 
 
     /**
-     * @param string $routeIs
+     * @param $isForClientApp
      * @param string $packageName
-     * @return App
+     * @return App|null
      */
-    private function findApp($routeIs, $packageName) {
-        if ($request->routeIs($this->getView() . '.client.show')) {
+    private function findApp($isForClientApp, $packageName) {
+        if ($isForClientApp) {
             $app = App::with('app_versions')->where('package_name', 'com.quick.quickappstore')->first();
         } else {
-            if ($packageName == null) return view($this->getView() . '.errors.404');
+            if ($packageName == null) return null;
 
             $app = App::with('app_versions')->where('package_name', '!=', 'com.quick.quickappstore')->where('package_name', $packageName)->first();
         }
 
-        if ($app == null) return view($this->getView() . '.errors.404');
+        if ($app == null) return null;
 
         return $app;
     }

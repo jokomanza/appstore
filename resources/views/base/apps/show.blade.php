@@ -47,14 +47,13 @@
                             <p>Description : {{ $app->description }}</p>
                             @if ($isAppDeveloper || $isAppOwner)
                                 <p>Api Token :
-                                <pre>{{ $app->api_token }}</pre>
-                                </p>
+                                <pre>{{ $app->api_token }}</pre></p>
                             @endif
 
                             <div class="row">
                                 @if ($app->repository_url)
                                     <div class="mb-3">
-                                        <a href="{{ $app->repository_url }}">Git Repository</a>
+                                        <a href="{{ url($app->repository_url) }}">Git Repository</a>
                                     </div>
                                 @endif
                                 @if ($app->user_documentation_url)

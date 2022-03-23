@@ -47,6 +47,13 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item  {{ Route::is('user.profile.show') ? 'active' : '' }}">
+                    <a href="{{ route('user.profile.show') }}" class='sidebar-link'>
+                        <i class="fa fa-book"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+
             </ul>
         </div>
         <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>

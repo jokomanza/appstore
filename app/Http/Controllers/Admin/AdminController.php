@@ -50,16 +50,17 @@ class AdminController extends Controller
      */
     public function store(CreateAdminRequest $request)
     {
-        if (Admin::create([
-            'registration_number' => $request['registration_number'],
-            'name' => $request['name'],
-            'email' => $request['email'],
-            'access_level' => $request['access_level'],
-            'password' => bcrypt($request['password']),
-        ])) {
-            return redirect()->route('admin.users.index');
-        } else {
-            return back()->withErrors("");
+        try {
+            if (Admin::create([
+                'registration_number' => $request['registration_number'],
+                'name' => $request['name'],
+                'email' => $request['email'],
+                'password' => bcrypt('123456'),
+            ])) {
+                return redirect()->route('admin.admin.index');
+            } else return back()->withErrors("Failed to create new admin");
+        } catch (\Exception $exception) {
+            return back()->withErrors("Error " . $exception->getCode())->withInput();
         }
     }
 
@@ -111,9 +112,6 @@ class AdminController extends Controller
 
     public function getDataTables(Request $request)
     {
-
-        $current_reg_num = Auth::user()->registration_number;
-
         $columns = [
             0 => 'registration_number',
             1 => 'name',
@@ -157,13 +155,7 @@ class AdminController extends Controller
                 $nestedData['registration_number'] = $user->registration_number;
                 $nestedData['name'] = $user->name;
                 $nestedData['email'] = $user->email;
-//                if ($user->access_level <= $access_level) {
-//                    $nestedData['options'] = ($current_reg_num != $user->registration_number ? "&emsp;<a href='$show' class='btn btn-danger'>Delete</a>" : '')
-//                        . "&emsp;<a href='$edit' class='btn btn-success' >Edit</a>";
-//                }
-//                else {
                 $nestedData['options'] = "";
-//                }
                 $data[] = $nestedData;
             }
         }

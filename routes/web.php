@@ -13,6 +13,11 @@ Route::get('/admin/docs', 'Admin\AdminDocumentationController@index')->name('adm
 
 //Auth::routes();
 
+Route::get('password/reset', 'User\Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
+Route::post('password/email', 'User\Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+Route::get('password/reset/{token}', 'User\Auth\ResetPasswordController@showResetForm')->name('password.reset');
+Route::post('password/reset', 'User\Auth\ResetPasswordController@reset');
+
 Route::group([
     'prefix' => 'admin',
     'as' => 'admin.',

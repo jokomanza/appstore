@@ -15,14 +15,12 @@
 
     <section class="section">
         <div class="card">
-            {{-- <div class="card-header">
-                Datatable
-            </div> --}}
             <div class="card-body">
                 <table class="table" id="apps">
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Icon</th>
                             <th>Name</th>
                             <th>Package Name</th>
                             <th>Updated</th>
@@ -38,7 +36,6 @@
 
 @push('script')
     <script>
-        // Jquery Datatable
         $(document).ready(function() {
             $("#apps").dataTable().fnDestroy();
 
@@ -56,6 +53,8 @@
                 },
                 "columns": [{
                     "data": "id"
+                },{
+                    "data": "icon"
                 }, {
                     "data": "name"
                 }, {

@@ -13,7 +13,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-Route::get('/client/download', 'Api\ApiController@downloadClient');
+Route::get('/documentation', function() {
+    return "Under development";
+})->name('api.docs');
+
+Route::get('/client/download', 'Api\ApiController@downloadClient')->name('api.client.download');
 
 Route::get('apps', 'Api\ApiController@getAllApps');
 

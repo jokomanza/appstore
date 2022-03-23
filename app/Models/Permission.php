@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use App\User;
 
 /**
- * Class Developer
+ * Class Permission
  * 
  * @property int $id
  * @property int $app_id
  * @property string $user_registration_number
- * @property timestamp without time zone|null $created_at
- * @property timestamp without time zone|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * 
  * @property App $app
  * @property User $user

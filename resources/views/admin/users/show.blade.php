@@ -1,25 +1,20 @@
-@extends('layouts.app')
+@extends('admin.layouts.admin')
 
 @section('content')
-    <header class="mb-3">
-        <a href="#" class="burger-btn d-block d-xl-none">
-            <i class="bi bi-justify fs-3"></i>
-        </a>
-    </header>
 
     <div class="page-heading">
         <div class="page-title">
             <div class="row">
                 <div class="col-12 col-md-6 order-md-1 order-last">
-                    <h3>App #{{ $data->id }}</h3>
-                    <p class="text-subtitle text-muted">{{ $data->name }}'s detail.</p>
+                    <h3>User #{{ $user->registration_number }}</h3>
+                    <p class="text-subtitle text-muted">User detail.</p>
                 </div>
                 <div class="col-12 col-md-6 order-md-2 order-first">
                     <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('admin.home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('admin.app.index') }}">Apps</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">{{ $data->name }}</li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.app.index') }}">Users</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ $user->registration_number }}</li>
                         </ol>
                     </nav>
                 </div>
@@ -30,55 +25,43 @@
                 <div class="col-md-4">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Detail App</h4>
+                            <h4 class="card-title">Detail</h4>
                         </div>
                         <div class="card-content">
                             <div class="card-body">
 
                                 <div class="mb-4">
-                                    <img src="{{ str_contains($data->icon_url, 'http') ? $data->icon_url : asset("storage/$data->icon_url") }}"
-                                        width="100" height="100">
+                                    <img src="{{ asset('images/user1.png') }}"
+                                         width="100" height="100">
                                 </div>
                                 <div class="col">
-                                    <p class="text">Name : {{ $data->name }}</p>
+                                    <p class="text">Name : {{ $user->name }}</p>
                                 </div>
-                                <p>Package Name : {{ $data->package_name }}</p>
-                                <p>Type : {{ $data->type }}</p>
-                                <p>Description : {{ $data->description }}</p>
-
-                                <div class="row">
-                                    @if ($data->repository_url)
-                                        <div class="mb-3">
-                                            <a href="{{ $data->repository_url }}">Git Repository</a>
-                                        </div>
-                                    @endif
-                                    @if ($data->user_documentation_url)
-                                        <div class="mb-3">
-                                            <a href="{{ asset('/storage/' . $data->user_documentation_url) }}">User
-                                                Documentation</a>
-                                        </div>
-                                    @endif
-                                    @if ($data->developer_documentation_url)
-                                        <div class="mb-3">
-                                            <a href="{{ asset('/storage/' . $data->developer_documentation_url) }}">Developer
-                                                Documentation</a>
-                                        </div>
-                                    @endif
-                                </div>
-                                <p>Created {{ (new \Carbon\Carbon($data->created_at))->diffForHumans() }}
-                                    {{ $data->created_at == $data->updated_at? '': ' and updated ' . (new \Carbon\Carbon($data->updated_at))->diffForHumans() }}
-                                </p>
+                                <p>Registration Number : {{ $user->registration_number }}</p>
+                                <p>Email : {{ $user->email }}</p>
+                                <p>Status : {{ $user instanceof \App\Admin ? 'Admin' : 'User'}}</p>
 
                                 <br><br>
 
                                 <div class="buttons">
-                                    <a clas="col-1" href="{{ url("app/$data->id/edit") }}"
-                                        class="btn btn-primary">Update</a>
-                                    <form class="col-1" method="POST" action="{{ url("app/$data->id") }}">
+                                    <a clas="col-1"
+                                       href="{{ route('admin.user.edit', $user->registration_number) }}"
+                                       class="btn btn-primary">Edit</a>
+
+                                    <form class="col-1" method="POST"
+                                          action="{{ route('admin.user.password.reset', $user->registration_number) }}">
+                                        {{ csrf_field() }}
+                                        {{ method_field('PUT') }}
+
+                                        <input type="submit" class="btn btn-secondary" value="Reset Password">
+                                    </form>
+
+                                    <form class="col-1" method="POST"
+                                          action="{{ route('admin.user.destroy', $user->registration_number) }}">
                                         {{ csrf_field() }}
                                         {{ method_field('DELETE') }}
 
-                                        <input type="submit" class="btn btn-danger" value="Delete">
+                                        <input type="submit" class="delete-user btn btn-danger" value="Delete">
                                     </form>
                                 </div>
 
@@ -89,7 +72,7 @@
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Versions</h4>
+                            <h4 class="card-title">Apps</h4>
                         </div>
                         <div class="card-content">
                             <div class="card-body">
@@ -97,39 +80,39 @@
                                 <div class="table-responsive">
                                     <table class="table table-lg">
                                         <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th>Version</th>
-                                                <th>Size</th>
-                                                <th>Released</th>
-                                                <th></th>
-                                            </tr>
+                                        <tr>
+                                            <th>Icon</th>
+                                            <th>Name</th>
+                                            <th>Position</th>
+                                            <th>Last Updated</th>
+                                        </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($data->app_versions as $key => $value)
-                                                <tr>
-                                                    <td><img src="{{ str_contains($value->icon_url, 'http') ? $value->icon_url : asset("storage/$value->icon_url") }}"
-                                                            width="50" height="50"></td>
-                                                    <td class="text-bold-500">{{ $value->version_name }}</td>
-                                                    <td>{{ $value->apk_file_size }}</td>
-                                                    <td>{{ $value->updated_at }}</td>
-                                                    <td class="text-bold-500">
-                                                        <div class="buttons">
-                                                            <a class="btn btn-success"
-                                                                href="{{ asset("storage/$value->apk_file_url") }}">Download</a>
-                                                            <a class="btn btn-primary"
-                                                                href="{{ route('version.show', [$data->id, $value->id]) }}">View</a>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
+                                        @forelse ($apps as $key => $value)
+                                            <tr>
+                                                <td>
+                                                    <img src="{{ asset("storage/". $value->app->icon_url) }}"
+                                                         width="50" height="50"></td>
+                                                <td class="text-bold-500">{{ $value->app->name }}</td>
+                                                <td>{{ $value->type }}</td>
+                                                <td>{{ (new \Carbon\Carbon($value->app->updated_at))->diffForHumans() }}</td>
+                                                <td class="text-bold-500">
+                                                    <div class="buttons">
+                                                        <a class="btn btn-primary"
+                                                           href="{{ isClientApp($value->app) ? route('admin.client.show') : route('admin.app.show', [$value->app->package_name]) }}">View</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                        @empty
+                                            <tr>
+                                                <td colspan="5">
+                                                    <p class="text-center">This user don't have any app yet</p>
+                                                </td>
+                                            </tr>
+                                        @endforelse
                                         </tbody>
                                     </table>
-                                    <a class="btn btn-success" href="{{ route('version.create', $data->id) }}">Create new
-                                        version</a>
-                                    <div class="d-flex justify-content-center">
-                                        {{-- {!! $data->links() !!} --}}
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -139,26 +122,41 @@
         </section>
     </div>
 
+@endsection
 
-
-
+@push('script')
 
     <script>
-        $('.delete-application').click(function(e) {
-            // e.preventDefault() // Don't post the form, unless confirmed
+        $('.delete-user').click(function (e) {
+            e.preventDefault() // Don't post the form, unless confirmed
 
-            bootbox.confirm({
-                size: "small",
-                message: "Are you sure?",
-                callback: function(result) {
-                    /* result is a boolean; true = OK, false = Cancel*/
-                }
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover his/her account!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
             })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        swal({
+                            title: "Are you really sure?",
+                            text: "Once again, you will NOT BE ABLE TO RECOVER HIS/HER ACCOUNT!",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        })
+                            .then((willDelete) => {
+                                if (willDelete) {
+                                    $(e.target).closest('form').submit() // Post the surrounding form
+                                } else {
 
-            // if (confirm('Are you sure?')) {
-            //     // Post the form
-            //     $(e.target).closest('form').submit() // Post the surrounding form
-            // }
-        });
+                                }
+                            });
+                    } else {
+
+                    }
+                });
+        })
     </script>
-@endsection
+@endpush

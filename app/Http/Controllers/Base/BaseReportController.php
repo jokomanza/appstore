@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Base;
 
 use App\Models\App;
 use App\Models\Report;
+use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\UnauthorizedException;
 use Illuminate\View\View;
 
 abstract class BaseReportController extends BaseController
@@ -20,7 +20,7 @@ abstract class BaseReportController extends BaseController
      * @param int $id
      * @return Factory|Application|View
      */
-    public function show(Request $request,$id,$packageName = null)
+    public function show(Request $request, $packageName, $id)
     {
         if ($request->routeIs($this->getView() . '.client.report.show')) {
             $report = Report::with('app')->whereHas('app', function ($q) use ($packageName) {
@@ -48,9 +48,9 @@ abstract class BaseReportController extends BaseController
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    public function destroy(Request $request, $id, $packageName = null )
+    public function destroy(Request $request, $packageName, $id)
     {
 
         if ($request->routeIs($this->getView() . '.client.report.destroy')) {
@@ -75,8 +75,7 @@ abstract class BaseReportController extends BaseController
         if ($version->delete()) {
             if ($isClientApp) return redirect()->route($this->getView() . '.client.show');
             else return redirect()->route($this->getView() . '.app.show', $packageName);
-        }
-        else return back()->withErrors('Failed to delete data');
+        } else return back()->withErrors('Failed to delete data');
     }
 
     public function getDataTables(Request $request, $packageName)

@@ -4,6 +4,33 @@
 use Illuminate\Support\Facades\Route;
 
 
+// settings
+/*----------------------------------------------------------------------------------------------------------------*/
+Route::get('/settings', 'AdminSettingController@index')
+    ->name('setting.index');
+
+
+// profile
+/*----------------------------------------------------------------------------------------------------------------*/
+Route::get('/profile', 'AdminProfileController@show')
+    ->name('profile.show');
+
+Route::get('/profile/edit', 'AdminProfileController@edit')
+    ->name('profile.edit');
+
+Route::put('/profile', 'AdminProfileController@update')
+    ->name('profile.update');
+
+Route::delete('/profile', 'AdminProfileController@destroy')
+    ->name('profile.destroy');
+
+Route::get('/profile/password/edit', 'AdminProfileController@editPassword')
+    ->name('profile.password.edit');
+
+Route::put('/profile/password', 'AdminProfileController@updatePassword')
+    ->name('profile.password.update');
+
+
 // auth
 /*----------------------------------------------------------------------------------------------------------------*/
 Route::get('/login', 'Auth\AdminLoginController@showLoginForm')
@@ -140,6 +167,10 @@ Route::put('/user/{registrationNumber}', 'UserController@update')
 Route::delete('/user/{registrationNumber}', 'UserController@destroy')
     ->where('registrationNumber', '[A-Z]{1}[0-9]{4}$')
     ->name('user.destroy');
+
+Route::put('/user/{registrationNumber}/password/reset', 'UserController@resetPassword')
+    ->where('registrationNumber', '[A-Z]{1}[0-9]{4}$')
+    ->name('user.password.reset');
 
 Route::post('user/datatables', 'UserController@getDataTables')
     ->name('user.datatables');
