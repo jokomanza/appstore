@@ -1,12 +1,6 @@
 @extends('admin.layouts.admin')
 
 @section('content')
-    <header class="mb-3">
-        <a href="#" class="burger-btn d-block d-xl-none">
-            <i class="bi bi-justify fs-3"></i>
-        </a>
-    </header>
-
     <div class="page-heading">
         <h3>Quick App Store Statistics</h3>
     </div>
@@ -16,7 +10,7 @@
                 <div class="row">
                     <div class="col-6 col-lg-3 col-md-6">
                         <div class="card" onclick="location.href='{{ route('app.index') }}';"
-                            style="cursor: pointer;">
+                             style="cursor: pointer;">
                             <div class="card-body px-3 py-4-5">
                                 <div class="row">
                                     <div class="col-md-4">
@@ -34,7 +28,7 @@
                     </div>
                     <div class="col-6 col-lg-3 col-md-6">
                         <div class="card" onclick="location.href='{{ route('user.index') }}';"
-                            style="cursor: pointer;">
+                             style="cursor: pointer;">
                             <div class="card-body px-3 py-4-5">
                                 <div class="row">
                                     <div class="col-md-4">
@@ -109,10 +103,10 @@
 
                         @foreach ($recentApps as $app)
                             <div onclick="location.href='{{ route('app.show', $app->id) }}';" style="cursor: pointer;"
-                                class="recent-message d-flex px-4 py-3 ripple">
+                                 class="recent-message d-flex px-4 py-3 ripple">
                                 <div class="avatar avatar-lg">
                                     <img
-                                        src="{{ str_contains($app->icon_url, 'http') ? $app->icon_url : asset("storage/$app->icon_url") }}">
+                                            src="{{ str_contains($app->icon_url, 'http') ? $app->icon_url : asset("storage/$app->icon_url") }}">
                                 </div>
                                 <div class="name ms-4">
                                     <h5 class="mb-1">{{ $app->name }}</h5>
@@ -123,7 +117,7 @@
 
                         <div class="px-4">
                             <a href="{{ route('app.index') }}"
-                                class='btn btn-block btn-xl btn-light-primary font-bold mt-3'>
+                               class='btn btn-block btn-xl btn-light-primary font-bold mt-3'>
                                 Show more</a>
                         </div>
                     </div>

@@ -21,8 +21,8 @@
                                                 <label class="form-label" for="registration-number">Registration
                                                     Number</label>
                                                 <input type="text" id="registration-number" name="registration_number"
-                                                    class="form-control form-control-lg"
-                                                    value="{{ old('registration_number') }}" required autofocus />
+                                                       class="form-control form-control-lg"
+                                                       value="{{ old('registration_number') }}" required autofocus/>
                                             </div>
 
                                             @if ($errors->has('registration_number'))
@@ -40,7 +40,7 @@
                                             <div class="form-outline">
                                                 <label class="form-label" for="email">Password</label>
                                                 <input type="password" id="password" name="password"
-                                                    class="form-control form-control-lg" required autofocus />
+                                                       class="form-control form-control-lg" required autofocus/>
                                             </div>
 
                                         </div>
@@ -57,14 +57,14 @@
                                             <div class="checkbox">
                                                 <label>
                                                     <input type="checkbox" name="remember"
-                                                        {{ old('remember') ? 'checked' : '' }}> Remember Me
+                                                            {{ old('remember') ? 'checked' : '' }}> Remember Me
                                                 </label>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="mt-4 pt-2">
-                                        <input class="btn btn-primary btn-lg" type="submit" value="Submit" />
+                                        <input class="btn btn-primary btn-lg" type="submit" value="Submit"/>
                                     </div>
 
                                 </form>

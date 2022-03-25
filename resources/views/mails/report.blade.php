@@ -9,21 +9,22 @@
 </head>
 
 <body>
-    <h1>Dear Developers</h1>
+<h1>Dear Developers</h1>
 
-    <p>Your application {{ $report->package_name }} (version {{ $report->app_version_name }}) {{ $report->is_silent ? 'has encountered an error on' : 'crashed at' }}
-        {{ $report->created_at }}, with exception {{ $report->exception }}</p>
-    <p>Crash occurs on {{ $report->brand . ' ' . $report->phone_model }} device with android version
-        {{ $report->android_version }}</p>
-    <p><a href="{{ url('report/' . $report->report_id) }}">Open</a> in Acra Web Admin for more details</p>
-    <p>Please check immediately and fix the problem</p>
+<p>Your application {{ $report->package_name }} (version {{ $report->app_version_name }}
+    ) {{ $report->is_silent ? 'has encountered an error on' : 'crashed at' }}
+    {{ $report->created_at }}, with exception {{ $report->exception }}</p>
+<p>Crash occurs on {{ $report->brand . ' ' . $report->phone_model }} device with android version
+    {{ $report->android_version }}</p>
+<p><a href="{{ url('report/' . $report->report_id) }}">Open</a> in Acra Web Admin for more details</p>
+<p>Please check immediately and fix the problem</p>
 
-    <br>
-    <br>
+<br>
+<br>
 
-    <p>Thanks</p>
-    <br>
-    <p>Crash Report System</p>
+<p>Thanks</p>
+<br>
+<p>Crash Report System</p>
 
 </body>
 

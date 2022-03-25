@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\App;
 use App\Models\AppVersion;
+use App\Models\Permission;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
@@ -17,7 +19,8 @@ class ApiController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $appId
+     * @param Request $request
+     * @param $fileName
      * @return \Illuminate\Http\Response
      */
     public function download(Request $request, $fileName)
@@ -40,6 +43,11 @@ class ApiController extends Controller
         return $response;
     }
 
+    /**
+     * @param Request $request
+     * @param $appId
+     * @return JsonResponse
+     */
     public function checkAppUpdate(Request $request, $appId)
     {
 
@@ -71,13 +79,15 @@ class ApiController extends Controller
 
         $update = AppVersion::where('version_code', '>', $appVersion->version_code)->orderBy('version_code', 'DESC')->first();
 
-        if (!isset($update)) {
-            return not_found("this version has no update");
-        }
+        if (!isset($update)) return not_found("this version has no update");
 
         return ok($update);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getAllUpdate(Request $request)
     {
 
@@ -87,9 +97,6 @@ class ApiController extends Controller
             'apps.*.version_code' => 'required|numeric'
         ]);
 
-        // dump($validator->messages());
-        // die;
-
         if ($validator->fails()) {
             return not_found('Validation fails', $validator->messages());
         }
@@ -98,22 +105,15 @@ class ApiController extends Controller
 
         foreach ($request->all()['apps'] as $key => $value) {
 
-            // dump($request->all());
-
-
             $newest = AppVersion::with("app")->where('version_code', '>', $value['version_code'])
                 ->whereHas('app', function ($q) use ($value) {
                     $q->where('package_name', $value['package_name']);
                 })->orderBy('version_code', 'DESC')->first();
 
-            if (isset($newest)) {
-                $hasUpdate[] = $newest;
-            }
+            if (isset($newest)) $hasUpdate[] = $newest;
         }
 
-        if (empty($hasUpdate)) {
-            return not_found("No update found");
-        }
+        if (empty($hasUpdate))  return not_found("No update found");
 
         foreach ($hasUpdate as $key => $value) {
             $hasUpdate[$key]['updated'] = (new Carbon($value->updated_at))->diffForHumans();
@@ -122,6 +122,10 @@ class ApiController extends Controller
         return ok($hasUpdate);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getAppsDetails(Request $request)
     {
 
@@ -129,9 +133,6 @@ class ApiController extends Controller
             'apps' => 'required|array|min:1',
             'apps.*.package_name' => 'required|string'
         ]);
-
-        // dump($validator->messages());
-        // die;
 
         if ($validator->fails()) {
             return not_found('Validation fails', $validator->messages());
@@ -141,23 +142,22 @@ class ApiController extends Controller
 
         foreach ($request->all()['apps'] as $key => $value) {
 
-            // dump($request->all());
-
             $app = App::where('package_name', $value['package_name'])
                 ->orderBy('updated_at', 'DESC')->first();
 
-            if (isset($app)) {
-                $data[] = $app;
-            }
+            if (isset($app)) $data[] = $app;
         }
 
-        if (empty($data)) {
-            return ok("no applications found in database");
-        }
+        if (empty($data)) return ok("no applications found in database");
 
         return ok($data);
     }
 
+    /**
+     * @param Request $request
+     * @param $appId
+     * @return JsonResponse
+     */
     public function getUpdate(Request $request, $appId)
     {
 
@@ -189,13 +189,17 @@ class ApiController extends Controller
 
         $newest = AppVersion::where('version_code', '>', $appVersion->version_code)->where('app_id', $appId)->orderBy('version_code', 'DESC')->first();
 
-        if ($newest == null) {
-            return not_found();
-        }
+        if ($newest == null) return not_found();
 
         return ok($newest);
     }
 
+    /**
+     * @param Request $request
+     * @param $packageName
+     * @param $versionCode
+     * @return JsonResponse
+     */
     public function checkUpdate(Request $request, $packageName, $versionCode)
     {
 
@@ -212,16 +216,15 @@ class ApiController extends Controller
         })->orderBy('version_code', 'DESC')->first();
 
         if ($newest == null) {
-            return not_found();
+            return not_found("This version is the latest");
         }
 
         return ok($newest);
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @param $appId
+     * @return JsonResponse
      */
     public function getAppVersions($appId)
     {
@@ -235,6 +238,10 @@ class ApiController extends Controller
         return ok($data);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getAllApps(Request $request)
     {
         // DB::enableQueryLog();
@@ -251,7 +258,7 @@ class ApiController extends Controller
                 ->orderBy('version_code', 'DESC')
                 ->first();
 
-            $data[$key]['developers'] = Developer::with('user')->where('app_id', $value->id)->get()
+            $data[$key]['developers'] = Permission::with('user')->where('app_id', $value->id)->get()
                 ->map(function ($value) {
                     return $value->user;
                 });
@@ -263,6 +270,10 @@ class ApiController extends Controller
             return ok($data);
     }
 
+    /**
+     * @param $packageName
+     * @return JsonResponse
+     */
     public function getLatestApp($packageName)
     {
         // DB::enableQueryLog();
@@ -277,7 +288,7 @@ class ApiController extends Controller
             ->orderBy('version_code', 'DESC')
             ->first();
 
-        $data['developers'] = Developer::with('user')->where('app_id', $data->id)->get()
+        $data['developers'] = Permission::with('user')->where('app_id', $data->id)->get()
             ->map(function ($value) {
                 return $value->user;
             });
@@ -285,6 +296,12 @@ class ApiController extends Controller
         return ok($data);
     }
 
+    /**
+     * Download the latest version of client app
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function downloadClient(Request $request)
     {
 

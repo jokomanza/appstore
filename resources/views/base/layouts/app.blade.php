@@ -17,7 +17,7 @@
     <link href="{{ asset('vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
     <link href="{{ asset('css/theme.css') }}" rel="stylesheet">
     <link href="{{ asset('select2-4.0.13/css/select2.css') }}" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap5.datatables.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap5.datatables.css') }}"/>
 
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
@@ -29,16 +29,16 @@
 </head>
 
 <body>
-    <div id="app">
+<div id="app">
 
-        @yield('sidebar')
+    @yield('sidebar')
 
-        @yield('main')
+    @yield('main')
 
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/bootstrap.bundle.js') }}"></script>
     <script src="{{ asset('js/mazer.js') }}"></script>
-    @stack('script')
+@stack('script')
 </body>
 
 </html>

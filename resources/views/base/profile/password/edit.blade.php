@@ -20,17 +20,12 @@
                     <div class="card-body">
 
                         <div class="row">
-                            @if (count($errors) > 0)
-                                <div class="alert alert-danger">
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif
 
-                            <br/>
+                            <div class="row">
+                                @include('base.components.alerts.success')
+
+                                @include('base.components.alerts.errors')
+                            </div>
 
                             <form action="{{ route($updateUserPasswordRoute)  }}" method="post"
                                   enctype="multipart/form-data">
@@ -42,12 +37,13 @@
                                     <input class="form-control" type="password" name="old-password" required autofocus>
                                 </div>
                                 <div class="form-group">
-                                    <label for="password" >New Password</label>
+                                    <label for="password">New Password</label>
                                     <input class="form-control" type="password" name="password" required autofocus>
                                 </div>
                                 <div class="form-group">
                                     <label for="password_confirmation">Confirmation</label>
-                                    <input class="form-control" type="password" name="password_confirmation" required autofocus>
+                                    <input class="form-control" type="password" name="password_confirmation" required
+                                           autofocus>
                                 </div>
 
                                 <div class="form-group">

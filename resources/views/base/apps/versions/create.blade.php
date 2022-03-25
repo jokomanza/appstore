@@ -3,7 +3,8 @@
         <div class="row">
             <div class="col-12 col-md-6 order-md-1 order-last">
                 <h3>Release New Version</h3>
-                <p class="text-subtitle text-muted">Release new version for {{ $isClientApp ? 'Client App' : $app->name }} app.</p>
+                <p class="text-subtitle text-muted">Release new version
+                    for {{ $isClientApp ? 'Client App' : $app->name }} app.</p>
             </div>
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
@@ -21,35 +22,31 @@
                         <div class="card-body">
 
                             <div class="row">
-                                @if (count($errors) > 0)
-                                    <div class="alert alert-danger">
-                                        <ul>
-                                            @foreach ($errors->all() as $error)
-                                                <li>{{ $error }}</li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                @endif
 
-                                <br />
+                                <div class="row">
+                                    @include('base.components.alerts.success')
 
-                                <form action="{{ route($storeVersionRoute, $app->id) }}" method="post"
-                                    enctype="multipart/form-data">
+                                    @include('base.components.alerts.errors')
+                                </div>
+
+                                <form action="{{ route($storeVersionRoute, $app->package_name) }}" method="post"
+                                      enctype="multipart/form-data">
                                     {{ csrf_field() }}
 
                                     <div class="form-group">
                                         <label for="icon_file">Icon</label>
                                         <input class="form-control" type="file" accept=".jpg, .png, .jpeg"
-                                            name="icon_file" required autofocus>
+                                               name="icon_file" required autofocus>
                                     </div>
                                     <div class="form-group">
                                         <label for="apk_file">APK</label>
                                         <input class="form-control" type="file" accept=".apk" name="apk_file" required
-                                            autofocus>
+                                               autofocus>
                                     </div>
                                     <div class="form-group">
                                         <label for="description">Description</label>
-                                        <textarea class="form-control" type="text" name="description" required autofocus>{{ old('description') }}</textarea>
+                                        <textarea class="form-control" type="text" name="description" required
+                                                  autofocus>{{ old('description') }}</textarea>
                                     </div>
                                     <div class="form-group">
                                         <input class="btn btn-primary" type="submit" value="Create">

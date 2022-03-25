@@ -28,17 +28,12 @@
                         <div class="card-body">
 
                             <div class="row">
-                                @if (count($errors) > 0)
-                                    <div class="alert alert-danger">
-                                        <ul>
-                                            @foreach ($errors->all() as $error)
-                                                <li>{{ $error }}</li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                @endif
 
-                                <br/>
+                                <div class="row">
+                                    @include('base.components.alerts.success')
+
+                                    @include('base.components.alerts.errors')
+                                </div>
 
                                 <form action="{{ route('admin.admin.store') }}" method="post"
                                       enctype="multipart/form-data">

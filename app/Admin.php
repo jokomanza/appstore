@@ -37,13 +37,11 @@ class Admin extends Authenticatable
     {
         if ($app == null) return false;
 
-        if ($app->package_name == 'com.quick.quickappstore') return true;
-
-        return Permission::where(['user_registration_number' => $this->registration_number, 'app_id' => $app->id, 'type' => 'developer'])->first();
+        return true;
     }
 
     public function isOwnerOf(App $app)
     {
-        return Permission::where(['user_registration_number' => $this->registration_number, 'app_id' => $app->id, 'type' => 'owner'])->first();
+        return true;
     }
 }

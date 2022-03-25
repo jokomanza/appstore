@@ -3,15 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Admin;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateUserPasswordRequest;
 use App\Http\Requests\UpdateUserRequest;
-use App\User;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -41,30 +39,12 @@ class AdminProfileController extends Controller
      *
      * @return Application|Factory|View
      */
-    public function edit(Request  $request)
+    public function edit(Request $request)
     {
         $user = $request->user();
 
         return view('admin.profile.edit', compact('user'));
     }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param UpdateUserRequest $request
-     * @return RedirectResponse
-     */
-    public function update(UpdateUserRequest $request)
-    {
-        $user = $request->user();
-
-        $user->fill($request->all());
-
-        if ($user->update()) return redirect()->route('admin.profile.show');
-        else return back()->withErrors('Failed to update profile');
-    }
-
-
 
     /**
      * Show the form for editing the specified resource.
@@ -93,6 +73,22 @@ class AdminProfileController extends Controller
 
         if ($user->update()) return redirect()->route('admin.profile.show');
         else return back()->withErrors('Failed to change password');
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param UpdateUserRequest $request
+     * @return RedirectResponse
+     */
+    public function update(UpdateUserRequest $request)
+    {
+        $user = $request->user();
+
+        $user->fill($request->all());
+
+        if ($user->update()) return redirect()->route('admin.profile.show');
+        else return back()->withErrors('Failed to update profile');
     }
 
     /**

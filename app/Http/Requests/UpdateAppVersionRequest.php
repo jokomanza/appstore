@@ -24,7 +24,7 @@ class UpdateAppVersionRequest extends FormRequest
     public function rules()
     {
         return [
-            'description' => 'required|string|max:300'
+            'description' => 'required|string|min:3|max:300'
         ];
     }
 }

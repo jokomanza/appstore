@@ -4,7 +4,7 @@
             <div class="d-flex justify-content-between">
                 <div class="logo">
                     <a href="{{ route('user.home') }}"><img src="{{ asset('images/logo.png') }}" alt="App Store"
-                            srcset="">
+                                                            srcset="">
                         <h2><strong>Quick App Store</strong></h2>
                     </a>
                 </div>

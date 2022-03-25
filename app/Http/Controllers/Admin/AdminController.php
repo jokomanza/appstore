@@ -5,20 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateAdminRequest;
-use Illuminate\Auth\Access\AuthorizationException;
+use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class AdminController extends Controller
 {
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->middleware('auth:admin');
     }
 
@@ -30,16 +29,6 @@ class AdminController extends Controller
     public function index()
     {
         return view('admin.admins.index');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Application|Factory|View
-     */
-    public function create()
-    {
-        return view('admin.admins.create');
     }
 
     /**
@@ -59,15 +48,25 @@ class AdminController extends Controller
             ])) {
                 return redirect()->route('admin.admin.index');
             } else return back()->withErrors("Failed to create new admin");
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return back()->withErrors("Error " . $exception->getCode())->withInput();
         }
     }
 
     /**
+     * Show the form for creating a new resource.
+     *
+     * @return Application|Factory|View
+     */
+    public function create()
+    {
+        return view('admin.admins.create');
+    }
+
+    /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function show($id)
@@ -78,7 +77,7 @@ class AdminController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function edit($id)
@@ -90,7 +89,7 @@ class AdminController extends Controller
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function update(Request $request, $id)
@@ -101,7 +100,7 @@ class AdminController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function destroy($id)
@@ -131,8 +130,7 @@ class AdminController extends Controller
                 ->limit($limit)
                 ->orderBy($order, $dir)
                 ->get();
-        }
-        else {
+        } else {
             $search = $request->input('search.value');
 
             $users = Admin::where('registration_number', 'LIKE', "%$search%")

@@ -18,7 +18,9 @@
             <li class="breadcrumb-item"><a href="{{ route('admin.client.show') }}">Client</a></li>
         @else
             <li class="breadcrumb-item"><a href="{{ route('admin.app.index') }}">Apps</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('admin.app.show', [$report->app->package_name]) }}">{{ $report->app->name }}</a></li>
+            <li class="breadcrumb-item"><a
+                        href="{{ route('admin.app.show', [$report->app->package_name]) }}">{{ $report->app->name }}</a>
+            </li>
         @endif
 
         <li class="breadcrumb-item active" aria-current="page">Report {{ $report->id }}</li>

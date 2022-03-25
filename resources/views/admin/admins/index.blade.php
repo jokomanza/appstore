@@ -6,9 +6,8 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-12 col-md-6 order-md-1 order-last">
-                    <h3>Show All Admins</h3>
-                    <p class="text-subtitle text-muted">Show all admins in Quick App Store. Note that you can't delete
-                        other admin account, the only one can delete admin account is the own owner</p>
+                    <h3>All Admins</h3>
+                    <p class="text-subtitle text-muted">Display all admins in Quick App Store. Note that you cannot modify another admin account, the only person who can change an admin account is the owner himself</p>
                 </div>
                 <div class="col-12 col-md-6 order-md-2 order-first">
                     <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
@@ -22,9 +21,16 @@
         </div>
 
         <section class="section">
+
+            <div class="row">
+                @include('base.components.alerts.success')
+
+                @include('base.components.alerts.errors')
+            </div>
+
             <div class="card">
                 <div class="card-body">
-                    <table class="table" id="apps">
+                    <table class="table" id="admins">
                         <thead>
                         <tr>
                             <th>Registration Number</th>
@@ -39,10 +45,14 @@
         </section>
     </div>
 
+@endsection
+
+@push('script')
     <script>
-        // Jquery Datatable
         $(document).ready(function () {
-            $('#apps').DataTable({
+            $("#admins").dataTable().fnDestroy();
+
+            $('#admins').DataTable({
                 "processing": true
                 , "serverSide": true
                 , "autoWidth": false
@@ -70,4 +80,4 @@
         });
 
     </script>
-@endsection
+@endpush

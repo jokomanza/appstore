@@ -13,20 +13,14 @@
         </div>
     </div>
     <section class="section">
+
         <div class="row">
+            @include('base.components.alerts.success')
 
-            <div class="col-md-12">
-                @if (count($errors) > 0)
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-            </div>
+            @include('base.components.alerts.errors')
+        </div>
 
+        <div class="row">
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
@@ -100,7 +94,8 @@
                     </div>
                     <div class="card-content">
                         <div class="card-body">
-                            <a href="{{ route($fullReportRoute, $report->report_id) }}" target="__blank">See full report</a>
+                            <a href="{{ route($fullReportRoute, $report->report_id) }}" target="__blank">See full
+                                report</a>
 
                         </div>
                     </div>
@@ -117,7 +112,8 @@
                             <div class="card-body">
 
                                 <div class="buttons">
-                                    <form class="col-1" method="POST" action="{{ $isClientApp ? route($destroyReportRoute, $report->id) :  route($destroyReportRoute, [$report->app->package_name, $report->id]) }}">
+                                    <form class="col-1" method="POST"
+                                          action="{{ $isClientApp ? route($destroyReportRoute, $report->id) :  route($destroyReportRoute, [$report->app->package_name, $report->id]) }}">
                                         {{ csrf_field() }}
                                         {{ method_field('DELETE') }}
                                         <input type="submit" class="delete-report btn btn-danger" value="Delete">
@@ -128,7 +124,7 @@
                     </div>
                 </div>
             @endif
-            
+
         </div>
         <div class="card">
             <div class="card-header">
@@ -153,26 +149,27 @@
     </section>
 </div>
 
-<script>
-    $(document).ready(function() {
-        $('.delete-report').click(function(e) {
-            e.preventDefault() // Don't post the form, unless confirmed
+@push('script')
+    <script>
+        $(document).ready(function () {
+            $('.delete-report').click(function (e) {
+                e.preventDefault() // Don't post the form, unless confirmed
 
-            swal({
+                swal({
                     title: "Are you sure?"
                     , text: "Once deleted, you will not be able to recover this report!"
                     , icon: "warning"
                     , buttons: true
                     , dangerMode: true
-                , })
-                .then((willDelete) => {
-                    if (willDelete) {
-                        $(e.target).closest('form').submit() // Post the surrounding form
-                    } else {
+                    ,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            $(e.target).closest('form').submit() // Post the surrounding form
+                        }
+                    });
+            });
+        })
 
-                    }
-                });
-        });
-    })
-
-</script>
+    </script>
+@endpush

@@ -50,7 +50,8 @@ class CrateTableReports extends Migration
 
             $table->foreign('app_id')
             ->references('id')
-                ->on('apps');
+                ->on('apps')
+                ->onDelete('cascade');
         });
     }
 

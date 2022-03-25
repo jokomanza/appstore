@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         if (App::count() <= 500) {
-            factory(App::class , 100)->create();
+            // factory(App::class , 100)->create();
         }
 
         if (!DB::table('users')->where('registration_number', 'F2373')->first()) {
@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
             $app->name = 'Quick App Store';
             $app->package_name = 'com.quick.quickappstore';
             $app->description = 'Apliaksi mobile untuk sistem quick app store';
-            $app->type = 'Tool App';
+            $app->type = 'Client App';
             $app->icon_url = 'com.quick.quickappstore.icon.default.png';
             $app->repository_url = 'http:git.quick.com/production/quick-appstore-mobile.git';
             $app->api_token = str_random(128);

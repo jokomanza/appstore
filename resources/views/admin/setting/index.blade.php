@@ -20,7 +20,14 @@
             </div>
         </div>
         <section class="section">
-            <div class="row" id="basic-table">
+
+            <div class="row">
+                @include('base.components.alerts.success')
+
+                @include('base.components.alerts.errors')
+            </div>
+
+            <div class="row">
                 <div class="col-md-4">
                     <div class="card">
                         <div class="card-header">
@@ -28,7 +35,6 @@
                         </div>
                         <div class="card-content">
                             <div class="card-body">
-
 
 
                             </div>
@@ -51,6 +57,5 @@
             </div>
         </section>
     </div>
-
 
 @endsection

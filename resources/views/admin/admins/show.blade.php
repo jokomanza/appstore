@@ -26,7 +26,7 @@
             </div>
         </div>
         <section class="section">
-            <div class="row" id="basic-table">
+            <div class="row">
                 <div class="col-md-4">
                     <div class="card">
                         <div class="card-header">
@@ -35,9 +35,15 @@
                         <div class="card-content">
                             <div class="card-body">
 
+                                <div class="row">
+                                    @include('base.components.alerts.success')
+
+                                    @include('base.components.alerts.errors')
+                                </div>
+
                                 <div class="mb-4">
                                     <img src="{{ str_contains($data->icon_url, 'http') ? $data->icon_url : asset("storage/$data->icon_url") }}"
-                                        width="100" height="100">
+                                         width="100" height="100">
                                 </div>
                                 <div class="col">
                                     <p class="text">Name : {{ $data->name }}</p>
@@ -73,7 +79,7 @@
 
                                 <div class="buttons">
                                     <a clas="col-1" href="{{ url("app/$data->id/edit") }}"
-                                        class="btn btn-primary">Update</a>
+                                       class="btn btn-primary">Update</a>
                                     <form class="col-1" method="POST" action="{{ url("app/$data->id") }}">
                                         {{ csrf_field() }}
                                         {{ method_field('DELETE') }}
@@ -97,38 +103,39 @@
                                 <div class="table-responsive">
                                     <table class="table table-lg">
                                         <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th>Version</th>
-                                                <th>Size</th>
-                                                <th>Released</th>
-                                                <th></th>
-                                            </tr>
+                                        <tr>
+                                            <th></th>
+                                            <th>Version</th>
+                                            <th>Size</th>
+                                            <th>Released</th>
+                                            <th></th>
+                                        </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($data->app_versions as $key => $value)
-                                                <tr>
-                                                    <td><img src="{{ str_contains($value->icon_url, 'http') ? $value->icon_url : asset("storage/$value->icon_url") }}"
-                                                            width="50" height="50"></td>
-                                                    <td class="text-bold-500">{{ $value->version_name }}</td>
-                                                    <td>{{ $value->apk_file_size }}</td>
-                                                    <td>{{ $value->updated_at }}</td>
-                                                    <td class="text-bold-500">
-                                                        <div class="buttons">
-                                                            <a class="btn btn-success"
-                                                                href="{{ asset("storage/$value->apk_file_url") }}">Download</a>
-                                                            <a class="btn btn-primary"
-                                                                href="{{ route('version.show', [$data->id, $value->id]) }}">View</a>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
+                                        @foreach ($data->app_versions as $key => $value)
+                                            <tr>
+                                                <td>
+                                                    <img src="{{ str_contains($value->icon_url, 'http') ? $value->icon_url : asset("storage/$value->icon_url") }}"
+                                                         width="50" height="50"></td>
+                                                <td class="text-bold-500">{{ $value->version_name }}</td>
+                                                <td>{{ $value->apk_file_size }}</td>
+                                                <td>{{ $value->updated_at }}</td>
+                                                <td class="text-bold-500">
+                                                    <div class="buttons">
+                                                        <a class="btn btn-success"
+                                                           href="{{ asset("storage/$value->apk_file_url") }}">Download</a>
+                                                        <a class="btn btn-primary"
+                                                           href="{{ route('version.show', [$data->id, $value->id]) }}">View</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                         </tbody>
                                     </table>
-                                    <a class="btn btn-success" href="{{ route('version.create', $data->id) }}">Create new
+                                    <a class="btn btn-success" href="{{ route('version.create', $data->id) }}">Create
+                                        new
                                         version</a>
                                     <div class="d-flex justify-content-center">
-                                        {{-- {!! $data->links() !!} --}}
                                     </div>
                                 </div>
                             </div>
@@ -142,23 +149,29 @@
 
 
 
-
-    <script>
-        $('.delete-application').click(function(e) {
-            // e.preventDefault() // Don't post the form, unless confirmed
-
-            bootbox.confirm({
-                size: "small",
-                message: "Are you sure?",
-                callback: function(result) {
-                    /* result is a boolean; true = OK, false = Cancel*/
-                }
-            })
-
-            // if (confirm('Are you sure?')) {
-            //     // Post the form
-            //     $(e.target).closest('form').submit() // Post the surrounding form
-            // }
-        });
-    </script>
 @endsection
+
+@push('script')
+    <script>
+        $(document).ready(function () {
+            $('.delete-version').click(function (e) {
+                e.preventDefault() // Don't post the form, unless confirmed
+
+                swal({
+                    title: "Are you sure?",
+                    text: "Once deleted, you will not be able to recover this version!",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            $(e.target).closest('form').submit() // Post the surrounding form
+                        } else {
+
+                        }
+                    });
+            });
+        })
+    </script>
+@endpush

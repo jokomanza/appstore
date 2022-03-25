@@ -7,9 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Report;
 use App\Notifications\NewReportNotification;
-use App\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ReportController extends Controller
@@ -19,35 +18,32 @@ class ReportController extends Controller
         $this->middleware('auth:report-api');
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function index(Request $request)
     {
         $app = $request->user();
 
         $reports = Report::where('app_id', $app->id)->orderBy('created_at', 'DESC');
 
-        if (!isset($reports))
-            return ok($reports);
-        else
-            return not_found('this app does not have any reports yet');
+        if (!isset($reports)) return ok($reports);
+        else return not_found('this app does not have any reports yet');
     }
 
-    private function array_change_key_case_recursive($arr)
-    {
-        return array_map(function ($item) {
-            if (is_array($item))
-                $item = $this->array_change_key_case_recursive($item);
-            return $item;
-        }, array_change_key_case($arr));
-    }
-
+    /**
+     * Store a new report
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function store(Request $request)
     {
 
         $app = $request->user();
 
-        if ($app == null) {
-            return unauthenticated('Username or token invalid');
-        }
+        if ($app == null) return unauthenticated('app token invalid');
 
         $data = $this->array_change_key_case_recursive($request->all());
 
@@ -103,7 +99,8 @@ class ReportController extends Controller
             $data['exception'] = $stacktrace[0];
         }
 
-        Storage::disk('local')->put('data.json', json_encode($data));
+        // Debugging purpose
+        // Storage::disk('local')->put('data.json', json_encode($data));
 
         $crash = new Report();
         $crash->fill($data);
@@ -117,13 +114,27 @@ class ReportController extends Controller
         });
 
         if (empty($people)) {
-            $people[] = Admin::all();
+            foreach (Admin::all() as $admin) $people[] = $admin;
         }
 
         foreach ($people as $person) {
             $person->notify(new NewReportNotification($crash));
         }
 
-        return response()->json($request->all(), 200);
+        return ok($request->all());
+    }
+
+    /**
+     * Private helper function
+     *
+     * @param $arr
+     * @return array|array[]
+     */
+    private function array_change_key_case_recursive($arr)
+    {
+        return array_map(function ($item) {
+            if (is_array($item)) $item = $this->array_change_key_case_recursive($item);
+            return $item;
+        }, array_change_key_case($arr));
     }
 }

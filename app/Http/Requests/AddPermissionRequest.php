@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AddDeveloperRequest extends FormRequest
+class AddPermissionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,7 @@ class AddDeveloperRequest extends FormRequest
     {
         return [
             'app_id' => 'required|numeric|exists:apps,id',
-            'user_registration_number' => 'required|string|exists:users,registration_number',
+            'user_registration_number' => 'required|string',
         ];
     }
 }

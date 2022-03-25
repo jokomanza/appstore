@@ -148,29 +148,29 @@ Route::get('/client/version', 'UserAppVersionController@create')
 Route::post('/client/version', 'UserAppVersionController@store')
     ->name('client.version.store');
 
-Route::get('/client/version/{versionName}', 'UserAppVersionController@show')
+Route::get('/client/version/{versionName}', 'UserAppVersionController@showClient')
     ->where('versionName', '[0-9]{1,5}.[0-9]{1,5}.[0-9]{1,5}$')
     ->name('client.version.show');
 
-Route::get('/client/version/{versionName}/edit', 'UserAppVersionController@edit')
+Route::get('/client/version/{versionName}/edit', 'UserAppVersionController@editClient')
     ->where('versionName', '[0-9]{1,5}.[0-9]{1,5}.[0-9]{1,5}$')
     ->name('client.version.edit');
 
-Route::put('/client/version/{versionName}', 'UserAppVersionController@update')
+Route::put('/client/version/{versionName}', 'UserAppVersionController@updateClient')
     ->where('versionName', '[0-9]{1,5}.[0-9]{1,5}.[0-9]{1,5}$')
     ->name('client.version.update');
 
-Route::delete('/client/version/{versionName}', 'UserAppVersionController@delete')
+Route::delete('/client/version/{versionName}', 'UserAppVersionController@deleteClient')
     ->where('versionName', '[0-9]{1,5}.[0-9]{1,5}.[0-9]{1,5}$')
     ->name('client.version.delete');
 
 
 // client reports
 /*--------------------------------------------------------------------------------------------------------------------*/
-Route::get('/client/report/{id}', 'UserReportController@show')
+Route::get('/client/report/{id}', 'UserReportController@showClient')
     ->where('id', '^[0-9]*$')
     ->name('client.report.show');
 
-Route::delete('/client/report/{id}', 'UserReportController@destroy')
+Route::delete('/client/report/{id}', 'UserReportController@destroyClient')
     ->where('id', '^[0-9]*$')
     ->name('client.report.destroy');

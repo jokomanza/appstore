@@ -12,20 +12,14 @@
         </div>
     </div>
     <section class="section">
+
         <div class="row">
+            @include('base.components.alerts.success')
 
-            <div class="col-md-12">
-                @if (count($errors) > 0)
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-            </div>
+            @include('base.components.alerts.errors')
+        </div>
 
+        <div class="row">
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
@@ -61,7 +55,7 @@
                                     {{ csrf_field() }}
                                     {{ method_field('DELETE') }}
 
-                                    <input type="submit" class="delete-application btn btn-danger" value="Delete">
+                                    <input type="submit" class="delete-application btn btn-danger" value="Delete Account">
                                 </form>
                             </div>
 

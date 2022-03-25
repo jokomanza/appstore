@@ -6,12 +6,19 @@
         <h3>Quick App Store Statistics</h3>
     </div>
     <div class="page-content">
+
+        <div class="row">
+            @include('base.components.alerts.success')
+
+            @include('base.components.alerts.errors')
+        </div>
+
         <section class="row">
             <div class="col-12 col-lg-9">
                 <div class="row">
                     <div class="col-6 col-lg-3 col-md-6">
                         <div class="card" onclick="location.href='{{ route('admin.app.index') }}';"
-                            style="cursor: pointer;">
+                             style="cursor: pointer;">
                             <div class="card-body px-3 py-4-5">
                                 <div class="row">
                                     <div class="col-md-4">
@@ -29,7 +36,7 @@
                     </div>
                     <div class="col-6 col-lg-3 col-md-6">
                         <div class="card" onclick="location.href='{{ route('admin.user.index') }}';"
-                            style="cursor: pointer;">
+                             style="cursor: pointer;">
                             <div class="card-body px-3 py-4-5">
                                 <div class="row">
                                     <div class="col-md-4">
@@ -39,7 +46,7 @@
                                     </div>
                                     <div class="col-md-8">
                                         <h6 class="text-muted font-semibold">Users</h6>
-                                        <h6 class="font-extrabold mb-0">{{ $developersCount }}</h6>
+                                        <h6 class="font-extrabold mb-0">{{ $usersCount }}</h6>
                                     </div>
                                 </div>
                             </div>
@@ -104,11 +111,12 @@
                     <div class="card-content pb-4">
 
                         @foreach ($recentApps as $app)
-                            <div onclick="location.href='{{ route('admin.app.show', $app->id) }}';" style="cursor: pointer;"
-                                class="recent-message d-flex px-4 py-3 ripple">
+                            <div onclick="location.href='{{ isClientApp($app) ? route('admin.client.show') : route('admin.app.show', $app->package_name) }}';"
+                                 style="cursor: pointer;"
+                                 class="recent-message d-flex px-4 py-3 ripple">
                                 <div class="avatar avatar-lg">
                                     <img
-                                        src="{{ str_contains($app->icon_url, 'http') ? $app->icon_url : asset("storage/$app->icon_url") }}">
+                                            src="{{ asset("storage/$app->icon_url") }}">
                                 </div>
                                 <div class="name ms-4">
                                     <h5 class="mb-1">{{ $app->name }}</h5>
@@ -119,7 +127,7 @@
 
                         <div class="px-4">
                             <a href="{{ route('admin.app.index') }}"
-                                class='btn btn-block btn-xl btn-light-primary font-bold mt-3'>
+                               class='btn btn-block btn-xl btn-light-primary font-bold mt-3'>
                                 Show more</a>
                         </div>
                     </div>

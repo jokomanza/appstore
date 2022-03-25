@@ -7,11 +7,12 @@ use App\Interfaces\AppRepositoryInterface;
 use App\Interfaces\AppServiceInterface;
 use App\Models\App;
 use App\Models\Developer;
+use App\Models\Report;
 use App\User;
 use DomainException;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Report;
 
 class ClientController extends Controller
 {
@@ -33,12 +34,11 @@ class ClientController extends Controller
             $data = App::with('app_versions')->where('package_name', 'com.quick.quickappstore')->first();
             $developers = Developer::with('user')->where('app_id', $data->id)->get();
             $allowedDevelopers = User::where('access_level', '<=', $maxAccessLevel)->get(['registration_number'])
-            ->map(function ($value) {
-                return [$value->registration_number => $value->registration_number];
-            });
+                ->map(function ($value) {
+                    return [$value->registration_number => $value->registration_number];
+                });
             $reports = Report::where('app_id', $data->id)->get();
-        }
-        catch (\Exception $e) {
+        } catch (Exception $e) {
             return view('errors.404');
         }
 
@@ -88,11 +88,9 @@ class ClientController extends Controller
                 if ($devDocUrl) @unlink(public_path('/storage/') . $oldDevDoc);
 
                 return redirect()->route('client.index');
-            }
-            else
+            } else
                 throw new DomainException("Failed to update data");
-        }
-        catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->appService->handleUploadedFileWhenFailed($request->package_name, $time);
 
             return back()->withErrors($e->getMessage())->withInput();

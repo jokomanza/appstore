@@ -25,11 +25,6 @@ class UserLoginController extends LoginController
         $this->middleware('guest:user')->except('logout');
     }
 
-    protected function guard()
-    {
-        return Auth::guard('user');
-    }
-
     public function showLoginForm()
     {
         return view('user.auth.login');
@@ -40,5 +35,10 @@ class UserLoginController extends LoginController
         $this->guard()->logout();
 
         return redirect('/');
+    }
+
+    protected function guard()
+    {
+        return Auth::guard('user');
     }
 }

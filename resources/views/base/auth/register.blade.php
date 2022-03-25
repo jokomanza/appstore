@@ -19,8 +19,8 @@
                                             <div class="form-outline">
                                                 <label class="form-label" for="name">Name</label>
                                                 <input type="text" id="name" name="name"
-                                                    class="form-control form-control-lg" value="{{ old('name') }}"
-                                                    required autofocus />
+                                                       class="form-control form-control-lg" value="{{ old('name') }}"
+                                                       required autofocus/>
                                             </div>
 
                                             @if ($errors->has('name'))
@@ -35,8 +35,8 @@
                                             <div class="form-outline">
                                                 <label class="form-label" for="email">Email</label>
                                                 <input type="email" id="email" name="email"
-                                                    class="form-control form-control-lg" value="{{ old('email') }}"
-                                                    required autofocus />
+                                                       class="form-control form-control-lg" value="{{ old('email') }}"
+                                                       required autofocus/>
                                             </div>
 
 
@@ -50,8 +50,8 @@
                                                 <label class="form-label" for="registration-number">Registration
                                                     Number</label>
                                                 <input type="text" id="registration-number" name="registration_number"
-                                                    class="form-control form-control-lg"
-                                                    value="{{ old('registration_number') }}" required autofocus />
+                                                       class="form-control form-control-lg"
+                                                       value="{{ old('registration_number') }}" required autofocus/>
                                             </div>
 
                                             @if ($errors->has('registration_number'))
@@ -68,7 +68,7 @@
                                             <div class="form-outline">
                                                 <label class="form-label" for="email">Password</label>
                                                 <input type="password" id="password" name="password"
-                                                    class="form-control form-control-lg" required autofocus />
+                                                       class="form-control form-control-lg" required autofocus/>
                                             </div>
 
                                         </div>
@@ -78,8 +78,8 @@
                                                 <label class="form-label" for="password-confirmation">Password
                                                     Confirmation</label>
                                                 <input type="password" id="password-confirmation"
-                                                    name="password_confirmation" class="form-control form-control-lg"
-                                                    required autofocus />
+                                                       name="password_confirmation" class="form-control form-control-lg"
+                                                       required autofocus/>
                                             </div>
 
                                         </div>
@@ -92,7 +92,7 @@
                                     </div>
 
                                     <div class="mt-4 pt-2">
-                                        <input class="btn btn-primary btn-lg" type="submit" value="Submit" />
+                                        <input class="btn btn-primary btn-lg" type="submit" value="Submit"/>
                                     </div>
 
                                 </form>

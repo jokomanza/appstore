@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-12 col-md-6 order-md-1 order-last">
                 <h3>{{ $isClientApp ? 'Client App' : "App #$app->id" }}</h3>
-                <p class="text-subtitle text-muted">{{ $isClientApp ? 'Client App' : $app->name }} detail.</p>
+                <p class="text-subtitle text-muted">Display all {{ $isClientApp ? 'Client App' : $app->name }} details.</p>
             </div>
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
@@ -13,19 +13,14 @@
         </div>
     </div>
     <section class="section">
-        <div class="row">
 
-            <div class="col-md-12">
-                @if (count($errors) > 0)
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-            </div>
+        <div class="row">
+            @include('base.components.alerts.success')
+
+            @include('base.components.alerts.errors')
+        </div>
+
+        <div class="row">
 
             <div class="col-md-4">
                 <div class="card">
@@ -53,18 +48,18 @@
                             <div class="row">
                                 @if ($app->repository_url)
                                     <div class="mb-3">
-                                        <a href="{{ url($app->repository_url) }}">Git Repository</a>
+                                        <a href="{{ url($app->repository_url) }}" target="__blank">Git Repository</a>
                                     </div>
                                 @endif
                                 @if ($app->user_documentation_url)
                                     <div class="mb-3">
-                                        <a href="{{ asset('/storage/' . $app->user_documentation_url) }}">User
+                                        <a href="{{ asset('/storage/' . $app->user_documentation_url) }}" target="__blank">User
                                             Documentation</a>
                                     </div>
                                 @endif
-                                @if ($app->developer_documentation_url)
+                                @if ($app->developer_documentation_url && ($isAppOwner || $isAppDeveloper))
                                     <div class="mb-3">
-                                        <a href="{{ asset('/storage/' . $app->developer_documentation_url) }}">Developer
+                                        <a href="{{ asset('/storage/' . $app->developer_documentation_url) }}" target="__blank">Developer
                                             Documentation</a>
                                     </div>
                                 @endif
@@ -135,7 +130,7 @@
                                                 <img src="{{ str_contains($value->icon_url, 'http') ? $value->icon_url : asset("storage/$value->icon_url") }}"
                                                      width="50" height="50"></td>
                                             <td class="text-bold-500">{{ $value->version_name }}</td>
-                                            <td>{{ $value->apk_file_size }}</td>
+                                            <td>{{ round($value->apk_file_size / 1024.0 / 1024.0, 2) }} MB</td>
                                             <td>{{ $value->updated_at }}</td>
                                             <td class="text-bold-500">
                                                 <div class="buttons">
@@ -231,7 +226,7 @@
                                     <td class="text-bold-500">
                                         @if ($isAppOwner)
                                             <form
-                                                    action="{{ route($destroyPermissionRoute, [$app->id, $value->user_registration_number]) }}"
+                                                    action="{{ route($destroyPermissionRoute, [$app->package_name, $value->user_registration_number]) }}"
                                                     method="post">
                                                 {{ method_field('DELETE') }}
                                                 {{ csrf_field() }}
@@ -282,7 +277,6 @@
 @push('script')
     <script>
         $(document).ready(function () {
-            $("#reports").dataTable().fnDestroy();
 
             $('.delete-application').click(function (e) {
                 e.preventDefault() // Don't post the form, unless confirmed
@@ -304,6 +298,7 @@
             });
             $('.form-select').select2()
 
+            $("#reports").dataTable().fnDestroy();
             $('#reports').DataTable({
                 "processing": true,
                 "serverSide": true,

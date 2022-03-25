@@ -7,6 +7,7 @@ use App\Models\Report;
 use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -14,34 +15,54 @@ use Illuminate\View\View;
 abstract class BaseReportController extends BaseController
 {
 
+
+    public function showClient(Request $request, $id) {
+        return $this->show($request, config('app.client_package_name'), $id);
+    }
+
     /**
      * Display the specified resource.
      *
      * @param int $id
-     * @return Factory|Application|View
+     * @return Factory|Application|RedirectResponse|View
      */
     public function show(Request $request, $packageName, $id)
     {
         if ($request->routeIs($this->getView() . '.client.report.show')) {
-            $report = Report::with('app')->whereHas('app', function ($q) use ($packageName) {
-                $q->where('package_name', config('app.client_package_name'));
-            })->where('id', $id)->first();
+            $packageName = config('app.client_package_name');
         } else {
-            if ($packageName == null) return view($this->getView() . '.errors.404');
-
-            $report = Report::with('app')->whereHas('app', function ($q) use ($packageName) {
-                $q->where('package_name', $packageName)->where('package_name', '!=', config('app.client_package_name'));
-            })->where('id', $id)->first();
-
+            if ($packageName == config('app.client_package_name') || $packageName == null) {
+                return back()->withErrors('Package name is incorrect');
+            }
         }
+
+        $report = Report::with('app')->whereHas('app', function ($q) use ($packageName) {
+            $q->where('package_name', $packageName);
+        })->where('id', $id)->first();
+
         if ($report == null) return view($this->getView() . '.errors.404');
+
+        $app = $report->app;
+        $user = $request->user();
+
+        if (!$user->isDeveloperOf($app) && !$user->isOwnerOf($app)) return back()->withErrors("You don't have permission to see this report");
 
         return view($this->getView() . '.reports.show', compact('report'));
     }
 
+    /**
+     * @param $reportId
+     * @return Factory|Application|RedirectResponse|View
+     */
     public function showFull($reportId)
     {
         $report = Report::with('app')->where('report_id', $reportId)->firstOrFail();
+
+        $app = $report->app;
+        $user = $request->user();
+
+        if (!$user->isDeveloperOf($app) && !$user->isOwnerOf($app)) return back()->withErrors("You don't have permission to see this report");
+
         $report = json_decode($report);
 
         return view($this->getView() . '.reports.full', compact('report'));
@@ -50,18 +71,29 @@ abstract class BaseReportController extends BaseController
     /**
      * @throws Exception
      */
+    public function destroyClient(Request $request, $id) {
+        return $this->destroy($request, config('app.client_package_name'), $id);
+    }
+
+    /**
+     * @param Request $request
+     * @param $packageName
+     * @param $id
+     * @return Factory|Application|RedirectResponse|View
+     * @throws Exception
+     */
     public function destroy(Request $request, $packageName, $id)
     {
 
         if ($request->routeIs($this->getView() . '.client.report.destroy')) {
             $packageName = config('app.client_package_name');
         } else {
-            if ($packageName == null) return view($this->getView() . '.errors.404');
+            if ($packageName == config('app.client_package_name') || $packageName == null) back()->withErrors('Package name is incorrect');
         }
 
         $app = App::where('package_name', $packageName)->first();
 
-        if (!isset($app)) return back()->withErrors('application not found');
+        if (!isset($app)) return back()->withErrors('App not found');
 
         $isClientApp = $app->package_name == config('app.client_package_name');
 
@@ -74,7 +106,8 @@ abstract class BaseReportController extends BaseController
 
         if ($version->delete()) {
             if ($isClientApp) return redirect()->route($this->getView() . '.client.show');
-            else return redirect()->route($this->getView() . '.app.show', $packageName);
+
+            else return redirect()->route($this->getView() . '.app.show', $packageName)->with('messages', ['Successfully delete report']);
         } else return back()->withErrors('Failed to delete data');
     }
 

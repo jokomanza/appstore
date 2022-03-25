@@ -20,7 +20,8 @@ abstract class LoginController extends Controller
 
     use AuthenticatesUsers;
 
-    protected function username() {
+    protected function username()
+    {
         return 'registration_number';
     }
 
