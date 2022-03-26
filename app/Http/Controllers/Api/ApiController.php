@@ -7,8 +7,11 @@ use App\Models\App;
 use App\Models\AppVersion;
 use App\Models\Permission;
 use Carbon\Carbon;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
@@ -300,7 +303,7 @@ class ApiController extends Controller
      * Download the latest version of client app
      *
      * @param Request $request
-     * @return JsonResponse
+     * @return Application|JsonResponse|RedirectResponse|Redirector
      */
     public function downloadClient(Request $request)
     {
@@ -313,9 +316,11 @@ class ApiController extends Controller
 
         if (!isset($latest)) return not_found("Client application doesn't have latest version");
 
-        $path = asset('storage/' . $latest->apk_file_url);
+        return redirect(asset('storage/' . $latest->apk_file_url));
 
-        if (!File::exists($path)) return not_found('File not found');
+        /*$path = asset('storage/' . $latest->apk_file_url);
+
+        if (!File::exists($path)) return not_found('File not found ' . $path);
 
         $file = File::get($path);
         $type = File::mimeType($path);
@@ -324,6 +329,6 @@ class ApiController extends Controller
         $response->header("Content-Type", 'application\vdn.android.package-archive');
         $response->header('Content-Disposition', 'attachment; filename="' . $latest->apk_file_url . '"');
 
-        return $response;
+        return $response;*/
     }
 }

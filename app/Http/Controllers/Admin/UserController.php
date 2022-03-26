@@ -160,6 +160,7 @@ class UserController extends Controller
             0 => 'registration_number',
             1 => 'name',
             2 => 'email',
+            3 => 'registration_number',
         ];
 
         $totalData = User::count();

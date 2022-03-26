@@ -123,9 +123,9 @@ abstract class BaseReportController extends BaseController
             0 => 'created_at',
             1 => 'app_version_name',
             2 => 'android_version',
-            3 => 'device',
+            3 => 'brand',
             4 => 'exception',
-            5 => 'action',
+            5 => 'id',
         ];
 
         $totalData = Report::with('app')->whereHas('app', function ($q) use ($app) {

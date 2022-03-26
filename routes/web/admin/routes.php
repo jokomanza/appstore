@@ -4,7 +4,7 @@
 use Illuminate\Support\Facades\Route;
 
 
-// settings
+// home
 /*----------------------------------------------------------------------------------------------------------------*/
 Route::get('/settings', 'AdminSettingController@index')
     ->name('setting.index');
@@ -45,6 +45,10 @@ Route::post('/logout', 'Auth\AdminLoginController@logout')
 
 // dashboard
 /*----------------------------------------------------------------------------------------------------------------*/
+Route::get('/', function () {
+    return redirect()->route('admin.home');
+});
+
 Route::get('/home', 'AdminHomeController@index')
     ->name('home');
 
