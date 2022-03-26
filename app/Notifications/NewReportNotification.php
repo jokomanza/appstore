@@ -32,14 +32,14 @@ class NewReportNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
@@ -60,7 +60,7 @@ class NewReportNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+            'report' => $this->report
         ];
     }
 }
