@@ -6,10 +6,13 @@ use App\Models\App;
 use App\Models\Report;
 use Exception;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\View\View;
 
 abstract class BaseReportController extends BaseController
@@ -53,6 +56,7 @@ abstract class BaseReportController extends BaseController
     /**
      * @param $reportId
      * @return Factory|Application|RedirectResponse|View
+     * @throws ModelNotFoundException
      */
     public function showFull($reportId)
     {
@@ -69,7 +73,33 @@ abstract class BaseReportController extends BaseController
     }
 
     /**
-     * @throws Exception
+     * @param Request $request
+     * @param $notificationId
+     * @return Factory|Application|RedirectResponse|View
+     */
+    public function showReportFromNotification(Request $request, $notificationId) {
+        $report = \App\Notification::find($notificationId);
+
+        $user = $report->notifiable()->getRelated();
+        $app = App::find($report->data['app_id']);
+
+        if($user->first() != $request->user()) {
+            return view($this->getView() . '.errors.404');
+        }
+
+        $report->markAsRead();
+
+        $isClientApp = isClientApp($app);
+
+        if ($isClientApp) return redirect()->route($this->getView() . '.client.report.show', $report->data['report_id']);
+        else return redirect()->route($this->getView() . '.report.show', [$app->package_name, $report->data['report_id']]);
+
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return Factory|Application|RedirectResponse|View
      */
     public function destroyClient(Request $request, $id) {
         return $this->destroy($request, config('app.client_package_name'), $id);
@@ -111,6 +141,11 @@ abstract class BaseReportController extends BaseController
         } else return back()->withErrors('Failed to delete data');
     }
 
+    /**
+     * @param Request $request
+     * @param $packageName
+     * @return JsonResponse
+     */
     public function getDataTables(Request $request, $packageName)
     {
         $app = App::where('package_name', $packageName)->first();

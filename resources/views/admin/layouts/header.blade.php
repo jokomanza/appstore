@@ -26,13 +26,19 @@
                     <li class="nav-item dropdown me-3">
                         <a class="nav-link active dropdown-toggle" href="#" data-bs-toggle="dropdown"
                            aria-expanded="false">
-                            <i class='bi bi-bell bi-sub fs-4 text-gray-600'></i>
+                            <i class='bi bi-bell bi-sub fs-4 text-gray-600'>{{ isset($reportNotifications) ? '*' : '' }}</i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                             <li>
                                 <h6 class="dropdown-header">Notifications</h6>
                             </li>
-                            <li><a class="dropdown-item">No notification available</a></li>
+                            @if(isset($reportNotifications))
+                                @forelse($reportNotifications as $report)
+                                    <li><a class="dropdown-item" href="{{ $report['link'] }}">{{ $report['message'] }}</a></li>
+                                @empty
+                                    <li><a class="dropdown-item">No notification available</a></li>
+                                @endforelse
+                            @endif
                         </ul>
                     </li>
                 </ul>

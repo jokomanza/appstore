@@ -32,7 +32,7 @@ class NewReportNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['database'];
     }
 
     /**
@@ -60,7 +60,10 @@ class NewReportNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'report' => $this->report
+            'app_id' => $this->report->app_id,
+            'report_id' => $this->report->id,
+            'exception' => $this->report->exception,
+            'created_at' => $this->report->created_at
         ];
     }
 }

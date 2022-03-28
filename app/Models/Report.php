@@ -1,55 +1,9 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Class Report
- * 
- * @property Carbon|null $updated_at
- * @property Carbon|null $created_at
- * @property string $shared_preferences
- * @property string $environment
- * @property string $device_features
- * @property character varying $installation_id
- * @property string $logcat
- * @property character varying|null $dumpsys_meminfo
- * @property character varying $user_crash_date
- * @property character varying $user_app_start_date
- * @property character varying|null $user_email
- * @property character varying|null $user_comment
- * @property string $display
- * @property string $crash_configuration
- * @property string $initial_configuration
- * @property character varying $exception
- * @property string $stack_trace
- * @property character varying|null $is_silent
- * @property character varying|null $custom_data
- * @property character varying $build_config
- * @property character varying $available_mem_size
- * @property character varying $total_mem_size
- * @property string $build
- * @property character varying $android_version
- * @property character varying $product
- * @property character varying $brand
- * @property character varying $phone_model
- * @property character varying $file_path
- * @property character varying $package_name
- * @property character varying $app_version_name
- * @property character varying $app_version_code
- * @property int $app_id
- * @property character varying $report_id
- * @property int $id
- * 
- * @property Application $application
- *
- * @package App\Models
- */
 class Report extends Model
 {
 

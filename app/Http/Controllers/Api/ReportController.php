@@ -7,8 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Report;
 use App\Notifications\NewReportNotification;
+use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 
 class ReportController extends Controller
@@ -37,6 +39,7 @@ class ReportController extends Controller
      *
      * @param Request $request
      * @return JsonResponse
+     * @throws MassAssignmentException
      */
     public function store(Request $request)
     {
@@ -113,13 +116,11 @@ class ReportController extends Controller
             return $value->user;
         });
 
-        if (empty($people)) {
+        if ($people->isEmpty()) {
             foreach (Admin::all() as $admin) $people[] = $admin;
         }
 
-        foreach ($people as $person) {
-            $person->notify(new NewReportNotification($crash));
-        }
+        Notification::send($people, new NewReportNotification($crash));
 
         return ok($request->all());
     }
