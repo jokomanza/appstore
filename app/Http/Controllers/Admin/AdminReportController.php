@@ -16,7 +16,7 @@ class AdminReportController extends BaseReportController
         $this->middleware('auth:admin');
     }
 
-    function getView()
+    function getUserType()
     {
         return 'admin';
     }

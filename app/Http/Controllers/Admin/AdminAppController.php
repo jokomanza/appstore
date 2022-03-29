@@ -14,7 +14,7 @@ class AdminAppController extends BaseAppController
         $this->middleware('auth:admin');
     }
 
-    function getView()
+    function getUserType()
     {
         return 'admin';
     }

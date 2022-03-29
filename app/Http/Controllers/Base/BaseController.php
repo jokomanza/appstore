@@ -7,9 +7,9 @@ use App\Http\Controllers\Controller;
 abstract class BaseController extends Controller
 {
     /**
-     * Return base view for this controller
+     * Return user type for this controller
      *
-     * @return string view name
+     * @return string user type
      */
-    abstract function getView();
+    abstract function getUserType();
 }

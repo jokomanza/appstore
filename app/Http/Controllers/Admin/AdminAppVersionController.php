@@ -13,7 +13,7 @@ class AdminAppVersionController extends BaseAppVersionController
         $this->middleware('auth:admin');
     }
 
-    function getView()
+    function getUserType()
     {
         return 'admin';
     }

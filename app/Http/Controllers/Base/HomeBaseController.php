@@ -32,7 +32,7 @@ abstract class HomeBaseController extends BaseController
 
 
         return view(
-            $this->getView() . '.home',
+            $this->getUserType() . '.home',
             compact('recentApps', 'appsCount', 'usersCount', 'adminsCount', 'errorsCount', 'isClientDeveloper')
         );
     }

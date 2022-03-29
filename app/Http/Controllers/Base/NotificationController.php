@@ -25,10 +25,10 @@ abstract class NotificationController extends BaseController
 
             $reportNotifications[] = [
                 'message' => "There is a new error report in the  $app->name application with a $exception exception, please check and fix it soon",
-                'link' => route($this->getView() . '.notification.report.show', $report->id)
+                'link' => route($this->getUserType() . '.notification.report.show', $report->id)
             ];
         }
 
-        return view($this->getView() . '.notification.index', compact('reportNotifications'));
+        return view($this->getUserType() . '.notification.index', compact('reportNotifications'));
     }
 }

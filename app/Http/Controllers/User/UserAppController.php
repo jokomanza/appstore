@@ -21,7 +21,7 @@ class UserAppController extends BaseAppController
         parent::__construct($appRepository, $appService);
         $this->middleware('auth:user');
     }
-    function getView()
+    function getUserType()
     {
         return 'user';
     }

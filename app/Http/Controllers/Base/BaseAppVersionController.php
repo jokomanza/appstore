@@ -35,7 +35,7 @@ abstract class BaseAppVersionController extends BaseController
      */
     public function create(Request $request, $packageName = null)
     {
-        if ($request->routeIs($this->getView() . '.client.version.create')) {
+        if ($request->routeIs($this->getUserType() . '.client.version.create')) {
             $packageName = config('app.client_package_name');
         } else {
             if ($packageName == null) return back()->withErrors("Package name parameter was null");
@@ -45,7 +45,7 @@ abstract class BaseAppVersionController extends BaseController
 
         if (!$app) return back()->withErrors("App not found");
 
-        return view($this->getView() . '.apps.versions.create', compact('app'));
+        return view($this->getUserType() . '.apps.versions.create', compact('app'));
     }
 
     /**
@@ -137,11 +137,11 @@ abstract class BaseAppVersionController extends BaseController
             return back()->withErrors("Failed to save app version");
         }
 
-        if ($request->routeIs($this->getView() . '.client.version.store')) {
-            return redirect()->route($this->getView() . '.client.show')
+        if ($request->routeIs($this->getUserType() . '.client.version.store')) {
+            return redirect()->route($this->getUserType() . '.client.show')
                 ->with('messages', ['Successfully release new version']);
         } else {
-            return redirect()->route($this->getView() . '.app.show', $packageName)
+            return redirect()->route($this->getUserType() . '.app.show', $packageName)
                 ->with('messages', ['Successfully release new version']);
         }
 
@@ -161,7 +161,7 @@ abstract class BaseAppVersionController extends BaseController
      */
     public function show(Request $request, $packageName = null, $versionName)
     {
-        if ($request->routeIs($this->getView() . '.client.version.show')) {
+        if ($request->routeIs($this->getUserType() . '.client.version.show')) {
             $packageName =  config('app.client_package_name');
         } else {
             if ($packageName == config('app.client_package_name') || $packageName == null) {
@@ -178,14 +178,14 @@ abstract class BaseAppVersionController extends BaseController
         if (!$version) return back()->withErrors('Version not found');
 
         $isAppDeveloper = Auth::user()->isDeveloperOf($app);
-        if ($this->getView() == 'admin') $isAppOwner = true;
+        if ($this->getUserType() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
 
         if (!$isAppDeveloper && !$isAppOwner) {
             return back()->withErrors("You don't have permission to perform this action");
         }
 
-        return view($this->getView() . '.apps.versions.show', compact('app', 'version', 'isAppDeveloper', 'isAppOwner'));
+        return view($this->getUserType() . '.apps.versions.show', compact('app', 'version', 'isAppDeveloper', 'isAppOwner'));
     }
 
     public function editClient(Request $request, $versionName) {
@@ -202,7 +202,7 @@ abstract class BaseAppVersionController extends BaseController
      */
     public function edit(Request $request, $packageName = null, $versionName)
     {
-        if ($request->routeIs($this->getView() . '.client.version.edit')) {
+        if ($request->routeIs($this->getUserType() . '.client.version.edit')) {
             $packageName = config('app.client_package_name');
         } else {
             if ($packageName == config('app.client_package_name') || $packageName == null) {
@@ -219,7 +219,7 @@ abstract class BaseAppVersionController extends BaseController
 
         $app = $version->app;
 
-        return view($this->getView() . '.apps.versions.edit', compact('app', 'version'));
+        return view($this->getUserType() . '.apps.versions.edit', compact('app', 'version'));
     }
 
     public function updateClient(UpdateAppVersionRequest $request, $versionName) {
@@ -235,7 +235,7 @@ abstract class BaseAppVersionController extends BaseController
      */
     public function update(UpdateAppVersionRequest $request, $packageName = null, $versionName)
     {
-        if ($request->routeIs($this->getView() . '.client.version.update')) {
+        if ($request->routeIs($this->getUserType() . '.client.version.update')) {
             $packageName = config('app.client_package_name');
         } else {
             if ($packageName == config('app.client_package_name') || $packageName == null) {
@@ -253,11 +253,11 @@ abstract class BaseAppVersionController extends BaseController
         $version->description = $request->description;
 
         if ($version->update()) {
-            if ($request->routeIs($this->getView() . '.client.version.update')) {
-                return redirect()->route($this->getView() . '.client.version.show', $versionName)
+            if ($request->routeIs($this->getUserType() . '.client.version.update')) {
+                return redirect()->route($this->getUserType() . '.client.version.show', $versionName)
                     ->with('messages', ['Successfully update description']);
             } else {
-                return redirect()->route($this->getView() . '.version.show', [$packageName, $versionName])
+                return redirect()->route($this->getUserType() . '.version.show', [$packageName, $versionName])
                     ->with('messages', ['Successfully update description']);
             }
         } else return back()->withErrors('Failed to update data');
@@ -290,18 +290,18 @@ abstract class BaseAppVersionController extends BaseController
 
         $app = $version->app;
 
-        if ($this->getView() == 'admin') $isAppOwner = true;
+        if ($this->getUserType() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
         if (!$isAppOwner) return back()->withErrors("You can't delete this app version because you are not app owner");
 
         if ($version->delete()) {
             $this->service->handleDeletedVersion($version);
 
-            if ($request->routeIs($this->getView() . '.client.version.destroy')) {
-                return redirect()->route($this->getView() . '.client.show')
+            if ($request->routeIs($this->getUserType() . '.client.version.destroy')) {
+                return redirect()->route($this->getUserType() . '.client.show')
                     ->with('messages', ['Successfully delete app version']);
             } else {
-                return redirect()->route($this->getView() . '.app.show', $packageName)
+                return redirect()->route($this->getUserType() . '.app.show', $packageName)
                     ->with('messages', ['Successfully delete app version']);
             }
         } else return back()->withErrors('Failed to delete data');

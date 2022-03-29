@@ -14,7 +14,7 @@ class UserAppVersionController extends BaseAppVersionController
         $this->middleware('auth:user');
     }
 
-    function getView()
+    function getUserType()
     {
         return 'user';
     }

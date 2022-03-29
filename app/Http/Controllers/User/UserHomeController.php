@@ -16,7 +16,7 @@ class UserHomeController extends HomeBaseController
         $this->middleware('auth:user');
     }
 
-    function getView()
+    function getUserType()
     {
         return 'user';
     }

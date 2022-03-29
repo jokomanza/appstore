@@ -16,7 +16,7 @@ class AdminHomeController extends HomeBaseController
         $this->middleware('auth:admin');
     }
 
-    function getView()
+    function getUserType()
     {
         return 'admin';
     }

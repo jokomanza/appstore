@@ -48,7 +48,7 @@ abstract class BaseAppController extends BaseController
      */
     public function index()
     {
-        return view($this->getView() . '.apps.index');
+        return view($this->getUserType() . '.apps.index');
     }
 
     /**
@@ -58,7 +58,7 @@ abstract class BaseAppController extends BaseController
      */
     public function create()
     {
-        return view($this->getView() . '.apps.create');
+        return view($this->getUserType() . '.apps.create');
     }
 
     /**
@@ -85,7 +85,7 @@ abstract class BaseAppController extends BaseController
 
             if ($app->save()) {
                 return redirect()
-                    ->route($this->getView() . '.app.show', $app->package_name)
+                    ->route($this->getUserType() . '.app.show', $app->package_name)
                     ->with('messages', ['Successfully create new app']);
             } else throw new Exception("failed to save app");
         } catch (Exception $e) {
@@ -144,14 +144,14 @@ abstract class BaseAppController extends BaseController
             $reports = Report::where('app_id', $app->id)->get();
 
         } catch (ModelNotFoundException $exception) {
-            return view($this->getView() . '.errors.404')
+            return view($this->getUserType() . '.errors.404')
                 ->with('message', 'App not found');
         }
         catch (Exception $e) {
             return back()->withException($e);
         }
 
-        return view($this->getView() . '.apps.show', compact('app', 'permissions', 'allowedPersons', 'reports', 'isAppDeveloper', 'isAppOwner'));
+        return view($this->getUserType() . '.apps.show', compact('app', 'permissions', 'allowedPersons', 'reports', 'isAppDeveloper', 'isAppOwner'));
     }
 
     /**
@@ -163,17 +163,17 @@ abstract class BaseAppController extends BaseController
      */
     public function edit(Request $request, $packageName = null)
     {
-        $app = $this->findApp($request->routeIs($this->getView() . '.client.edit'), $packageName);
+        $app = $this->findApp($request->routeIs($this->getUserType() . '.client.edit'), $packageName);
 
-        if ($app == null) return view($this->getView() . '.errors.404')->with('message', 'Target app not found');
+        if ($app == null) return view($this->getUserType() . '.errors.404')->with('message', 'Target app not found');
 
         $isAppDeveloper = Auth::user()->isDeveloperOf($app);
-        if ($this->getView() == 'admin') $isAppOwner = true;
+        if ($this->getUserType() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
 
         if (!$isAppDeveloper && !$isAppOwner) return back()->withErrors("You don't have permission to perform this action");
 
-        return view($this->getView() . '.apps.edit', compact('app', 'isAppDeveloper', 'isAppOwner'));
+        return view($this->getUserType() . '.apps.edit', compact('app', 'isAppDeveloper', 'isAppOwner'));
     }
 
     /**
@@ -185,12 +185,12 @@ abstract class BaseAppController extends BaseController
      */
     public function update(Request $request, $packageName = null)
     {
-        $app = $this->findApp($request->routeIs($this->getView() . '.client.update'), $packageName);
+        $app = $this->findApp($request->routeIs($this->getUserType() . '.client.update'), $packageName);
 
-        if ($app == null) return view($this->getView() . '.errors.404')->with('message', 'Target app not found');
+        if ($app == null) return view($this->getUserType() . '.errors.404')->with('message', 'Target app not found');
 
         $isAppDeveloper = Auth::user()->isDeveloperOf($app);
-        if ($this->getView() == 'admin') $isAppOwner = true;
+        if ($this->getUserType() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
 
         if (!$isAppDeveloper && !$isAppOwner) return back()->withErrors("You don't have permission to perform this action");
@@ -226,11 +226,11 @@ abstract class BaseAppController extends BaseController
                 @unlink(public_path('/storage/') . $oldUserDoc);
                 @unlink(public_path('/storage/') . $oldDevDoc);
 
-                if ($request->routeIs($this->getView() . '.client.update')) {
+                if ($request->routeIs($this->getUserType() . '.client.update')) {
                     return redirect()->route('admin.client.show')
                         ->with('messages', ['Successfully update app data']);
                 } else {
-                    return redirect()->route($this->getView() . '.app.show', $app->package_name)
+                    return redirect()->route($this->getUserType() . '.app.show', $app->package_name)
                         ->with('messages', ['Successfully update app data']);
                 }
             } else throw new Exception("Failed to update data");
@@ -274,7 +274,7 @@ abstract class BaseAppController extends BaseController
 
         if ($app == null) return back()->withErrors("Application not found");
 
-        if ($this->getView() == 'admin') $isAppOwner = true;
+        if ($this->getUserType() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
         if (!$isAppOwner) return back()->withErrors("You can't delete this app because you are not app owner");
 
@@ -283,7 +283,7 @@ abstract class BaseAppController extends BaseController
         if ($this->appRepository->deleteApp($app->id)) {
             $this->appService->handleDeletedApp($app, $versions);
 
-            return redirect()->route($this->getView() . '.app.index')->with('messages', ['Successfully delete app']);
+            return redirect()->route($this->getUserType() . '.app.index')->with('messages', ['Successfully delete app']);
         } else return back()->withErrors('Failed to delete data');
     }
 
@@ -353,8 +353,8 @@ abstract class BaseAppController extends BaseController
         $data = array();
         if (!empty($apps)) {
             foreach ($apps as $app) {
-                $show = route($this->getView() . '.app.show', $app->package_name);
-                $edit = route($this->getView() . '.app.edit', $app->package_name);
+                $show = route($this->getUserType() . '.app.show', $app->package_name);
+                $edit = route($this->getUserType() . '.app.edit', $app->package_name);
 
                 $isAppDeveloper = Auth::user()->isDeveloperOf($app);
                 $isAppOwner = Auth::user()->isOwnerOf($app);
@@ -367,7 +367,7 @@ abstract class BaseAppController extends BaseController
                 $nestedData['package_name'] = $app->package_name;
                 $nestedData['updated_at'] = (new Carbon($app->updated_at))->diffForHumans();
                 $nestedData['options'] = "&emsp;<a href='$show' class='btn btn-secondary'>Show</a>";
-                if ($isAppDeveloper || $isAppOwner || $this->getView() == 'admin') $nestedData['options'] .= "&emsp;<a href='$edit' class='btn btn-success' >Edit</a>";
+                if ($isAppDeveloper || $isAppOwner || $this->getUserType() == 'admin') $nestedData['options'] .= "&emsp;<a href='$edit' class='btn btn-success' >Edit</a>";
                 $data[] = $nestedData;
             }
         }

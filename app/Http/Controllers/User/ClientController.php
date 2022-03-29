@@ -21,7 +21,7 @@ class ClientController extends Controller
 
     public function __construct(AppRepositoryInterface $appRepository, AppServiceInterface $appService)
     {
-        $this->middleware('auth');
+        $this->middleware('auth:user');
         $this->appRepository = $appRepository;
         $this->appService = $appService;
     }

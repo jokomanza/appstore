@@ -16,7 +16,7 @@ class UserReportController extends BaseReportController
         $this->middleware('auth:user');
     }
 
-    function getView()
+    function getUserType()
     {
         return 'user';
     }

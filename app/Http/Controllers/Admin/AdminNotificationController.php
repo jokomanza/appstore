@@ -13,7 +13,7 @@ class AdminNotificationController extends NotificationController
         $this->middleware('auth:admin');
     }
 
-    function getView()
+    function getUserType()
     {
         return 'admin';
     }

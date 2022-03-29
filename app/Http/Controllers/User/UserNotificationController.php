@@ -13,7 +13,7 @@ class UserNotificationController extends NotificationController
         $this->middleware('auth:user');
     }
 
-    function getView()
+    function getUserType()
     {
         return 'user';
     }
