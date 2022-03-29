@@ -32,9 +32,26 @@ use Illuminate\View\View;
  */
 abstract class BaseAppController extends BaseController
 {
+    /**
+     * The app repository implementation.
+     *
+     * @var AppRepositoryInterface
+     */
     protected $appRepository;
+
+    /**
+     * The app service implementation.
+     *
+     * @var AppServiceInterface
+     */
     protected $appService;
 
+    /**
+     * Create a new controller instance.
+     *
+     * @param AppRepositoryInterface $appRepository
+     * @param AppServiceInterface $appService
+     */
     public function __construct(AppRepositoryInterface $appRepository, AppServiceInterface $appService)
     {
         $this->appRepository = $appRepository;

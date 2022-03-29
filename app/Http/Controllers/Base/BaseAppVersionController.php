@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Base;
 
 use ApkParser\Exceptions\XmlParserException;
 use ApkParser\Parser;
-use App\Http\Controllers\Base\Controller;
 use App\Http\Requests\CreateAppVersionRequest;
 use App\Http\Requests\UpdateAppVersionRequest;
 use App\Interfaces\AppVersionServiceInterface;
@@ -19,10 +18,26 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\View\View;
 
+/**
+ * Base app version controller.
+ *
+ * @property AppVersionServiceInterface $service
+ */
 abstract class BaseAppVersionController extends BaseController
 {
+
+    /**
+     * App version service implementation.
+     *
+     * @var AppVersionServiceInterface
+     */
     private $service;
 
+    /**
+     * Create a controller instance.
+     *
+     * @param AppVersionServiceInterface $service
+     */
     public function __construct(AppVersionServiceInterface $service)
     {
         $this->service = $service;
@@ -147,7 +162,13 @@ abstract class BaseAppVersionController extends BaseController
 
     }
 
-    public function showClient(Request $request, $versionName) {
+    /**
+     * @param Request $request
+     * @param $versionName
+     * @return Factory|Application|RedirectResponse|View
+     */
+    public function showClient(Request $request, $versionName)
+    {
         return $this->show($request, null, $versionName);
     }
 
@@ -162,7 +183,7 @@ abstract class BaseAppVersionController extends BaseController
     public function show(Request $request, $packageName = null, $versionName)
     {
         if ($request->routeIs($this->getUserType() . '.client.version.show')) {
-            $packageName =  config('app.client_package_name');
+            $packageName = config('app.client_package_name');
         } else {
             if ($packageName == config('app.client_package_name') || $packageName == null) {
                 return back()->withErrors('Package name is incorrect');
@@ -188,7 +209,13 @@ abstract class BaseAppVersionController extends BaseController
         return view($this->getUserType() . '.apps.versions.show', compact('app', 'version', 'isAppDeveloper', 'isAppOwner'));
     }
 
-    public function editClient(Request $request, $versionName) {
+    /**
+     * @param Request $request
+     * @param $versionName
+     * @return RedirectResponse|View
+     */
+    public function editClient(Request $request, $versionName)
+    {
         return $this->edit($request, null, $versionName);
     }
 
@@ -222,9 +249,11 @@ abstract class BaseAppVersionController extends BaseController
         return view($this->getUserType() . '.apps.versions.edit', compact('app', 'version'));
     }
 
-    public function updateClient(UpdateAppVersionRequest $request, $versionName) {
+    public function updateClient(UpdateAppVersionRequest $request, $versionName)
+    {
         return $this->update($request, null, $versionName);
     }
+
     /**
      * Update the specified resource in storage.
      *
@@ -265,9 +294,13 @@ abstract class BaseAppVersionController extends BaseController
 
 
     /**
+     * @param Request $request
+     * @param $versionName
+     * @return void
      * @throws Exception
      */
-    public function destroyClient(Request $request, $versionName) {
+    public function destroyClient(Request $request, $versionName)
+    {
         $this->destroy($request, config('app.client_package_name'), $versionName);
     }
 

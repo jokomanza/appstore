@@ -15,6 +15,11 @@ use Illuminate\View\View;
 class AdminSettingController extends Controller
 {
 
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth:admin');

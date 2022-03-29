@@ -12,22 +12,29 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\View\View;
 
 abstract class BaseReportController extends BaseController
 {
 
 
-    public function showClient(Request $request, $id) {
+    /**
+     * @param Request $request
+     * @param $id
+     * @return Factory|Application|RedirectResponse|View
+     * @throws Exception
+     */
+    public function showClient(Request $request, $id)
+    {
         return $this->show($request, config('app.client_package_name'), $id);
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param int $id
+     * @param Request $request
+     * @param $packageName
+     * @param $id
      * @return Factory|Application|RedirectResponse|View
+     * @throws Exception
      */
     public function show(Request $request, $packageName, $id)
     {
@@ -82,14 +89,16 @@ abstract class BaseReportController extends BaseController
      * @param Request $request
      * @param $notificationId
      * @return Factory|Application|RedirectResponse|View
+     * @throws Exception
      */
-    public function showReportFromNotification(Request $request, $notificationId) {
+    public function showReportFromNotification(Request $request, $notificationId)
+    {
         $report = \App\Notification::find($notificationId);
 
         $user = $report->notifiable()->getRelated();
         $app = App::find($report->data['app_id']);
 
-        if($user->first() != $request->user()) {
+        if ($user->first() != $request->user()) {
             return view($this->getUserType() . '.errors.404');
         }
 
@@ -108,7 +117,8 @@ abstract class BaseReportController extends BaseController
      * @return Factory|Application|RedirectResponse|View
      * @throws Exception
      */
-    public function destroyClient(Request $request, $id) {
+    public function destroyClient(Request $request, $id)
+    {
         return $this->destroy($request, config('app.client_package_name'), $id);
     }
 

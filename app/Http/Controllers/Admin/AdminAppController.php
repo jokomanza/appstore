@@ -8,6 +8,10 @@ use App\Interfaces\AppServiceInterface;
 
 class AdminAppController extends BaseAppController
 {
+    /**
+     * @param AppRepositoryInterface $appRepository
+     * @param AppServiceInterface $appService
+     */
     public function __construct(AppRepositoryInterface $appRepository, AppServiceInterface $appService)
     {
         parent::__construct($appRepository, $appService);

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Base\BaseAppVersionController;
-use App\Http\Controllers\Base\Controller;
 use App\Interfaces\AppVersionServiceInterface;
 
 class UserAppVersionController extends BaseAppVersionController

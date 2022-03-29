@@ -8,14 +8,18 @@ use App\Http\Requests\CreateAdminRequest;
 use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class AdminController extends Controller
 {
 
+    /**
+     * Create new controller instance.
+     *
+     */
     public function __construct()
     {
         $this->middleware('auth:admin');
@@ -63,52 +67,11 @@ class AdminController extends Controller
         return view('admin.admins.create');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param int $id
-     * @return Response
-     */
-    public function show($id)
-    {
-        //
-    }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param int $id
-     * @return Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
      * @param Request $request
-     * @param int $id
-     * @return Response
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
-
     public function getDataTables(Request $request)
     {
         $columns = [
