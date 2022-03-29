@@ -3,7 +3,7 @@
         <div class="sidebar-header">
             <div class="d-flex justify-content-between">
                 <div class="logo">
-                    <a href="{{ route('admin.home') }}"><img style="height: 3rem; width: 3rem;" src="{{ asset('images/logo.png') }}" alt="App Store"
+                    <a href="{{ route('welcome') }}"><img style="height: 3rem; width: 3rem;" src="{{ asset('images/logo.png') }}" alt="App Store"
                                                              srcset="">
                         <h2><strong>Quick App Store (ADMIN)</strong></h2>
                     </a>
@@ -78,8 +78,8 @@
 
                 <li class="sidebar-title">Other</li>
 
-                <li class="sidebar-item {{ Route::is('admin.docs') ? 'active' : '' }}  ">
-                    <a href="{{ route('admin.docs') }}" class='sidebar-link'>
+                <li class="sidebar-item {{ Route::is('admin.manual') ? 'active' : '' }}  ">
+                    <a href="{{ route('admin.manual') }}" class='sidebar-link'>
                         <i class="fa fa-book"></i>
                         <span>User Manual</span>
                     </a>

@@ -6,10 +6,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
 
-Route::get('/docs', 'User\UserDocumentationController@index')->name('user.docs');
-Route::get('/admin/docs', 'Admin\AdminDocumentationController@index')->name('admin.docs');
+Route::get('/manual', 'User\UserManualController@index')->name('user.manual');
+Route::get('/admin/manual', 'Admin\UserManualController@index')->name('admin.manual');
 
 //Auth::routes();
 

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreUserManual;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
 use Illuminate\View\View;
 
 class AdminSettingController extends Controller
@@ -24,7 +27,11 @@ class AdminSettingController extends Controller
      */
     public function index()
     {
-        return view('admin.setting.index');
+        $userManual = null;
+
+        if (File::exists(public_path('storage/user_manual.pdf'))) $userManual = asset('/storage/user_manual.pdf');
+
+        return view('admin.setting.index', compact('userManual'));
     }
 
     /**
@@ -46,6 +53,23 @@ class AdminSettingController extends Controller
     public function store(Request $request)
     {
         //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param StoreUserManual $request
+     * @return RedirectResponse
+     */
+    public function storeUserManual(StoreUserManual $request)
+    {
+        $path = public_path('storage/user_manual.pdf');
+
+        $message = File::exists($path) ? 'changed' : 'uploaded';
+
+        if ($request->file('user_manual')->move(public_path('/storage/'), 'user_manual.pdf')) {
+            return back()->with('messages', ["Successfully $message the user manual"]);
+        } else return back()->withErrors("Failed to upload user manual");
     }
 
     /**

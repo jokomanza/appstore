@@ -37,6 +37,29 @@
                             <div class="card-body">
 
 
+                                <h5>User Manual</h5>
+                                <form action="{{ route('admin.setting.manual.store') }}" method="post"
+                                      enctype="multipart/form-data">
+                                    {{ csrf_field() }}
+
+                                    @if(isset($userManual))
+                                        <p>Current User Manual : <a href="{{ url($userManual) }}">Open</a></p>
+                                    @else
+                                        <p>Currently there is no user manual</p>
+                                    @endif
+
+                                    <div class="form-group col-md-8">
+                                        <label class="mt-3 mb-2" for="user_manual">User
+                                            Manual</label>
+                                        <input class="form-control" type="file" name="user_manual"
+                                               required accept="application/pdf">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input class="btn btn-primary" type="submit"
+                                               value="{{ isset($userManual) ? 'Change' : 'Upload'}}">
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
