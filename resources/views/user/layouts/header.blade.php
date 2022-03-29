@@ -23,16 +23,9 @@
                         </ul>
                     </li>
                     <li class="nav-item dropdown me-3">
-                        <a class="nav-link active dropdown-toggle" href="#" data-bs-toggle="dropdown"
-                           aria-expanded="false">
+                        <a class="nav-link active" href="{{ route('user.notification.index') }}">
                             <i class='bi bi-bell bi-sub fs-4 text-gray-600'></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                            <li>
-                                <h6 class="dropdown-header">Notifications</h6>
-                            </li>
-                            <li><a class="dropdown-item">No notification available</a></li>
-                        </ul>
                     </li>
                 </ul>
                 <div class="dropdown">

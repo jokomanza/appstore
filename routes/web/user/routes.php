@@ -24,6 +24,8 @@ Route::get('/profile/password/edit', 'UserProfileController@editPassword')
 Route::put('/profile/password', 'UserProfileController@updatePassword')
     ->name('profile.password.update');
 
+Route::get('/notifications', 'UserNotificationController@index')
+    ->name('notification.index');
 
 // auth
 /*----------------------------------------------------------------------------------------------------------------*/

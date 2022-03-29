@@ -50,13 +50,16 @@ abstract class BaseReportController extends BaseController
 
         if (!$user->isDeveloperOf($app) && !$user->isOwnerOf($app)) return back()->withErrors("You don't have permission to see this report");
 
+        $notification = \App\Notification::where('data', 'LIKE', '%"report_id":' . $report->id . '%')->first();
+        if ($notification != null) $notification->delete();
+
         return view($this->getView() . '.reports.show', compact('report'));
     }
 
     /**
      * @param $reportId
      * @return Factory|Application|RedirectResponse|View
-     * @throws ModelNotFoundException
+     * @throws ModelNotFoundException|Exception
      */
     public function showFull($reportId)
     {
@@ -66,6 +69,9 @@ abstract class BaseReportController extends BaseController
         $user = $request->user();
 
         if (!$user->isDeveloperOf($app) && !$user->isOwnerOf($app)) return back()->withErrors("You don't have permission to see this report");
+
+        $notification = \App\Notification::where('data', 'LIKE', '%"report_id":' . $report->id . '%')->first();
+        if ($notification != null) $notification->delete();
 
         $report = json_decode($report);
 
@@ -87,7 +93,7 @@ abstract class BaseReportController extends BaseController
             return view($this->getView() . '.errors.404');
         }
 
-        $report->markAsRead();
+        $report->delete();
 
         $isClientApp = isClientApp($app);
 
@@ -100,6 +106,7 @@ abstract class BaseReportController extends BaseController
      * @param Request $request
      * @param $id
      * @return Factory|Application|RedirectResponse|View
+     * @throws Exception
      */
     public function destroyClient(Request $request, $id) {
         return $this->destroy($request, config('app.client_package_name'), $id);
@@ -132,9 +139,12 @@ abstract class BaseReportController extends BaseController
         $isAppDeveloper = Auth::user()->isDeveloperOf($app);
         if (!$isAppOwner && !$isAppDeveloper) return back()->withErrors("You can't delete this report because you are not owner or developer of this app");
 
-        $version = Report::where(['app_id' => $app->id, 'id' => $id])->firstOrFail();
+        $report = Report::where(['app_id' => $app->id, 'id' => $id])->firstOrFail();
 
-        if ($version->delete()) {
+        $notification = \App\Notification::where('data', 'LIKE', '%"report_id":' . $report->id . '%')->first();
+        if ($notification != null) $notification->delete();
+
+        if ($report->delete()) {
             if ($isClientApp) return redirect()->route($this->getView() . '.client.show');
 
             else return redirect()->route($this->getView() . '.app.show', $packageName)->with('messages', ['Successfully delete report']);

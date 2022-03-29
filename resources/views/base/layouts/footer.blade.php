@@ -4,7 +4,7 @@
             <p>2022 &copy; CV. Karya Hidup Sentosa</p>
         </div>
         <div class="float-end">
-            <p>Crafted with <span class="text-danger"><i class="bi bi-heart"></i></span> by <a
+            <p>Created by the ICT production team and the web template is made with <span class="text-danger"><i class="bi bi-heart"></i></span> by <a
                         href="http://ahmadsaugi.com">A. Saugi</a></p>
         </div>
     </div>

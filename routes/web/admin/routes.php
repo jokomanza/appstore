@@ -30,6 +30,9 @@ Route::get('/profile/password/edit', 'AdminProfileController@editPassword')
 Route::put('/profile/password', 'AdminProfileController@updatePassword')
     ->name('profile.password.update');
 
+Route::get('/notifications', 'AdminNotificationController@index')
+    ->name('notification.index');
+
 
 // auth
 /*----------------------------------------------------------------------------------------------------------------*/
