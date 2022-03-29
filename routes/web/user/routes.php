@@ -116,6 +116,10 @@ Route::delete('/app/{packageName}/version/{versionName}', 'UserAppVersionControl
 
 // app reports
 /*----------------------------------------------------------------------------------------------------------------*/
+Route::get('/notifications/report/{id}', 'UserReportController@showReportFromNotification')
+    ->where('id', '^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$')
+    ->name('notification.report.show');
+
 Route::get('/app/{packageName}/report/{id}', 'UserReportController@show')
     ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
     ->where('id', '^[0-9]*$')
