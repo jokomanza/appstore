@@ -30,8 +30,3 @@
 @guest('user')
     @yield('content')
 @endguest
-
-
-@push('script')
-    @stack('script')
-@endpush

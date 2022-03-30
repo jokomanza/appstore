@@ -64,6 +64,12 @@ Route::get('/', function () {
 Route::get('/home', 'AdminHomeController@index')
     ->name('home');
 
+Route::get('/admin/manual', 'UserManualController@index')
+    ->name('manual');
+
+Route::get('/admin/documentations', 'DocumentationController@index')
+    ->name('documentation');
+
 
 // apps
 /*----------------------------------------------------------------------------------------------------------------*/

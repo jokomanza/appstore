@@ -43,6 +43,12 @@ Route::post('/logout', 'Auth\UserLoginController@logout')
 Route::get('/home', 'UserHomeController@index')
     ->name('home');
 
+Route::get('/manual', 'UserManualController@index')
+    ->name('manual');
+
+Route::get('/documentations', 'DocumentationController@index')
+    ->name('documentation');
+
 
 // apps
 /*----------------------------------------------------------------------------------------------------------------*/

@@ -27,6 +27,8 @@
     <script src="{{ asset('select2-4.0.13/js/select2.full.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/datatables.js') }}"></script>
 
+    @stack('head-script')
+
 </head>
 
 <body>

@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Base;
 
 use App\Admin;
 use App\Models\App;
+use App\Models\AppVersion;
 use App\Models\Permission;
 use App\Models\Report;
-use App\Notifications\NewReportNotification;
 use App\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 abstract class HomeBaseController extends BaseController
@@ -35,5 +36,33 @@ abstract class HomeBaseController extends BaseController
             $this->getUserType() . '.home',
             compact('recentApps', 'appsCount', 'usersCount', 'adminsCount', 'errorsCount', 'isClientDeveloper')
         );
+    }
+
+
+    public function getReportsChart()
+    {
+        $errors = Report::select(DB::raw("TO_CHAR(DATE(created_at) :: DATE, 'Mon dd, yyyy') as x"), DB::raw('count(*) as y'))
+            ->groupBy('x')
+            ->get();
+
+        return response()->json($errors);
+    }
+
+    public function getAppsChart()
+    {
+        $errors = App::select(DB::raw("TO_CHAR(DATE(created_at) :: DATE, 'Mon dd, yyyy') as x"), DB::raw('count(*) as y'))
+            ->groupBy('x')
+            ->get();
+
+        return response()->json($errors);
+    }
+
+    public function getVersionsChart()
+    {
+        $errors = AppVersion::select(DB::raw("TO_CHAR(DATE(created_at) :: DATE, 'Mon dd, yyyy') as x"), DB::raw('count(*) as y'))
+            ->groupBy('x')
+            ->get();
+
+        return response()->json($errors);
     }
 }
