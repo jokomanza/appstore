@@ -11,6 +11,9 @@ Route::get('/', function () {
 Route::get('/manual', 'User\UserManualController@index')->name('user.manual');
 Route::get('/admin/manual', 'Admin\UserManualController@index')->name('admin.manual');
 
+Route::get('/documentations', 'User\DocumentationController@index')->name('user.documentation');
+Route::get('/admin/documentations', 'Admin\DocumentationController@index')->name('admin.documentation');
+
 //Auth::routes();
 
 Route::get('password/reset', 'User\Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');

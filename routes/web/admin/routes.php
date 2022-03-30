@@ -9,8 +9,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/settings', 'AdminSettingController@index')
     ->name('setting.index');
 
-Route::post('/settings/manual/', 'AdminSettingController@storeUserManual')
+Route::post('/settings/manual', 'AdminSettingController@storeUserManual')
     ->name('setting.manual.store');
+
+Route::post('/settings/development/standard', 'AdminSettingController@storeDevStandard')
+    ->name('setting.development.standard.store');
+
+Route::post('/settings/development/guide', 'AdminSettingController@storeDevGuide')
+    ->name('setting.development.guide.store');
 
 
 // profile

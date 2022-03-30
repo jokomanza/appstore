@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreUserManual;
+use App\Http\Requests\StoreDocumentRequest;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
 use Illuminate\View\View;
 
@@ -33,92 +31,64 @@ class AdminSettingController extends Controller
     public function index()
     {
         $userManual = null;
+        $devStandard = null;
+        $devGuide = null;
 
         if (File::exists(public_path('storage/user_manual.pdf'))) $userManual = asset('/storage/user_manual.pdf');
+        if (File::exists(public_path('storage/android_development_standard.pdf'))) $devStandard = asset('/storage/android_development_standard.pdf');
+        if (File::exists(public_path('storage/android_development_guide.pdf'))) $devGuide = asset('/storage/android_development_guide.pdf');
 
-        return view('admin.setting.index', compact('userManual'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        //
+        return view('admin.setting.index', compact('userManual', 'devStandard', 'devGuide'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param StoreUserManual $request
+     * @param StoreDocumentRequest $request
      * @return RedirectResponse
      */
-    public function storeUserManual(StoreUserManual $request)
+    public function storeUserManual(StoreDocumentRequest $request)
     {
         $path = public_path('storage/user_manual.pdf');
 
         $message = File::exists($path) ? 'changed' : 'uploaded';
 
-        if ($request->file('user_manual')->move(public_path('/storage/'), 'user_manual.pdf')) {
+        if ($request->file('document')->move(public_path('/storage/'), 'user_manual.pdf')) {
             return back()->with('messages', ["Successfully $message the user manual"]);
         } else return back()->withErrors("Failed to upload user manual");
     }
 
     /**
-     * Display the specified resource.
+     * Store a newly created resource in storage.
      *
-     * @param int $id
-     * @return Response
+     * @param StoreDocumentRequest $request
+     * @return RedirectResponse
      */
-    public function show($id)
+    public function storeDevStandard(StoreDocumentRequest $request)
     {
-        //
+        $path = public_path('storage/android_development_standard.pdf');
+
+        $message = File::exists($path) ? 'changed' : 'uploaded';
+
+        if ($request->file('document')->move(public_path('/storage/'), 'android_development_standard.pdf')) {
+            return back()->with('messages', ["Successfully $message the android development standard"]);
+        } else return back()->withErrors("Failed to upload android development standard");
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Store a newly created resource in storage.
      *
-     * @param int $id
-     * @return Response
+     * @param StoreDocumentRequest $request
+     * @return RedirectResponse
      */
-    public function edit($id)
+    public function storeDevGuide(StoreDocumentRequest $request)
     {
-        //
-    }
+        $path = public_path('storage/android_development_guide.pdf');
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param int $id
-     * @return Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+        $message = File::exists($path) ? 'changed' : 'uploaded';
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        //
+        if ($request->file('document')->move(public_path('/storage/'), 'android_development_guide.pdf')) {
+            return back()->with('messages', ["Successfully $message the android development guide"]);
+        } else return back()->withErrors("Failed to upload android development guide");
     }
 }

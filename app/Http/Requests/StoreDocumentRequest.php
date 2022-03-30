@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreUserManual extends FormRequest
+class StoreDocumentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class StoreUserManual extends FormRequest
     public function rules()
     {
         return [
-            'user_manual' => 'required|mimes:pdf|max:10000'
+            'document' => 'required|mimes:pdf|max:10000'
         ];
     }
 }

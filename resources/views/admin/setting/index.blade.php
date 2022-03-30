@@ -36,7 +36,6 @@
                         <div class="card-content">
                             <div class="card-body">
 
-
                                 <h5>User Manual</h5>
                                 <form action="{{ route('admin.setting.manual.store') }}" method="post"
                                       enctype="multipart/form-data">
@@ -49,15 +48,65 @@
                                     @endif
 
                                     <div class="form-group col-md-8">
-                                        <label class="mt-3 mb-2" for="user_manual">User
+                                        <label class="mt-3 mb-2" for="document">User
                                             Manual</label>
-                                        <input class="form-control" type="file" name="user_manual"
+                                        <input class="form-control" type="file" name="document"
                                                required accept="application/pdf">
                                     </div>
 
                                     <div class="form-group">
                                         <input class="btn btn-primary" type="submit"
                                                value="{{ isset($userManual) ? 'Change' : 'Upload'}}">
+                                    </div>
+                                </form>
+
+                                <br>
+
+                                <h5>Android Development Standard</h5>
+                                <form action="{{ route('admin.setting.development.standard.store') }}" method="post"
+                                      enctype="multipart/form-data">
+                                    {{ csrf_field() }}
+
+                                    @if(isset($devStandard))
+                                        <p>Current Development Standard : <a href="{{ url($devStandard) }}">Open</a></p>
+                                    @else
+                                        <p>Currently there is no development standard</p>
+                                    @endif
+
+                                    <div class="form-group col-md-8">
+                                        <label class="mt-3 mb-2" for="document">Development Standard</label>
+                                        <input class="form-control" type="file" name="document"
+                                               required accept="application/pdf">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input class="btn btn-primary" type="submit"
+                                               value="{{ isset($devStandard) ? 'Change' : 'Upload'}}">
+                                    </div>
+                                </form>
+
+                                <br>
+
+                                <h5>Android Development Guide</h5>
+                                <form action="{{ route('admin.setting.development.guide.store') }}" method="post"
+                                      enctype="multipart/form-data">
+                                    {{ csrf_field() }}
+
+                                    @if(isset($devGuide))
+                                        <p>Current Development Guide : <a href="{{ url($devGuide) }}">Open</a></p>
+                                    @else
+                                        <p>Currently there is no development guide</p>
+                                    @endif
+
+                                    <div class="form-group col-md-8">
+                                        <label class="mt-3 mb-2" for="document">Development Guide</label>
+                                        <input class="form-control" type="file" name="document"
+                                               required accept="application/pdf">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input class="btn btn-primary" type="submit"
+                                               value="{{ isset($devGuide) ? 'Change' : 'Upload'}}">
                                     </div>
                                 </form>
                             </div>
