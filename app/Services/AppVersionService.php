@@ -7,7 +7,7 @@ use Intervention\Image\ImageManager;
 
 class AppVersionService implements AppVersionServiceInterface
 {
-    function handleUploadedIcon($packageName, \Illuminate\Http\UploadedFile $icon, $currentTime)
+    function handleUploadedIcon($packageName, $icon, $currentTime)
     {
         if ($icon) {
             $extension = $icon->getClientOriginalExtension();
@@ -48,9 +48,9 @@ class AppVersionService implements AppVersionServiceInterface
 
         return null;
     }
+
     function handleDeletedVersion(\App\Models\AppVersion $version)
     {
-        return @unlink(public_path('/storage/') . $version->apk_file_url) && @unlink(public_path('/storage/') . $version->icon_url);
-
+        return !(@unlink(public_path('/storage/') . $version->apk_file_url) && $version->icon_url) || @unlink(public_path('/storage/') . $version->icon_url);
     }
 }

@@ -25,7 +25,7 @@ class CreateAppVersionRequest extends FormRequest
     {
         return [
             'apk_file' => 'required|mimes:apk,jar,zip',
-            'icon_file' => 'required|image',
+            'icon_file' => 'image',
             'description' => 'required|string|max:255',
         ];
     }

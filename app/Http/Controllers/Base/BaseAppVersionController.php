@@ -102,7 +102,7 @@ abstract class BaseAppVersionController extends BaseController
             ];
         }
 
-        if (preg_match('^[0-9]{1,5}.[0-9]{1,5}.[0-9]{1,5}$', $package_name)) {
+        if (!preg_match("/^\d{1,5}.\d{1,5}.\d{1,5}$/", $version_code)) {
             $additionalError['version_code'] = [
                 "Version code invalid"
             ];
@@ -127,19 +127,21 @@ abstract class BaseAppVersionController extends BaseController
 
         if (!empty($additionalError)) {
             @unlink(public_path('/storage/') . $storedApkName);
-            @unlink(public_path('/storage/') . $storedIconName);
+            if ($storedIconName) @unlink(public_path('/storage/') . $storedIconName);
             // dd($additionalError);
 
             return back()->withErrors($additionalError)->withInput();
         }
 
         $finalApkName = $package_name . '.' . $version_code . '.' . time() . '.apk';
-        $finalIconName = $package_name . '.' . $version_code . '.icon.' . time() . '.jpg';
         File::move(public_path('/storage/') . $storedApkName, public_path('/storage/') . $finalApkName);
-        File::move(public_path('/storage/') . $storedIconName, public_path('/storage/') . $finalIconName);
-
         $storedApkName = $finalApkName;
-        $storedIconName = $finalIconName;
+
+        if ($storedIconName) {
+            $finalIconName = $package_name . '.' . $version_code . '.icon.' . time() . '.jpg';
+            File::move(public_path('/storage/') . $storedIconName, public_path('/storage/') . $finalIconName);
+            $storedIconName = $finalIconName;
+        }
 
         $appVersion = new AppVersion();
         $appVersion->app_id = $app->id;
@@ -153,7 +155,7 @@ abstract class BaseAppVersionController extends BaseController
         $appVersion->description = $request->description;
         if (!$appVersion->save()) {
             @unlink(public_path('/storage/') . $storedApkName);
-            @unlink(public_path('/storage/') . $storedIconName);
+            if ($storedIconName) @unlink(public_path('/storage/') . $storedIconName);
 
             return back()->withErrors("Failed to save app version");
         }

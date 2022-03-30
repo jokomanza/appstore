@@ -36,7 +36,7 @@
                                     <div class="form-group">
                                         <label for="icon_file">Icon</label>
                                         <input class="form-control" type="file" accept=".jpg, .png, .jpeg"
-                                               name="icon_file" required autofocus>
+                                               name="icon_file">
                                     </div>
                                     <div class="form-group">
                                         <label for="apk_file">APK</label>

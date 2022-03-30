@@ -3,7 +3,8 @@
         <div class="row">
             <div class="col-12 col-md-6 order-md-1 order-last">
                 <h3>{{ $isClientApp ? 'Client App' : "App #$app->id" }}</h3>
-                <p class="text-subtitle text-muted">Display all {{ $isClientApp ? 'Client App' : $app->name }} details.</p>
+                <p class="text-subtitle text-muted">Display all {{ $isClientApp ? 'Client App' : $app->name }}
+                    details.</p>
             </div>
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
@@ -53,13 +54,15 @@
                                 @endif
                                 @if ($app->user_documentation_url)
                                     <div class="mb-3">
-                                        <a href="{{ asset('/storage/' . $app->user_documentation_url) }}" target="__blank">User
+                                        <a href="{{ asset('/storage/' . $app->user_documentation_url) }}"
+                                           target="__blank">User
                                             Documentation</a>
                                     </div>
                                 @endif
                                 @if ($app->developer_documentation_url && ($isAppOwner || $isAppDeveloper))
                                     <div class="mb-3">
-                                        <a href="{{ asset('/storage/' . $app->developer_documentation_url) }}" target="__blank">Developer
+                                        <a href="{{ asset('/storage/' . $app->developer_documentation_url) }}"
+                                           target="__blank">Developer
                                             Documentation</a>
                                     </div>
                                 @endif
@@ -127,7 +130,7 @@
                                     @foreach ($app->app_versions as $key => $value)
                                         <tr>
                                             <td>
-                                                <img src="{{ str_contains($value->icon_url, 'http') ? $value->icon_url : asset("storage/$value->icon_url") }}"
+                                                <img src="{{ $value->icon_url ? asset("storage/$value->icon_url") : asset("storage/$app->icon_url") }}"
                                                      width="50" height="50"></td>
                                             <td class="text-bold-500">{{ $value->version_name }}</td>
                                             <td>{{ round($value->apk_file_size / 1024.0 / 1024.0, 2) }} MB</td>

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateAppVersionsTable extends Migration
 {
@@ -24,7 +24,8 @@ class CreateAppVersionsTable extends Migration
                 ->default(31);
             $table->string('apk_file_url', 120);
             $table->string('apk_file_size', 60);
-            $table->string('icon_url', 120);
+            $table->string('icon_url', 120)
+                ->nullable();
             $table->longText('description');
             $table->integer('downloads')
                 ->default(0);

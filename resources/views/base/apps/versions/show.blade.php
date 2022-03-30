@@ -26,7 +26,7 @@
                             </div>
 
                             <div class="mb-4">
-                                <img src="{{ str_contains($version->icon_url, 'http') ? $version->icon_url : asset("storage/$version->icon_url") }}"
+                                <img src="{{ $version->icon_url ? asset("storage/$version->icon_url") : asset("storage/$app->icon_url") }}"
                                      width="100" height="100">
                             </div>
                             <p class="text">Version Code : {{ $version->version_code }}</p>
