@@ -18,7 +18,10 @@
             <div class="card-body">
 
                 @if(isset($userManual))
-                    <p>Current User Manual : <a href="{{ url($userManual) }}">Open</a></p>
+
+                    <iframe src="{{ asset('/storage/user_manual.pdf') }}" width="100%"
+                            height="900px"></iframe>
+
                 @else
                     <p>Currently there is no user manual</p>
                 @endif
