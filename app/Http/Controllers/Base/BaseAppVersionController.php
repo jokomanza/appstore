@@ -102,6 +102,12 @@ abstract class BaseAppVersionController extends BaseController
             ];
         }
 
+        if (preg_match('^[0-9]{1,5}.[0-9]{1,5}.[0-9]{1,5}$', $package_name)) {
+            $additionalError['version_code'] = [
+                "Version code invalid"
+            ];
+        }
+
         if (!empty(AppVersion::where(['app_id' => $app->id, 'version_code' => $version_code])->first())) {
             $additionalError['version_code'] = [
                 "Version number " . $version_code . " for app $app->name already exists"
