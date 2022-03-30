@@ -16,7 +16,7 @@ class AppVersionService implements AppVersionServiceInterface
 
             $image = (new ImageManager())->make($icon);
 
-            if (!$image->save(public_path('/storage/') . str_replace("$extension", 'jpg', $stored))) {
+            if (!$image->save(public_path('/storage/') . str_replace("$extension", 'png', $stored))) {
                 throw new \Exception("Failed to save icon");
             }
 

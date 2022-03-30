@@ -17,7 +17,7 @@ class AppService implements AppServiceInterface
 
             $image = (new ImageManager())->make($icon);
 
-            if (!$image->save(public_path('/storage/') . str_replace("$extension", 'jpg', $stored))) {
+            if (!$image->save(public_path('/storage/') . str_replace("$extension", 'png', $stored))) {
                 throw new \Exception("Failed to save icon");
             }
 
@@ -59,7 +59,7 @@ class AppService implements AppServiceInterface
 
     public function handleUploadedFileWhenFailed($packageName, $currentTime)
     {
-        @unlink(public_path('/storage/') . "$packageName.default_icon.$currentTime.jpg");
+        @unlink(public_path('/storage/') . "$packageName.default_icon.$currentTime.png");
         @unlink(public_path('/storage/') . "$packageName.user_documentation.$currentTime.pdf");
         @unlink(public_path('/storage/') . "$packageName.developer_documentation.$currentTime.pdf");
     }
