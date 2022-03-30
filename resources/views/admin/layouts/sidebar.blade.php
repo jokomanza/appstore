@@ -20,7 +20,7 @@
 
                 <li class="sidebar-item {{ Route::is('admin.home') ? 'active' : '' }} ">
                     <a href="{{ route('admin.home') }}" class='sidebar-link'>
-                        <i class="bi bi-grid-fill"></i>
+                        <i class="bi bi-house-fill"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
@@ -81,14 +81,14 @@
 
                 <li class="sidebar-item {{ Route::is('admin.manual') ? 'active' : '' }}  ">
                     <a href="{{ route('admin.manual') }}" class='sidebar-link'>
-                        <i class="fa fa-book"></i>
+                        <i class="bi bi-book-fill"></i>
                         <span>User Manual</span>
                     </a>
                 </li>
 
                 <li class="sidebar-item  {{ Route::is('admin.documentation') ? 'active' : '' }}">
                     <a href="{{ route('admin.documentation') }}" class='sidebar-link'>
-                        <i class="fa fa-book"></i>
+                        <i class="bi bi-book-fill"></i>
                         <span>Documentations</span>
                     </a>
                 </li>
@@ -96,7 +96,7 @@
 
                 <li class="sidebar-item {{ Route::is('admin.profile.*') ? 'active' : '' }}  ">
                     <a href="{{ route('admin.profile.show') }}" class='sidebar-link'>
-                        <i class="fa fa-book"></i>
+                        <i class="bi bi-person-fill"></i>
                         <span>Profile</span>
                     </a>
                 </li>
@@ -104,7 +104,7 @@
 
                 <li class="sidebar-item {{ Route::is('admin.setting.*') ? 'active' : '' }}  ">
                     <a href="{{ route('admin.setting.index') }}" class='sidebar-link'>
-                        <i class="fa fa-book"></i>
+                        <i class="bi bi-gear-fill"></i>
                         <span>Settings</span>
                     </a>
                 </li>

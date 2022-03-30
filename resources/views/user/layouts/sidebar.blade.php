@@ -20,7 +20,7 @@
 
                 <li class="sidebar-item {{ Route::is('user.home') ? 'active' : '' }} ">
                     <a href="{{ route('user.home') }}" class='sidebar-link'>
-                        <i class="bi bi-grid-fill"></i>
+                        <i class="bi bi-house-fill"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
@@ -43,21 +43,21 @@
 
                 <li class="sidebar-item  {{ Route::is('user.manual') ? 'active' : '' }}">
                     <a href="{{ route('user.manual') }}" class='sidebar-link'>
-                        <i class="fa fa-book"></i>
+                        <i class="bi bi-book-fill"></i>
                         <span>User Manual</span>
                     </a>
                 </li>
 
                 <li class="sidebar-item  {{ Route::is('user.documentation') ? 'active' : '' }}">
                     <a href="{{ route('user.documentation') }}" class='sidebar-link'>
-                        <i class="fa fa-book"></i>
+                        <i class="bi bi-book-fill"></i>
                         <span>Documentations</span>
                     </a>
                 </li>
 
                 <li class="sidebar-item  {{ Route::is('user.profile.show') ? 'active' : '' }}">
                     <a href="{{ route('user.profile.show') }}" class='sidebar-link'>
-                        <i class="fa fa-book"></i>
+                        <i class="bi bi-person-fill"></i>
                         <span>Profile</span>
                     </a>
                 </li>
