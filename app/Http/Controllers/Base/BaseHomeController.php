@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
-abstract class HomeBaseController extends BaseController
+abstract class BaseHomeController extends BaseController
 {
 
     /**
@@ -22,7 +22,7 @@ abstract class HomeBaseController extends BaseController
      */
     public function index()
     {
-        $recentApps = App::orderBy('updated_at', 'DESC')->limit(5)->get();
+        $recentApps = App::orderBy('updated_at', 'DESC')->limit(3)->get();
         $appsCount = App::count();
         $usersCount = User::count();
         $adminsCount = Admin::count();

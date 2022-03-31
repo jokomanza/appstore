@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Base\HomeBaseController;
+use App\Http\Controllers\Base\BaseHomeController;
 
-class AdminHomeController extends HomeBaseController
+class AdminHomeController extends BaseHomeController
 {
     /**
      * Create a new controller instance.
