@@ -14,12 +14,12 @@ use App\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\View\Factory;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 
 /**
@@ -47,15 +47,24 @@ abstract class BaseAppController extends BaseController
     protected $appService;
 
     /**
+     * The app service implementation.
+     *
+     * @var bool
+     */
+    protected $isClientRoute;
+
+    /**
      * Create a new controller instance.
      *
      * @param AppRepositoryInterface $appRepository
      * @param AppServiceInterface $appService
+     * @param Request $request
      */
     public function __construct(AppRepositoryInterface $appRepository, AppServiceInterface $appService)
     {
         $this->appRepository = $appRepository;
         $this->appService = $appService;
+        $this->isClientRoute = Route::is('client.*');
     }
 
     /**
@@ -88,27 +97,25 @@ abstract class BaseAppController extends BaseController
     {
         $time = time();
 
-        try {
-            $iconUrl = $this->appService->handleUploadedIcon($request->get('package_name'), $request->file('icon_file'), $time);
-            $userDocUrl = $this->appService->handleUploadedUserDocumentation($request->get('package_name'), $request->file('user_documentation_file'), $time);
-            $devDocUrl = $this->appService->handleUploadedDeveloperDocumentation($request->get('package_name'), $request->file('developer_documentation_file'), $time);
+        $iconUrl = $this->appService->handleUploadedIcon($request->get('package_name'), $request->file('icon_file'), $time);
+        $userDocUrl = $this->appService->handleUploadedUserDocumentation($request->get('package_name'), $request->file('user_documentation_file'), $time);
+        $devDocUrl = $this->appService->handleUploadedDeveloperDocumentation($request->get('package_name'), $request->file('developer_documentation_file'), $time);
 
-            $app = new App();
-            $app->fill($request->all());
-            $app->api_token = str_random(128);
-            $app->icon_url = $iconUrl;
-            $app->user_documentation_url = $userDocUrl;
-            $app->developer_documentation_url = $devDocUrl;
+        $app = new App();
+        $app->fill($request->all());
+        $app->api_token = str_random(128);
+        $app->icon_url = $iconUrl;
+        $app->user_documentation_url = $userDocUrl;
+        $app->developer_documentation_url = $devDocUrl;
 
-            if ($app->save()) {
-                return redirect()
-                    ->route($this->getUserType() . '.app.show', $app->package_name)
-                    ->with('messages', ['Successfully create new app']);
-            } else throw new Exception("failed to save app");
-        } catch (Exception $e) {
+        if ($app->save()) {
+            return redirect()
+                ->route($this->getUserType() . '.app.show', $app->package_name)
+                ->with('messages', ['Successfully create new app']);
+        } else {
             $this->appService->handleUploadedFileWhenFailed($request->package_name, $time);
 
-            return back()->withErrors($e->getMessage())->withInput();
+            return back()->withErrors('Failed to create new app')->withInput();
         }
     }
 
@@ -132,30 +139,26 @@ abstract class BaseAppController extends BaseController
      */
     public function show(Request $request, $packageName)
     {
-        try {
-
-            if (!$request->routeIs($this->getUserType() . '.client.show')) {
-                if ($packageName == config('app.client_package_name')) {
-                    return redirect()->route($this->getUserType() . '.client.show');
-                }
+        if (!$request->routeIs($this->getUserType() . '.client.show')) {
+            if ($packageName == config('app.client_package_name')) {
+                return redirect()->route($this->getUserType() . '.client.show');
             }
-
-            $app = App::with('app_versions')->where('package_name', $packageName)->firstOrFail();
-
-            $isAppDeveloper = Auth::user()->isDeveloperOf($app);
-            $isAppOwner = Auth::user()->isOwnerOf($app);
-
-            $permissions = (new Permission)->getPermissionsWithUser($app->id);
-            $allowedPersons = (new User)->getAllRegistrationNumbers();
-
-            $reports = (new Report)->getReportsByAppId($app->id);
-
-        } catch (ModelNotFoundException $exception) {
-            return view($this->getUserType() . '.errors.404')
-                ->with('message', 'App not found');
-        } catch (Exception $e) {
-            return back()->withException($e);
         }
+
+        $app = App::with('app_versions')->where('package_name', $packageName)->first();
+        if ($app == null) {
+            return redirect()
+                ->route($this->getUserType() . ($this->isClientRoute ? 'client.show' : '.app.show'))
+                ->withErrors("App not found");
+        }
+
+        $isAppDeveloper = Auth::user()->isDeveloperOf($app);
+        $isAppOwner = Auth::user()->isOwnerOf($app);
+
+        $permissions = (new Permission)->getPermissionsWithUser($app->id);
+        $allowedPersons = (new User)->getAllRegistrationNumbers();
+
+        $reports = (new Report)->getReportsByAppId($app->id);
 
         return view($this->getUserType() . '.apps.show', compact('app', 'permissions', 'allowedPersons', 'reports', 'isAppDeveloper', 'isAppOwner'));
     }
@@ -188,14 +191,17 @@ abstract class BaseAppController extends BaseController
         }
 
         $app = (new App)->getApp($packageName);
-
-        if ($app == null) return view($this->getUserType() . '.errors.404')->with('message', 'Target app not found');
+        if ($app == null) {
+            return redirect()
+                ->route($this->getUserType() . ($this->isClientRoute ? 'client.show' : '.app.show'))
+                ->withErrors("App not found");
+        }
 
         $isAppDeveloper = Auth::user()->isDeveloperOf($app);
         if ($this->getUserType() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
 
-        if (!$isAppDeveloper && !$isAppOwner) return back()->withErrors("You don't have permission to perform this action");
+        if (!$isAppDeveloper && !$isAppOwner) return redirect()->route($this->getUserType() . '.app.', ['message' => "You don't have permission to perform this action"]);
 
         return view($this->getUserType() . '.apps.edit', compact('app', 'isAppDeveloper', 'isAppOwner'));
     }
@@ -227,14 +233,17 @@ abstract class BaseAppController extends BaseController
         }
 
         $app = (new App)->getApp($packageName);
-
-        if ($app == null) return view($this->getUserType() . '.errors.404')->with('message', 'Target app not found');
+        if ($app == null) {
+            return redirect()
+                ->route($this->getUserType() . ($this->isClientRoute ? 'client.show' : '.app.show'))
+                ->withErrors("App not found");
+        }
 
         $isAppDeveloper = Auth::user()->isDeveloperOf($app);
         if ($this->getUserType() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
 
-        if (!$isAppDeveloper && !$isAppOwner) return back()->withErrors("You don't have permission to perform this action");
+        if (!$isAppDeveloper && !$isAppOwner) return view($this->getUserType() . '.errors.403', ['message' => "You don't have permission to perform this action"]);
 
         $time = time();
 
@@ -292,12 +301,15 @@ abstract class BaseAppController extends BaseController
     public function destroy(Request $request, $packageName)
     {
         if ($packageName == config('app.client_package_name')) {
-            return back()->withErrors("You can't perform this action");
+            return redirect()->route($this->getUserType() . '.client.show')->withErrors("You can't delete client app");
         }
 
         $app = (new App)->getApp($packageName);
-
-        if ($app == null) return back()->withErrors("Application not found");
+        if ($app == null) {
+            return redirect()
+                ->route($this->getUserType() . ($this->isClientRoute ? 'client.show' : '.app.show'))
+                ->withErrors("App not found");
+        }
 
         if ($this->getUserType() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
@@ -309,7 +321,7 @@ abstract class BaseAppController extends BaseController
             $this->appService->handleDeletedApp($app, $versions);
 
             return redirect()->route($this->getUserType() . '.app.index')->with('messages', ['Successfully delete app']);
-        } else return back()->withErrors('Failed to delete data');
+        } else return redirect($this->getUserType() . '.app.show', $packageName)->withErrors('Failed to delete data');
     }
 
     /**

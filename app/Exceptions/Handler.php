@@ -43,19 +43,23 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  Request  $request
+     * @param Request $request
      * @param Exception $e
      * @return Response
      */
     public function render($request, Exception $e)
     {
+        if ($e instanceof BaseException) {
+            if ($e->shouldRedirectBack) return back()->withErrors($e->getMessage());
+        }
+
         return parent::render($request, $e);
     }
 
     /**
      * Convert an authentication exception into an unauthenticated response.
      *
-     * @param  Request  $request
+     * @param Request $request
      * @param AuthenticationException $exception
      * @return JsonResponse|RedirectResponse
      */
