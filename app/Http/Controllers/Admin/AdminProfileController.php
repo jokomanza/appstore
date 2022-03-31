@@ -71,7 +71,7 @@ class AdminProfileController extends Controller
 
         $user->password = bcrypt($request->password);
 
-        if ($user->update()) return redirect()->route('admin.profile.show');
+        if ($user->update()) return redirect()->route('admin.profile.show')->with('messages', ['Successfully update your password']);
         else return back()->withErrors('Failed to change password');
     }
 
@@ -87,7 +87,7 @@ class AdminProfileController extends Controller
 
         $user->fill($request->all());
 
-        if ($user->update()) return redirect()->route('admin.profile.show');
+        if ($user->update()) return redirect()->route('admin.profile.show')->with('messages', ['Successfully update your data']);
         else return back()->withErrors('Failed to update profile');
     }
 

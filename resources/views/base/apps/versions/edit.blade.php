@@ -1,9 +1,14 @@
+@push('head')
+    <script src="{{ asset('js/autosize.js') }}"></script>
+@endpush
+
 <div class="page-heading">
     <div class="page-title">
         <div class="row">
             <div class="col-12 col-md-6 order-md-1 order-last">
                 <h3>Edit Version</h3>
-                <p class="text-subtitle text-muted">Edit version data. Note that you can only edit the description. If you want to change any other data, you have to recreate the version.</p>
+                <p class="text-subtitle text-muted">Edit version data. Note that you can only edit the description. If
+                    you want to change any other data, you have to recreate the version.</p>
             </div>
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">

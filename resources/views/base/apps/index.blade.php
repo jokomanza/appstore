@@ -1,3 +1,8 @@
+@push('head')
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap5.datatables.css') }}"/>
+    <script type="text/javascript" src="{{ asset('js/datatables.js') }}"></script>
+@endpush
+
 <div class="page-heading">
     <div class="page-title">
         <div class="row">

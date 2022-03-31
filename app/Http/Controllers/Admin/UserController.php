@@ -46,7 +46,7 @@ class UserController extends Controller
             'email' => $request['email'],
             'access_level' => $request['access_level'],
             'password' => bcrypt('123456'),
-        ])) return redirect()->route('admin.user.index');
+        ])) return redirect()->route('admin.user.index')->with('messages', ['Successfully create new user account']);
         else return back()->withErrors("");
     }
 
@@ -109,7 +109,7 @@ class UserController extends Controller
 
         $user->password = bcrypt('123456');
 
-        if ($user->update()) return back();
+        if ($user->update()) return back()->with('messages', ['Successfully reset user password']);
         else return back()->withErrors('Failed to reset user password');
     }
 
@@ -128,7 +128,7 @@ class UserController extends Controller
 
         $user->fill($request->all());
 
-        if ($user->update()) return redirect()->route('admin.user.show', $registrationNumber);
+        if ($user->update()) return redirect()->route('admin.user.show', $registrationNumber)->with('messages', ['Successfully update user data']);
         else return back()->withErrors('Failed to update user');
     }
 
@@ -145,7 +145,7 @@ class UserController extends Controller
 
         if ($user == null) return view('admin.errors.404');
 
-        if ($user->delete()) return redirect()->route('admin.user.index');
+        if ($user->delete()) return redirect()->route('admin.user.index')->with('messages', ['Successfully delete user']);
         else return back()->withErrors("Failed to delete user account");
     }
 

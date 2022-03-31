@@ -50,7 +50,7 @@ class AdminController extends Controller
                 'email' => $request['email'],
                 'password' => bcrypt('123456'),
             ])) {
-                return redirect()->route('admin.admin.index');
+                return redirect()->route('admin.admin.index')->with('messages', ['Successfully create new admin account']);
             } else return back()->withErrors("Failed to create new admin");
         } catch (Exception $exception) {
             return back()->withErrors("Error " . $exception->getCode())->withInput();

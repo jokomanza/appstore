@@ -24,8 +24,8 @@
                         </ul>
                     </li>
                     <li class="nav-item dropdown me-3">
-                        <a class="nav-link active" href="{{ route('admin.notification.index') }}" >
-                            <i class='bi bi-bell bi-sub fs-4 text-gray-600'></i>
+                        <a class="nav-link active" href="{{ route('admin.notification.index') }}">
+                            <i class='bi bi-bell bi-sub fs-4 {{ hasUnreadNotification() ? 'text-danger' : 'text-gray-600' }}'></i>
                         </a>
                     </li>
                 </ul>

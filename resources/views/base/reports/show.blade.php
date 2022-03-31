@@ -1,3 +1,7 @@
+@push('head')
+    <script src="{{ asset('js/sweetalert.min.js') }}"></script>
+@endpush
+
 <div class="page-heading">
     <div class="page-title">
         <div class="row">

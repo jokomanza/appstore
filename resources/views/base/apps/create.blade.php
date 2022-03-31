@@ -1,3 +1,7 @@
+@push('head')
+    <script src="{{ asset('js/autosize.js') }}"></script>
+@endpush
+
 <div class="page-heading">
     <div class="page-title">
         <div class="row">
@@ -88,3 +92,10 @@
         </div>
     </section>
 </div>
+
+@push('script')
+    <script>
+        autosize(document.querySelector('textarea'))
+    </script>
+@endpush
+

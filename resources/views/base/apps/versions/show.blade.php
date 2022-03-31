@@ -1,3 +1,7 @@
+@push('head')
+    <script src="{{ asset('js/sweetalert.min.js') }}"></script>
+@endpush
+
 <div class="page-heading">
     <div class="page-title">
         <div class="row">
@@ -89,8 +93,6 @@
                     .then((willDelete) => {
                         if (willDelete) {
                             $(e.target).closest('form').submit() // Post the surrounding form
-                        } else {
-
                         }
                     });
             });

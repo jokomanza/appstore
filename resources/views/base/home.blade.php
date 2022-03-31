@@ -1,6 +1,6 @@
-@push('head-script')
+@push('head')
     <link rel="stylesheet" href="{{ asset('vendor/iconly/bold.css') }}">
-    <script src="{{ asset('assets/js/apexcharts.js') }}"></script>
+    <script src="{{ asset('js/apexcharts.js') }}"></script>
 @endpush
 
 @section('content')

@@ -1,5 +1,10 @@
 @extends('admin.layouts.admin')
 
+@push('head')
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap5.datatables.css') }}"/>
+    <script type="text/javascript" src="{{ asset('js/datatables.js') }}"></script>
+@endpush
+
 @section('content')
 
     <div class="page-heading">
@@ -7,7 +12,9 @@
             <div class="row">
                 <div class="col-12 col-md-6 order-md-1 order-last">
                     <h3>All Admins</h3>
-                    <p class="text-subtitle text-muted">Display all admins in Quick App Store. Note that you cannot modify another admin account, the only person who can change an admin account is the owner himself</p>
+                    <p class="text-subtitle text-muted">Display all admins in Quick App Store. Note that you cannot
+                        modify another admin account, the only person who can change an admin account is the owner
+                        himself</p>
                 </div>
                 <div class="col-12 col-md-6 order-md-2 order-first">
                     <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">

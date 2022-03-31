@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class AppVersion
@@ -89,5 +90,15 @@ class AppVersion extends Model
             ->whereHas('app', function ($q) use ($packageName) {
                 $q->where('package_name', $packageName);
             })->first();
+    }
+
+    /**
+     * @return AppVersion[]|Collection|\Illuminate\Support\Collection
+     */
+    public function getChartData()
+    {
+        return $this->select(DB::raw("TO_CHAR(DATE(created_at) :: DATE, 'Mon dd, yyyy') as x"), DB::raw('count(*) as y'))
+            ->groupBy('x')
+            ->get();
     }
 }

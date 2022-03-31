@@ -1,5 +1,10 @@
 @extends('admin.layouts.admin')
 
+@push('head')
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap5.datatables.css') }}"/>
+    <script type="text/javascript" src="{{ asset('js/datatables.js') }}"></script>
+@endpush
+
 @section('content')
 
     <div class="page-heading">

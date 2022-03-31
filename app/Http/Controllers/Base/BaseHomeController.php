@@ -5,11 +5,8 @@ namespace App\Http\Controllers\Base;
 use App\Admin;
 use App\Models\App;
 use App\Models\AppVersion;
-use App\Models\Permission;
 use App\Models\Report;
 use App\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 abstract class BaseHomeController extends BaseController
@@ -27,41 +24,31 @@ abstract class BaseHomeController extends BaseController
         $usersCount = User::count();
         $adminsCount = Admin::count();
         $errorsCount = Report::count();
-        $isClientDeveloper = Auth::user()->isDeveloperOf(Permission::whereHas('app', function ($q) {
-            $q->where('package_name', 'com.quick.quickappstore');
-        })->first());
-
 
         return view(
             $this->getUserType() . '.home',
-            compact('recentApps', 'appsCount', 'usersCount', 'adminsCount', 'errorsCount', 'isClientDeveloper')
+            compact('recentApps', 'appsCount', 'usersCount', 'adminsCount', 'errorsCount')
         );
     }
 
 
     public function getReportsChart()
     {
-        $errors = Report::select(DB::raw("TO_CHAR(DATE(created_at) :: DATE, 'Mon dd, yyyy') as x"), DB::raw('count(*) as y'))
-            ->groupBy('x')
-            ->get();
+        $errors = (new Report)->getChartData();
 
         return response()->json($errors);
     }
 
     public function getAppsChart()
     {
-        $errors = App::select(DB::raw("TO_CHAR(DATE(created_at) :: DATE, 'Mon dd, yyyy') as x"), DB::raw('count(*) as y'))
-            ->groupBy('x')
-            ->get();
+        $errors = (new App)->getChartData();
 
         return response()->json($errors);
     }
 
     public function getVersionsChart()
     {
-        $errors = AppVersion::select(DB::raw("TO_CHAR(DATE(created_at) :: DATE, 'Mon dd, yyyy') as x"), DB::raw('count(*) as y'))
-            ->groupBy('x')
-            ->get();
+        $errors = (new AppVersion)->getChartData();
 
         return response()->json($errors);
     }

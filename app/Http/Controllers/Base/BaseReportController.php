@@ -38,11 +38,9 @@ abstract class BaseReportController extends BaseController
      */
     public function show(Request $request, $packageName, $id)
     {
-        if ($request->routeIs($this->getUserType() . '.client.report.show')) {
-            $packageName = config('app.client_package_name');
-        } else {
-            if ($packageName == config('app.client_package_name') || $packageName == null) {
-                return back()->withErrors('Package name is incorrect');
+        if (!$request->routeIs($this->getUserType() . '.client.report.show')) {
+            if ($packageName == config('app.client_package_name')) {
+                return redirect()->route($this->getUserType() . '.client.report.show', $id);
             }
         }
 
@@ -55,7 +53,7 @@ abstract class BaseReportController extends BaseController
         $app = $report->app;
         $user = $request->user();
 
-        if (!$user->isDeveloperOf($app) && !$user->isOwnerOf($app)) return back()->withErrors("You don't have permission to see this report");
+        if (!$user->isDeveloperOf($app) && !$user->isOwnerOf($app)) return view($this->getUserType() . '.errors.403', ['message' => "You don't have permission to see this report"]);
 
         $notification = \App\Notification::where('data', 'LIKE', '%"report_id":' . $report->id . '%')->first();
         if ($notification != null) $notification->delete();
@@ -147,7 +145,8 @@ abstract class BaseReportController extends BaseController
         if ($this->getUserType() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
         $isAppDeveloper = Auth::user()->isDeveloperOf($app);
-        if (!$isAppOwner && !$isAppDeveloper) return back()->withErrors("You can't delete this report because you are not owner or developer of this app");
+        if (!$isAppOwner && !$isAppDeveloper) return back()
+            ->withErrors("You can't delete this report because you are not owner or developer of this app");
 
         $report = Report::where(['app_id' => $app->id, 'id' => $id])->firstOrFail();
 
@@ -155,9 +154,10 @@ abstract class BaseReportController extends BaseController
         if ($notification != null) $notification->delete();
 
         if ($report->delete()) {
-            if ($isClientApp) return redirect()->route($this->getUserType() . '.client.show');
-
-            else return redirect()->route($this->getUserType() . '.app.show', $packageName)->with('messages', ['Successfully delete report']);
+            if ($isClientApp) return redirect()->route($this->getUserType() . '.client.show')
+                ->with('messages', ['Successfully delete report']);
+            else return redirect()->route($this->getUserType() . '.app.show', $packageName)
+                ->with('messages', ['Successfully delete report']);
         } else return back()->withErrors('Failed to delete data');
     }
 

@@ -1,7 +1,9 @@
 <?php
-use Illuminate\Support\Facades\Auth;
-use App\Models\Permission;
 
+use App\Models\App;
+use App\Models\Permission;
+use App\Notifications\NewReportNotification;
+use Illuminate\Support\Facades\Auth;
 
 
 if (!function_exists('isClientDeveloper')) {
@@ -14,8 +16,16 @@ if (!function_exists('isClientDeveloper')) {
 }
 
 if (!function_exists('isClientApp')) {
-    function isClientApp(\App\Models\App $app)
+    function isClientApp(App $app)
     {
         return $app->package_name == config('app.client_package_name');
+    }
+}
+
+if (!function_exists('hasUnreadNotification')) {
+    function hasUnreadNotification()
+    {
+        return Auth::user()->unreadNotifications
+                ->where('type', NewReportNotification::class)->first() != null;
     }
 }

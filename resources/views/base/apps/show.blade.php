@@ -1,4 +1,8 @@
-@push('head-script')
+@push('head')
+    <link href="{{ asset('select2-4.0.13/css/select2.css') }}" rel="stylesheet">
+    <script src="{{ asset('select2-4.0.13/js/select2.full.min.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap5.datatables.css') }}"/>
+    <script type="text/javascript" src="{{ asset('js/datatables.js') }}"></script>
     <script src="{{ asset('js/clipboard.min.js') }}"></script>
 @endpush
 

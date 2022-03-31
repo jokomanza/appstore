@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
 
 class Report extends Model
 {
@@ -91,5 +92,15 @@ class Report extends Model
     public function getReportsByAppId($appId)
     {
         return $this->where('app_id', $appId)->get();
+    }
+
+    /**
+     * @return Report[]|Collection|\Illuminate\Support\Collection
+     */
+    public function getChartData()
+    {
+        return $this->select(DB::raw("TO_CHAR(DATE(created_at) :: DATE, 'Mon dd, yyyy') as x"), DB::raw('count(*) as y'))
+            ->groupBy('x')
+            ->get();
     }
 }

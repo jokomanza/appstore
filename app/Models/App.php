@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class App extends Authenticatable
 {
@@ -81,10 +85,6 @@ class App extends Authenticatable
     public function getVersion($versionName)
     {
         return $this->app_versions()->where('version_name', $versionName)->first();
-
-        return AppVersion::where('app_id', $this->id)
-            ->where('version_name', $versionName)
-            ->first();
     }
 
     public function app_versions()
@@ -110,5 +110,23 @@ class App extends Authenticatable
     public function getAppWithVersions($packageName)
     {
         return $this->with('app_versions')->where('package_name', $packageName)->first();
+    }
+
+    /**
+     * @return App|Model|Builder|null
+     */
+    public function getClientApp()
+    {
+        return $this->where('package_name', config('app.client_package_name'))->first();
+    }
+
+    /**
+     * @return App[]|Collection|\Illuminate\Support\Collection
+     */
+    public function getChartData()
+    {
+        return $this->select(DB::raw("TO_CHAR(DATE(created_at) :: DATE, 'Mon dd, yyyy') as x"), DB::raw('count(*) as y'))
+            ->groupBy('x')
+            ->get();
     }
 }

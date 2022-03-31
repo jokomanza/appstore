@@ -146,32 +146,4 @@
         </section>
     </div>
 
-
-
-
 @endsection
-
-@push('script')
-    <script>
-        $(document).ready(function () {
-            $('.delete-version').click(function (e) {
-                e.preventDefault() // Don't post the form, unless confirmed
-
-                swal({
-                    title: "Are you sure?",
-                    text: "Once deleted, you will not be able to recover this version!",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
-                })
-                    .then((willDelete) => {
-                        if (willDelete) {
-                            $(e.target).closest('form').submit() // Post the surrounding form
-                        } else {
-
-                        }
-                    });
-            });
-        })
-    </script>
-@endpush

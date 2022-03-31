@@ -1,5 +1,10 @@
 @extends('admin.layouts.admin')
 
+@push('head')
+    <script src="{{ asset('js/sweetalert.min.js') }}"></script>
+@endpush
+
+
 @section('content')
 
     <div class="page-heading">
