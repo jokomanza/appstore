@@ -219,13 +219,13 @@ Route::post('/admin', 'AdminController@store')
 
 // client
 /*--------------------------------------------------------------------------------------------------------------------*/
-Route::get('/client', 'AdminAppController@show')
+Route::get('/client', 'AdminAppController@showClient')
     ->name('client.show');
 
-Route::get('/client/edit', 'AdminAppController@edit')
+Route::get('/client/edit', 'AdminAppController@editClient')
     ->name('client.edit');
 
-Route::put('/client', 'AdminAppController@update')
+Route::put('/client', 'AdminAppController@updateClient')
     ->name('client.update');
 
 

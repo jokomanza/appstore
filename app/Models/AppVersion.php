@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -62,5 +63,31 @@ class AppVersion extends Model
     public function app()
     {
         return $this->belongsTo(App::class);
+    }
+
+    /**
+     * Get all versions of an app based on app id.
+     *
+     * @param $appId
+     * @return AppVersion[]|Collection
+     */
+    public function getVersions($appId)
+    {
+        return $this->where('app_id', $appId)->get();
+    }
+
+    /**
+     * Get version with app based on apps package name and version name.
+     *
+     * @param $packageName
+     * @param $versionName
+     * @return AppVersion|null
+     */
+    public function getVersion($packageName, $versionName)
+    {
+        return $this->where('version_name', $versionName)
+            ->whereHas('app', function ($q) use ($packageName) {
+                $q->where('package_name', $packageName);
+            })->first();
     }
 }

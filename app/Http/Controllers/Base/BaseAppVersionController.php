@@ -56,7 +56,7 @@ abstract class BaseAppVersionController extends BaseController
             if ($packageName == null) return back()->withErrors("Package name parameter was null");
         }
 
-        $app = App::where('package_name', $packageName)->first();
+        $app = (new App)->getApp($packageName);
 
         if (!$app) return back()->withErrors("App not found");
 
@@ -73,7 +73,7 @@ abstract class BaseAppVersionController extends BaseController
      */
     public function store(CreateAppVersionRequest $request, $packageName)
     {
-        $app = App::where('package_name', $packageName)->first();
+        $app = (new App)->getApp($packageName);
 
         if ($app == null) back()->withErrors('Target app not found');
 
@@ -177,30 +177,26 @@ abstract class BaseAppVersionController extends BaseController
      */
     public function showClient(Request $request, $versionName)
     {
-        return $this->show($request, null, $versionName);
+        return $this->show($request, config('app.client_package_name'), $versionName);
     }
 
     /**
      * Display the specified resource.
      *
      * @param Request $request
-     * @param null $packageName
+     * @param string $packageName
      * @param $versionName
      * @return Factory|Application|RedirectResponse|View
      */
-    public function show(Request $request, $packageName = null, $versionName)
+    public function show(Request $request, $packageName, $versionName)
     {
-        if ($request->routeIs($this->getUserType() . '.client.version.show')) {
-            $packageName = config('app.client_package_name');
-        } else {
+        if (!$request->routeIs($this->getUserType() . '.client.version.show')) {
             if ($packageName == config('app.client_package_name') || $packageName == null) {
                 return back()->withErrors('Package name is incorrect');
             }
         }
 
-        $app = App::where('package_name', $packageName)
-            ->first();
-
+        $app = (new App)->getApp($packageName);
         if (!$app) return back()->withErrors("Application not found");
 
         $version = $app->getVersion($versionName);
@@ -224,42 +220,41 @@ abstract class BaseAppVersionController extends BaseController
      */
     public function editClient(Request $request, $versionName)
     {
-        return $this->edit($request, null, $versionName);
+        return $this->edit($request, config('app.client_package_name'), $versionName);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show edit page.
      *
      * @param Request $request
+     * @param $packageName
      * @param $versionName
-     * @param null $packageName
-     * @return RedirectResponse|View
+     * @return Factory|Application|RedirectResponse|View
      */
-    public function edit(Request $request, $packageName = null, $versionName)
+    public function edit(Request $request, $packageName, $versionName)
     {
-        if ($request->routeIs($this->getUserType() . '.client.version.edit')) {
-            $packageName = config('app.client_package_name');
-        } else {
+        if (!$request->routeIs($this->getUserType() . '.client.version.edit')) {
             if ($packageName == config('app.client_package_name') || $packageName == null) {
                 return back()->withErrors('Package name is incorrect');
             }
         }
 
-        $version = AppVersion::with('app')->where(['version_name' => $versionName])
-            ->whereHas('app', function ($q) use ($packageName) {
-                $q->where('package_name', $packageName);
-            })->first();
-
+        $version = (new AppVersion)->getVersion($packageName, $versionName);
         if (!$version) return back()->withErrors("App or Version not found");
 
-        $app = $version->app;
+        $app = $version->app()->first();
 
         return view($this->getUserType() . '.apps.versions.edit', compact('app', 'version'));
     }
 
+    /**
+     * @param UpdateAppVersionRequest $request
+     * @param $versionName
+     * @return RedirectResponse
+     */
     public function updateClient(UpdateAppVersionRequest $request, $versionName)
     {
-        return $this->update($request, null, $versionName);
+        return $this->update($request, config('app.client_package_name'), $versionName);
     }
 
     /**
@@ -267,27 +262,29 @@ abstract class BaseAppVersionController extends BaseController
      *
      * @param UpdateAppVersionRequest $request
      * @param $versionName
-     * @param null $packageName
+     * @param $packageName
      * @return RedirectResponse
      */
-    public function update(UpdateAppVersionRequest $request, $packageName = null, $versionName)
+    public function update(UpdateAppVersionRequest $request, $packageName, $versionName)
     {
-        if ($request->routeIs($this->getUserType() . '.client.version.update')) {
-            $packageName = config('app.client_package_name');
-        } else {
+        if (!$request->routeIs($this->getUserType() . '.client.version.update')) {
             if ($packageName == config('app.client_package_name') || $packageName == null) {
                 return back()->withErrors('Package name is incorrect');
             }
         }
 
-        $version = AppVersion::where(['version_name' => $versionName])
-            ->whereHas('app', function ($q) use ($packageName) {
-                $q->where('package_name', $packageName);
-            })->first();
-
+        $version = (new AppVersion)->getVersion($packageName, $versionName);
         if (!isset($version)) return back()->withErrors("Version not found");
 
-        $version->description = $request->description;
+        $app = $version->app()->first();
+
+        if ($this->getUserType() == 'admin') $isAppOwner = true;
+        else $isAppOwner = Auth::user()->isOwnerOf($app);
+        $isAppDeveloper = Auth::user()->isDeveloperOf($app);
+
+        if (!$isAppOwner || !$isAppDeveloper) return back()->withErrors("You can't update this app version because you are not the app developer or owner");
+
+        $version->description = $request->get('description');
 
         if ($version->update()) {
             if ($request->routeIs($this->getUserType() . '.client.version.update')) {
@@ -323,17 +320,16 @@ abstract class BaseAppVersionController extends BaseController
      */
     public function destroy(Request $request, $packageName, $versionName)
     {
-        $version = AppVersion::where('version_name', $versionName)->whereHas('app', function ($q) use ($packageName) {
-            $q->where('package_name', $packageName);
-        })->first();
+        $version = (new AppVersion)->getVersion($packageName, $versionName);
 
         if (!$version) return back()->withErrors('Target version not found');
 
-        $app = $version->app;
+        $app = $version->app()->first();
 
         if ($this->getUserType() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
-        if (!$isAppOwner) return back()->withErrors("You can't delete this app version because you are not app owner");
+
+        if (!$isAppOwner) return back()->withErrors("You can't delete this app version because you are not the app owner");
 
         if ($version->delete()) {
             $this->service->handleDeletedVersion($version);

@@ -2,22 +2,22 @@
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\App;
 use App\Models\Permission;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     use Notifiable;
 
-	protected $primaryKey = 'registration_number';
-	public $incrementing = false;
+    public $incrementing = false;
+    protected $primaryKey = 'registration_number';
     protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
-	 * 
+     *
      * @var array
      */
     protected $fillable = [
@@ -43,5 +43,15 @@ class User extends Authenticatable
     public function isOwnerOf(App $app)
     {
         return Permission::where(['user_registration_number' => $this->registration_number, 'app_id' => $app->id, 'type' => 'owner'])->first();
+    }
+
+    /**
+     * Get all registration number
+     *
+     * @return User[]
+     */
+    public function getAllRegistrationNumbers()
+    {
+        return $this->get(['registration_number'])->pluck('registration_number', 'registration_number');
     }
 }

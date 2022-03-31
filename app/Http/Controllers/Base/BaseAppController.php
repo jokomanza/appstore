@@ -89,9 +89,9 @@ abstract class BaseAppController extends BaseController
         $time = time();
 
         try {
-            $iconUrl = $this->appService->handleUploadedIcon($request->package_name, $request->file('icon_file'), $time);
-            $userDocUrl = $this->appService->handleUploadedUserDocumentation($request->package_name, $request->file('user_documentation_file'), $time);
-            $devDocUrl = $this->appService->handleUploadedDeveloperDocumentation($request->package_name, $request->file('developer_documentation_file'), $time);
+            $iconUrl = $this->appService->handleUploadedIcon($request->get('package_name'), $request->file('icon_file'), $time);
+            $userDocUrl = $this->appService->handleUploadedUserDocumentation($request->get('package_name'), $request->file('user_documentation_file'), $time);
+            $devDocUrl = $this->appService->handleUploadedDeveloperDocumentation($request->get('package_name'), $request->file('developer_documentation_file'), $time);
 
             $app = new App();
             $app->fill($request->all());
@@ -113,27 +113,14 @@ abstract class BaseAppController extends BaseController
     }
 
     /**
-     * Add new permission to current app, either developer or owner
+     * Display detail page for client app.
      *
-     * @param AddPermissionRequest $request
-     * @return RedirectResponse
+     * @param Request $request
+     * @return Factory|Application|RedirectResponse|View
      */
-    public function addPermission(AddPermissionRequest $request)
+    public function showClient(Request $request)
     {
-        $isExists = Permission::where(
-            [
-                'app_id' => $request->app_id,
-                'user_registration_number' => $request->user_registration_number
-            ]
-        )->first();
-
-        if ($isExists) return back()->withErrors('User already added');
-
-        $permission = new Permission();
-        $permission->fill($request->all());
-
-        if ($permission->save()) return back()->with('messages', ['Success add person to this project']);
-        else return back()->withErrors('Failed to add permission')->withInput();
+        return $this->show($request, config('app.client_package_name'));
     }
 
     /**
@@ -143,32 +130,45 @@ abstract class BaseAppController extends BaseController
      * @param null $packageName
      * @return Factory|Application|RedirectResponse|View
      */
-    public function show(Request $request, $packageName = null)
+    public function show(Request $request, $packageName)
     {
         try {
-            if ($packageName == null) $packageName = config('app.client_package_name');
+
+            if (!$request->routeIs($this->getUserType() . '.client.show')) {
+                if ($packageName == config('app.client_package_name')) {
+                    return redirect()->route($this->getUserType() . '.client.show');
+                }
+            }
 
             $app = App::with('app_versions')->where('package_name', $packageName)->firstOrFail();
 
             $isAppDeveloper = Auth::user()->isDeveloperOf($app);
             $isAppOwner = Auth::user()->isOwnerOf($app);
 
-            $permissions = Permission::with('user')->where('app_id', $app->id)->get();
-            $allowedPersons = User::get(['registration_number'])
-                ->map(function ($value) {
-                    return [$value->registration_number => $value->registration_number];
-                });
-            $reports = Report::where('app_id', $app->id)->get();
+            $permissions = (new Permission)->getPermissionsWithUser($app->id);
+            $allowedPersons = (new User)->getAllRegistrationNumbers();
+
+            $reports = (new Report)->getReportsByAppId($app->id);
 
         } catch (ModelNotFoundException $exception) {
             return view($this->getUserType() . '.errors.404')
                 ->with('message', 'App not found');
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return back()->withException($e);
         }
 
         return view($this->getUserType() . '.apps.show', compact('app', 'permissions', 'allowedPersons', 'reports', 'isAppDeveloper', 'isAppOwner'));
+    }
+
+    /**
+     * Display edit page for client app.
+     *
+     * @param Request $request
+     * @return Factory|Application|RedirectResponse|View
+     */
+    public function editClient(Request $request)
+    {
+        return $this->edit($request, config('app.client_package_name'));
     }
 
     /**
@@ -178,9 +178,16 @@ abstract class BaseAppController extends BaseController
      * @param null $packageName
      * @return Factory|Application|RedirectResponse|View
      */
-    public function edit(Request $request, $packageName = null)
+    public function edit(Request $request, $packageName)
     {
-        $app = $this->findApp($request->routeIs($this->getUserType() . '.client.edit'), $packageName);
+
+        if (!$request->routeIs($this->getUserType() . '.client.edit')) {
+            if ($packageName == config('app.client_package_name')) {
+                return redirect()->route($this->getUserType() . '.client.edit');
+            }
+        }
+
+        $app = (new App)->getApp($packageName);
 
         if ($app == null) return view($this->getUserType() . '.errors.404')->with('message', 'Target app not found');
 
@@ -194,6 +201,17 @@ abstract class BaseAppController extends BaseController
     }
 
     /**
+     * Update client app.
+     *
+     * @param Request $request
+     * @return Factory|Application|RedirectResponse|View
+     */
+    public function updateClient(Request $request)
+    {
+        return $this->update($request);
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param Request $request
@@ -202,7 +220,13 @@ abstract class BaseAppController extends BaseController
      */
     public function update(Request $request, $packageName = null)
     {
-        $app = $this->findApp($request->routeIs($this->getUserType() . '.client.update'), $packageName);
+        if (!$request->routeIs($this->getUserType() . '.client.update')) {
+            if ($packageName == config('app.client_package_name')) {
+                return redirect()->route($this->getUserType() . '.client.update');
+            }
+        }
+
+        $app = (new App)->getApp($packageName);
 
         if ($app == null) return view($this->getUserType() . '.errors.404')->with('message', 'Target app not found');
 
@@ -259,26 +283,6 @@ abstract class BaseAppController extends BaseController
     }
 
     /**
-     * @param $isForClientApp
-     * @param string $packageName
-     * @return App|null
-     */
-    private function findApp($isForClientApp, $packageName)
-    {
-        if ($isForClientApp) {
-            $app = App::with('app_versions')->where('package_name', config('app.client_package_name'))->first();
-        } else {
-            if ($packageName == null) return null;
-
-            $app = App::with('app_versions')->where('package_name', '!=', config('app.client_package_name'))->where('package_name', $packageName)->first();
-        }
-
-        if ($app == null) return null;
-
-        return $app;
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @param Request $request
@@ -287,7 +291,11 @@ abstract class BaseAppController extends BaseController
      */
     public function destroy(Request $request, $packageName)
     {
-        $app = $this->findApp(false, $packageName);
+        if ($packageName == config('app.client_package_name')) {
+            return back()->withErrors("You can't perform this action");
+        }
+
+        $app = (new App)->getApp($packageName);
 
         if ($app == null) return back()->withErrors("Application not found");
 
@@ -295,7 +303,7 @@ abstract class BaseAppController extends BaseController
         else $isAppOwner = Auth::user()->isOwnerOf($app);
         if (!$isAppOwner) return back()->withErrors("You can't delete this app because you are not app owner");
 
-        $versions = AppVersion::where('app_id', $app->id)->get();
+        $versions = (new AppVersion)->getVersions($app->id);
 
         if ($this->appRepository->deleteApp($app->id)) {
             $this->appService->handleDeletedApp($app, $versions);
@@ -305,7 +313,26 @@ abstract class BaseAppController extends BaseController
     }
 
     /**
-     * Remove user permission to this app
+     * Add new permission to current app, either developer or owner.
+     *
+     * @param AddPermissionRequest $request
+     * @return RedirectResponse
+     */
+    public function addPermission(AddPermissionRequest $request)
+    {
+        $alreadyExists = (new Permission)->hasPermission($request->get('app_id'), $request->get('user_registration_number'));
+
+        if ($alreadyExists) return back()->withErrors('User already added');
+
+        $permission = new Permission();
+        $permission->fill($request->all());
+
+        if ($permission->save()) return back()->with('messages', ['Success add person to this project']);
+        else return back()->withErrors('Failed to add permission')->withInput();
+    }
+
+    /**
+     * Remove user permission to this app.
      *
      * @param $packageName
      * @param $registrationNumber
@@ -314,13 +341,11 @@ abstract class BaseAppController extends BaseController
      */
     public function removePermission($packageName, $registrationNumber)
     {
-        $developer = Permission::whereHas('app', function ($q) use ($packageName) {
-            $q->where('package_name', $packageName);
-        })->where(['user_registration_number' => $registrationNumber])->first();
+        $permission = (new Permission)->getPermission($packageName, $registrationNumber);
 
-        if (!isset($developer)) return back()->withErrors('developer not found');
+        if (!isset($permission)) return back()->withErrors('Permission not found');
 
-        if ($developer->delete()) return back()->with('messages', ['Successfully remove person']);
+        if ($permission->delete()) return back()->with('messages', ['Successfully remove person']);
         else return back()->withErrors('Failed to delete data');
     }
 
@@ -338,7 +363,7 @@ abstract class BaseAppController extends BaseController
             3 => 'updated_at',
         ];
 
-        $totalData = App::where('package_name', '!=', 'com.quick.quickappstore')->count();
+        $totalData = App::where('package_name', '!=', config('app.client_package_name'))->count();
         $totalFiltered = $totalData;
 
         $limit = $request->input('length');
@@ -348,7 +373,7 @@ abstract class BaseAppController extends BaseController
 
         if (empty($request->input('search.value'))) {
             $apps = App::offset($start)
-                ->where('package_name', '!=', 'com.quick.quickappstore')
+                ->where('package_name', '!=', config('app.client_package_name'))
                 ->limit($limit)
                 ->orderBy($order, $dir)
                 ->get();
@@ -356,14 +381,14 @@ abstract class BaseAppController extends BaseController
             $search = $request->input('search.value');
 
             $apps = App::where('package_name', 'LIKE', "%$search%")
-                ->where('package_name', '!=', 'com.quick.quickappstore')
+                ->where('package_name', '!=', config('app.client_package_name'))
                 ->orWhere('name', 'LIKE', "%$search%")
                 ->offset($start)
                 ->limit($limit)
                 ->orderBy($order, $dir)
                 ->get();
             $totalFiltered = App::where('package_name', 'LIKE', "%$search%")
-                ->where('package_name', '!=', 'com.quick.quickappstore')
+                ->where('package_name', '!=', config('app.client_package_name'))
                 ->orWhere('name', 'LIKE', "%$search%")
                 ->count();
         }

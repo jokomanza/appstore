@@ -142,13 +142,13 @@ Route::get('/report/{reportId}', 'UserReportController@showFull')
 
 // client
 /*--------------------------------------------------------------------------------------------------------------------*/
-Route::get('/client', 'UserAppController@show')
+Route::get('/client', 'UserAppController@showClient')
     ->name('client.show');
 
-Route::get('/client/edit', 'UserAppController@edit')
+Route::get('/client/edit', 'UserAppController@editClient')
     ->name('client.edit');
 
-Route::put('/client', 'UserAppController@update')
+Route::put('/client', 'UserAppController@updateClient')
     ->name('client.update');
 
 
