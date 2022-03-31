@@ -1,3 +1,7 @@
+@push('head-script')
+    <script src="{{ asset('js/clipboard.min.js') }}"></script>
+@endpush
+
 <div class="page-heading">
     <div class="page-title">
         <div class="row">
@@ -43,7 +47,11 @@
                             <p>Description : {{ $app->description }}</p>
                             @if ($isAppDeveloper || $isAppOwner)
                                 <p>Api Token :
-                                <pre>{{ $app->api_token }}</pre></p>
+                                <div disabled aria-disabled="true" id="token">{{ $app->api_token }}</div></p>
+
+                                <button id="btn-token" class="btn btn-light-info mb-3">
+                                    Copy to clipboard
+                                </button>
                             @endif
 
                             <div class="row">
@@ -280,6 +288,12 @@
 @push('script')
     <script>
         $(document).ready(function () {
+
+            const clipboard = new ClipboardJS("#btn-token", {
+                text: () => {
+                    return document.getElementById("token").textContent.trim();
+                }
+            });
 
             $('.delete-application').click(function (e) {
                 e.preventDefault() // Don't post the form, unless confirmed
