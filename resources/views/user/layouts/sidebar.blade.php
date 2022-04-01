@@ -32,7 +32,7 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item {{ Route::is('user.client.show') ? 'active' : '' }} ">
+                <li class="sidebar-item {{ Route::is('user.client.*') ? 'active' : '' }} ">
                     <a href="{{ route('user.client.show') }}" class='sidebar-link'>
                         <i class="bi bi-grid-fill"></i>
                         <span>Client Application</span>

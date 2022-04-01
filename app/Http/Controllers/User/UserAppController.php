@@ -9,18 +9,19 @@ use App\Interfaces\AppServiceInterface;
 /**
  * Class App Controller
  *
- * @property AppRepositoryInterface $appRepository
- * @property AppServiceInterface $appService
+ * @property AppRepositoryInterface $applicationRepository
+ * @property AppServiceInterface $applicationService
  *
  * @package App\Http\Controllers
  */
 class UserAppController extends BaseAppController
 {
-    public function __construct(AppRepositoryInterface $appRepository, AppServiceInterface $appService)
+    public function __construct(AppRepositoryInterface $applicationRepository, AppServiceInterface $applicationService)
     {
-        parent::__construct($appRepository, $appService);
+        parent::__construct($applicationRepository, $applicationService);
         $this->middleware('auth:user');
     }
+
     function getUserType()
     {
         return 'user';

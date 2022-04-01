@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -67,14 +68,30 @@ class App extends Authenticatable
         return $this->update();
     }
 
+    /**
+     * @return HasMany
+     */
     public function reports()
     {
         return $this->hasMany(Report::class);
     }
 
+    /**
+     * @return HasMany
+     */
     public function developers()
     {
         return $this->hasMany(Developer::class);
+    }
+
+    /**
+     * Check if this app is client application.
+     *
+     * @return bool return true if this is client app, otherwise false
+     */
+    public function isClientApp()
+    {
+        return $this->package_name == config('app.client_package_name');
     }
 
     /**
@@ -85,10 +102,13 @@ class App extends Authenticatable
      */
     public function getVersion($versionName)
     {
-        return $this->app_versions()->where('version_name', $versionName)->first();
+        return $this->versions()->where('version_name', $versionName)->first();
     }
 
-    public function app_versions()
+    /**
+     * @return HasMany
+     */
+    public function versions()
     {
         return $this->hasMany(AppVersion::class);
     }

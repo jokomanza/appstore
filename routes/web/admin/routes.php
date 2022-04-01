@@ -124,7 +124,7 @@ Route::post('app/{packageName}/reports/datatables', 'AdminReportController@getDa
 /*----------------------------------------------------------------------------------------------------------------*/
 Route::get('/app/{packageName}/version', 'AdminAppVersionController@create')
     ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
-    ->name('version.create');
+    ->name('app.version.create');
 
 Route::post('/app/{packageName}/version', 'AdminAppVersionController@store')
     ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
@@ -215,51 +215,3 @@ Route::get('/admin', 'AdminController@create')
 
 Route::post('/admin', 'AdminController@store')
     ->name('admin.store');
-
-
-// client
-/*--------------------------------------------------------------------------------------------------------------------*/
-Route::get('/client', 'AdminAppController@showClient')
-    ->name('client.show');
-
-Route::get('/client/edit', 'AdminAppController@editClient')
-    ->name('client.edit');
-
-Route::put('/client', 'AdminAppController@updateClient')
-    ->name('client.update');
-
-
-// client versions
-/*--------------------------------------------------------------------------------------------------------------------*/
-Route::get('/client/version', 'AdminAppVersionController@create')
-    ->name('client.version.create');
-
-Route::post('/client/version', 'AdminAppVersionController@store')
-    ->name('client.version.store');
-
-Route::get('/client/version/{versionName}', 'AdminAppVersionController@showCLient')
-    ->where('versionName', '[0-9]{1,5}.[0-9]{1,5}.[0-9]{1,5}$')
-    ->name('client.version.show');
-
-Route::get('/client/version/{versionName}/edit', 'AdminAppVersionController@editClient')
-    ->where('versionName', '[0-9]{1,5}.[0-9]{1,5}.[0-9]{1,5}$')
-    ->name('client.version.edit');
-
-Route::put('/client/version/{versionName}', 'AdminAppVersionController@updateClient')
-    ->where('versionName', '[0-9]{1,5}.[0-9]{1,5}.[0-9]{1,5}$')
-    ->name('client.version.update');
-
-Route::delete('/client/version/{versionName}', 'AdminAppVersionController@deleteClient')
-    ->where('versionName', '[0-9]{1,5}.[0-9]{1,5}.[0-9]{1,5}$')
-    ->name('client.version.delete');
-
-
-// client reports
-/*--------------------------------------------------------------------------------------------------------------------*/
-Route::get('/client/report/{id}', 'AdminReportController@showClient')
-    ->where('id', '^[0-9]*$')
-    ->name('client.report.show');
-
-Route::delete('/client/report/{id}', 'AdminReportController@destroyClient')
-    ->where('id', '^[0-9]*$')
-    ->name('client.report.destroy');

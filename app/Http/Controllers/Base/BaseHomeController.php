@@ -13,7 +13,7 @@ abstract class BaseHomeController extends BaseController
 {
 
     /**
-     * Show the application dashboard.
+     * Show the applicationlication dashboard.
      *
      * @return View
      */

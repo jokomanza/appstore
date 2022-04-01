@@ -61,7 +61,8 @@
                             <div class="row">
                                 @if ($app->repository_url)
                                     <div class="mb-3">
-                                        <a href="{{ url($app->repository_url) }}" target="__blank">Git Repository</a>
+                                        <a href="{{ url($app->repository_url) }}" target="__blank">Git
+                                            Repository</a>
                                     </div>
                                 @endif
                                 @if ($app->user_documentation_url)
@@ -93,7 +94,7 @@
                             <div class="buttons">
                                 @if (($isClientApp && $isAppOwner) || $isAppDeveloper || $isAppOwner)
                                     <a clas="col-1"
-                                       href="{{ $isClientApp ? route($editClientAppRoute) : route($editAppRoute, $app->package_name) }}"
+                                       href="{{ route($editAppRoute, $app->package_name) }}"
                                        class="btn btn-primary">Edit</a>
                                 @endif
 
@@ -103,7 +104,7 @@
                                         {{ csrf_field() }}
                                         {{ method_field('DELETE') }}
 
-                                        <input type="submit" class="delete-application btn btn-danger" value="Delete">
+                                        <input type="submit" class="delete-app btn btn-danger" value="Delete">
                                     </form>
                                 @endif
                             </div>
@@ -132,14 +133,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @if ($app->app_versions->count() == 0)
-                                        <tr>
-                                            <td colspan="5">
-                                                <p class="text-center">No version available yet</p>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                    @foreach ($app->app_versions as $key => $value)
+                                    @forelse ($app->versions as $key => $value)
                                         <tr>
                                             <td>
                                                 <img src="{{ $value->icon_url ? asset("storage/$value->icon_url") : asset("storage/$app->icon_url") }}"
@@ -151,24 +145,24 @@
                                                 <div class="buttons">
                                                     <a class="btn btn-success"
                                                        href="{{ asset("storage/$value->apk_file_url") }}">Download</a>
-                                                    @if($isClientApp)
-                                                        @if($isAppOwner || $isAppDeveloper)
-                                                            <a class="btn btn-primary"
-                                                               href="{{ route($showClientVersionRoute, [$value->version_name]) }}">View</a>
-                                                        @endif
-                                                    @else
-                                                        <a class="btn btn-primary"
-                                                           href="{{ route($showVersionRoute, [$app->package_name, $value->version_name]) }}">View</a>
-                                                    @endif
+
+                                                    <a class="btn btn-primary"
+                                                       href="{{ route($showVersionRoute, [$app->package_name, $value->version_name]) }}">View</a>
                                                 </div>
                                             </td>
                                         </tr>
-                                    @endforeach
+                                    @empty
+                                        <tr>
+                                            <td colspan="5">
+                                                <p class="text-center">No version available yet</p>
+                                            </td>
+                                        </tr>
+                                    @endforelse
                                     </tbody>
                                 </table>
                                 @if ($isAppDeveloper || $isAppOwner)
                                     <a class="btn btn-success"
-                                       href="{{ $isClientApp ? route($createClientVersionRoute) : route($createVersionRoute, $app->package_name) }}">Create
+                                       href="{{ route($createVersionRoute, $app->package_name) }}">Create
                                         new
                                         version</a>
                                 @endif
@@ -232,7 +226,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach ($permissions as $key => $value)
+                            @forelse ($permissions as $key => $value)
                                 <tr>
                                     <td>{{ $value->user_registration_number }}</td>
                                     <td class="text-bold-500">{{ $value->user->name }}</td>
@@ -253,7 +247,15 @@
                                         @endif
                                     </td>
                                 </tr>
-                            @endforeach
+
+                            @empty
+                                <tr>
+                                    <td colspan="5">
+                                        <p class="text-center">There is no developer or owner in this app
+                                            yet</p>
+                                    </td>
+                                </tr>
+                            @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -299,7 +301,7 @@
                 }
             });
 
-            $('.delete-application').click(function (e) {
+            $('.delete-app').click(function (e) {
                 e.preventDefault() // Don't post the form, unless confirmed
 
                 swal({

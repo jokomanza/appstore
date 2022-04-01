@@ -59,7 +59,7 @@
                                     {{ csrf_field() }}
                                     {{ method_field('DELETE') }}
 
-                                    <input type="submit" class="delete-application btn btn-danger"
+                                    <input type="submit" class="delete-app btn btn-danger"
                                            value="Delete Account">
                                 </form>
                             </div>
@@ -129,7 +129,7 @@
         $(document).ready(function () {
             $("#reports").dataTable().fnDestroy();
 
-            $('.delete-application').click(function (e) {
+            $('.delete-app').click(function (e) {
                 e.preventDefault() // Don't post the form, unless confirmed
 
                 swal({

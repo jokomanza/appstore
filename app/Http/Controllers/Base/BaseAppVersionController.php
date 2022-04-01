@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Base;
 
-use ApkParser\Exceptions\XmlParserException;
 use ApkParser\Parser;
 use App\Http\Requests\CreateAppVersionRequest;
 use App\Http\Requests\UpdateAppVersionRequest;
@@ -34,6 +33,13 @@ abstract class BaseAppVersionController extends BaseController
     private $service;
 
     /**
+     * Determine is the current route is for client app or not.
+     *
+     * @var bool
+     */
+    private $isClientRoute;
+
+    /**
      * Create a controller instance.
      *
      * @param AppVersionServiceInterface $service
@@ -48,19 +54,30 @@ abstract class BaseAppVersionController extends BaseController
      *
      * @return Factory|Application|RedirectResponse|View
      */
-    public function create(Request $request, $packageName = null)
+    public function create(Request $request, $packageName)
     {
-        if ($request->routeIs($this->getUserType() . '.client.version.create')) {
-            $packageName = config('app.client_package_name');
-        } else {
-            if ($packageName == null) return back()->withErrors("Package name parameter was null");
+        $application = (new App)->getApp($packageName);
+
+        if ($application == null) {
+            return redirect()
+                ->route($this->getUserType() . '.app.index')
+                ->withErrors("App not found");
         }
 
-        $app = (new App)->getApp($packageName);
+        $isAppDeveloper = Auth::user()->isDeveloperOf($application);
+        if ($this->getUserType() == 'admin') $isAppOwner = true;
+        else $isAppOwner = Auth::user()->isOwnerOf($application);
 
-        if (!$app) return back()->withErrors("App not found");
+        if (!$isAppDeveloper && !$isAppOwner) {
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.app.show',
+                    $packageName
+                )
+                ->withErrors("You can't create new version, because you're not owner or developer of this app");
+        }
 
-        return view($this->getUserType() . '.apps.versions.create', compact('app'));
+        return view($this->getUserType() . '.applications.versions.create', compact('app'));
     }
 
     /**
@@ -69,38 +86,68 @@ abstract class BaseAppVersionController extends BaseController
      * @param CreateAppVersionRequest $request
      * @param $packageName
      * @return View|RedirectResponse
-     * @throws XmlParserException
      */
     public function store(CreateAppVersionRequest $request, $packageName)
     {
-        $app = (new App)->getApp($packageName);
+        $application = (new App)->getApp($packageName);
 
-        if ($app == null) back()->withErrors('Target app not found');
+        if ($application == null) {
+            return redirect()
+                ->route($this->getUserType() . '.app.index')
+                ->withErrors('The applicationlication you want to make the version, was not found');
+        }
+
+        $isAppDeveloper = Auth::user()->isDeveloperOf($application);
+        if ($this->getUserType() == 'admin') $isAppOwner = true;
+        else $isAppOwner = Auth::user()->isOwnerOf($application);
+
+        if (!$isAppDeveloper && !$isAppOwner) {
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.app.show',
+                    $packageName
+                )
+                ->withErrors("You can't create new version, because you're not owner or developer of this app");
+        }
 
         $time = time();
 
-        $storedApk = $this->service->handleUploadedApk($app->package_name, $request->file('apk_file'), $time);
+        $storedApk = $this->service->handleUploadedApk($application->package_name, $request->file('apk_file'), $time);
         $storedApkName = $storedApk['name'];
         $storedApkSize = $storedApk['size'];
-        $storedIconName = $this->service->handleUploadedIcon($app->package_name, $request->file('icon_file'), $time);
+        $storedIconName = $this->service->handleUploadedIcon($application->package_name, $request->file('icon_file'), $time);
 
-        $apk = new Parser(public_path('/storage/' . $storedApkName));
+        try {
+            $apk = new Parser(public_path('/storage/' . $storedApkName));
 
-        $manifest = $apk->getManifest();
-        $package_name = $manifest->getPackageName();
-        $version_code = $manifest->getVersionCode();
-        $version_name = $manifest->getVersionName();
-        $min_sdk_level = $manifest->getMinSdkLevel();
-        $target_sdk_level = $manifest->getTargetSdkLevel();
+            $manifest = $apk->getManifest();
+            $package_name = $manifest->getPackageName();
+            $version_code = $manifest->getVersionCode();
+            $version_name = $manifest->getVersionName();
+            $min_sdk_level = $manifest->getMinSdkLevel();
+            $target_sdk_level = $manifest->getTargetSdkLevel();
+
+        } catch (Exception $e) {
+            @unlink(public_path('/storage/') . $storedApkName);
+            if ($storedIconName) @unlink(public_path('/storage/') . $storedIconName);
+
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.app.version.create',
+                    $packageName
+                )
+                ->withErrors($e->getMessage())
+                ->withInput();
+        }
 
         $additionalError = [];
 
         // Additional validation
-        if ($app->package_name != $package_name) {
+        /*if ($application->package_name != $package_name) {
             $additionalError['package_name'] = [
-                "package name uploaded file (" . $package_name . ") not match with current app package name (" . $app->package_name . ")"
+                "package name uploaded file (" . $package_name . ") not match with current app package name (" . $application->package_name . ")"
             ];
-        }
+        }*/
 
         if (!preg_match("/^\d{1,5}.\d{1,5}.\d{1,5}$/", $version_code)) {
             $additionalError['version_code'] = [
@@ -108,29 +155,34 @@ abstract class BaseAppVersionController extends BaseController
             ];
         }
 
-        if (!empty(AppVersion::where(['app_id' => $app->id, 'version_code' => $version_code])->first())) {
+        if (!empty(AppVersion::where(['application_id' => $application->id, 'version_code' => $version_code])->first())) {
             $additionalError['version_code'] = [
-                "Version number " . $version_code . " for app $app->name already exists"
+                "Version number " . $version_code . " for app $application->name already exists"
             ];
         }
-        $maxVersionNumber = AppVersion::where(['app_id' => $app->id])->max('version_code');
+        $maxVersionNumber = AppVersion::where(['application_id' => $application->id])->max('version_code');
         if ($maxVersionNumber >= $version_code) {
             $additionalError['version_code'] = [
-                "Version number " . $version_code . " for app $app->name must greater than $maxVersionNumber "
+                "Version number " . $version_code . " for app $application->name must greater than $maxVersionNumber "
             ];
         }
-        if (!empty(AppVersion::where(['app_id' => $app->id, 'version_name' => $version_name])->first())) {
+        if (!empty(AppVersion::where(['application_id' => $application->id, 'version_name' => $version_name])->first())) {
             $additionalError['version_name'] = [
-                "Version name " . $version_name . " for app $app->name already exists"
+                "Version name " . $version_name . " for app $application->name already exists"
             ];
         }
 
         if (!empty($additionalError)) {
             @unlink(public_path('/storage/') . $storedApkName);
             if ($storedIconName) @unlink(public_path('/storage/') . $storedIconName);
-            // dd($additionalError);
 
-            return back()->withErrors($additionalError)->withInput();
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.app.version.create',
+                    $packageName
+                )
+                ->withErrors($additionalError)
+                ->withInput();
         }
 
         $finalApkName = $package_name . '.' . $version_code . '.' . time() . '.apk';
@@ -143,41 +195,31 @@ abstract class BaseAppVersionController extends BaseController
             $storedIconName = $finalIconName;
         }
 
-        $appVersion = new AppVersion();
-        $appVersion->app_id = $app->id;
-        $appVersion->version_code = $version_code;
-        $appVersion->version_name = $version_name;
-        $appVersion->min_sdk_level = $min_sdk_level;
-        $appVersion->target_sdk_level = $target_sdk_level;
-        $appVersion->apk_file_url = $storedApkName;
-        $appVersion->apk_file_size = $storedApkSize;
-        $appVersion->icon_url = $storedIconName;
-        $appVersion->description = $request->description;
-        if (!$appVersion->save()) {
+        $applicationVersion = new AppVersion();
+        $applicationVersion->application_id = $application->id;
+        $applicationVersion->version_code = $version_code;
+        $applicationVersion->version_name = $version_name;
+        $applicationVersion->min_sdk_level = $min_sdk_level;
+        $applicationVersion->target_sdk_level = $target_sdk_level;
+        $applicationVersion->apk_file_url = $storedApkName;
+        $applicationVersion->apk_file_size = $storedApkSize;
+        $applicationVersion->icon_url = $storedIconName;
+        $applicationVersion->description = $request->description;
+        if (!$applicationVersion->save()) {
             @unlink(public_path('/storage/') . $storedApkName);
             if ($storedIconName) @unlink(public_path('/storage/') . $storedIconName);
 
-            return back()->withErrors("Failed to save app version");
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.app.version.create',
+                    $packageName
+                )
+                ->withErrors("Failed to save new version")
+                ->withInput();
         }
 
-        if ($request->routeIs($this->getUserType() . '.client.version.store')) {
-            return redirect()->route($this->getUserType() . '.client.show')
-                ->with('messages', ['Successfully release new version']);
-        } else {
-            return redirect()->route($this->getUserType() . '.app.show', $packageName)
-                ->with('messages', ['Successfully release new version']);
-        }
-
-    }
-
-    /**
-     * @param Request $request
-     * @param $versionName
-     * @return Factory|Application|RedirectResponse|View
-     */
-    public function showClient(Request $request, $versionName)
-    {
-        return $this->show($request, config('app.client_package_name'), $versionName);
+        return redirect()->route($this->getUserType() . '.app.show', $packageName)
+            ->with('messages', ['Successfully release new version']);
     }
 
     /**
@@ -188,39 +230,31 @@ abstract class BaseAppVersionController extends BaseController
      * @param $versionName
      * @return Factory|Application|RedirectResponse|View
      */
-    public function show(Request $request, $packageName, $versionName)
+    public
+    function show(Request $request, $packageName, $versionName)
     {
-        if (!$request->routeIs($this->getUserType() . '.client.version.show')) {
-            if ($packageName == config('app.client_package_name') || $packageName == null) {
-                return back()->withErrors('Package name is incorrect');
-            }
+        $application = (new App)->getApp($packageName);
+        if ($application == null) {
+            return redirect()
+                ->route($this->getUserType() . '.app.index')
+                ->withErrors("Application not found");
         }
 
-        $app = (new App)->getApp($packageName);
-        if (!$app) return back()->withErrors("Application not found");
+        $version = $application->getVersion($versionName);
+        if ($version == null) {
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.app.show',
+                    $packageName
+                )
+                ->withErrors('Version not found');
+        }
 
-        $version = $app->getVersion($versionName);
-        if (!$version) return back()->withErrors('Version not found');
-
-        $isAppDeveloper = Auth::user()->isDeveloperOf($app);
+        $isAppDeveloper = Auth::user()->isDeveloperOf($application);
         if ($this->getUserType() == 'admin') $isAppOwner = true;
-        else $isAppOwner = Auth::user()->isOwnerOf($app);
+        else $isAppOwner = Auth::user()->isOwnerOf($application);
 
-        if (!$isAppDeveloper && !$isAppOwner) {
-            return back()->withErrors("You don't have permission to perform this action");
-        }
-
-        return view($this->getUserType() . '.apps.versions.show', compact('app', 'version', 'isAppDeveloper', 'isAppOwner'));
-    }
-
-    /**
-     * @param Request $request
-     * @param $versionName
-     * @return RedirectResponse|View
-     */
-    public function editClient(Request $request, $versionName)
-    {
-        return $this->edit($request, config('app.client_package_name'), $versionName);
+        return view($this->getUserType() . '.applications.versions.show', compact('app', 'version', 'isAppDeveloper', 'isAppOwner'));
     }
 
     /**
@@ -231,30 +265,40 @@ abstract class BaseAppVersionController extends BaseController
      * @param $versionName
      * @return Factory|Application|RedirectResponse|View
      */
-    public function edit(Request $request, $packageName, $versionName)
+    public
+    function edit(Request $request, $packageName, $versionName)
     {
-        if (!$request->routeIs($this->getUserType() . '.client.version.edit')) {
-            if ($packageName == config('app.client_package_name') || $packageName == null) {
-                return back()->withErrors('Package name is incorrect');
-            }
+        $application = (new App)->getApp($packageName);
+        if ($application == null) {
+            return redirect()
+                ->route($this->getUserType() . '.app.index')
+                ->withErrors("Application not found");
         }
 
-        $version = (new AppVersion)->getVersion($packageName, $versionName);
-        if (!$version) return back()->withErrors("App or Version not found");
+        $version = $application->getVersion($versionName);
+        if ($version == null) {
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.app.show',
+                    [$packageName, $versionName]
+                )
+                ->withErrors('Version not found');
+        }
 
-        $app = $version->app()->first();
+        $isAppDeveloper = Auth::user()->isDeveloperOf($application);
+        if ($this->getUserType() == 'admin') $isAppOwner = true;
+        else $isAppOwner = Auth::user()->isOwnerOf($application);
 
-        return view($this->getUserType() . '.apps.versions.edit', compact('app', 'version'));
-    }
+        if (!$isAppDeveloper && !$isAppOwner) {
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.version.show',
+                    [$packageName, $versionName]
+                )
+                ->withErrors("You don't have permission to edit this version");
+        }
 
-    /**
-     * @param UpdateAppVersionRequest $request
-     * @param $versionName
-     * @return RedirectResponse
-     */
-    public function updateClient(UpdateAppVersionRequest $request, $versionName)
-    {
-        return $this->update($request, config('app.client_package_name'), $versionName);
+        return view($this->getUserType() . '.applications.versions.edit', compact('app', 'version'));
     }
 
     /**
@@ -265,48 +309,54 @@ abstract class BaseAppVersionController extends BaseController
      * @param $packageName
      * @return RedirectResponse
      */
-    public function update(UpdateAppVersionRequest $request, $packageName, $versionName)
+    public
+    function update(UpdateAppVersionRequest $request, $packageName, $versionName)
     {
-        if (!$request->routeIs($this->getUserType() . '.client.version.update')) {
-            if ($packageName == config('app.client_package_name') || $packageName == null) {
-                return back()->withErrors('Package name is incorrect');
-            }
+        $application = (new App)->getApp($packageName);
+        if ($application == null) {
+            return redirect()
+                ->route($this->getUserType() . '.app.index')
+                ->withErrors("Application not found");
         }
 
-        $version = (new AppVersion)->getVersion($packageName, $versionName);
-        if (!isset($version)) return back()->withErrors("Version not found");
-
-        $app = $version->app()->first();
+        $version = $application->getVersion($versionName);
+        if ($version == null) {
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.app.show',
+                    $packageName
+                )
+                ->withErrors('Version not found');
+        }
 
         if ($this->getUserType() == 'admin') $isAppOwner = true;
-        else $isAppOwner = Auth::user()->isOwnerOf($app);
-        $isAppDeveloper = Auth::user()->isDeveloperOf($app);
+        else $isAppOwner = Auth::user()->isOwnerOf($application);
+        $isAppDeveloper = Auth::user()->isDeveloperOf($application);
 
-        if (!$isAppOwner || !$isAppDeveloper) return back()->withErrors("You can't update this app version because you are not the app developer or owner");
+        if (!$isAppOwner || !$isAppDeveloper) {
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.version.edit',
+                    $packageName
+                )
+                ->withErrors("You can't update this app version because you are not the app developer or owner")
+                ->withInput();
+        }
 
         $version->description = $request->get('description');
 
         if ($version->update()) {
-            if ($request->routeIs($this->getUserType() . '.client.version.update')) {
-                return redirect()->route($this->getUserType() . '.client.version.show', $versionName)
-                    ->with('messages', ['Successfully update description']);
-            } else {
-                return redirect()->route($this->getUserType() . '.version.show', [$packageName, $versionName])
-                    ->with('messages', ['Successfully update description']);
-            }
-        } else return back()->withErrors('Failed to update data');
-    }
-
-
-    /**
-     * @param Request $request
-     * @param $versionName
-     * @return void
-     * @throws Exception
-     */
-    public function destroyClient(Request $request, $versionName)
-    {
-        $this->destroy($request, config('app.client_package_name'), $versionName);
+            return redirect()->route($this->getUserType() . '.version.show', [$packageName, $versionName])
+                ->with('messages', ['Successfully update description']);
+        } else {
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.version.edit',
+                    $packageName
+                )
+                ->withErrors('Failed to update data')
+                ->withInput();
+        }
     }
 
     /**
@@ -318,29 +368,50 @@ abstract class BaseAppVersionController extends BaseController
      * @return RedirectResponse
      * @throws Exception
      */
-    public function destroy(Request $request, $packageName, $versionName)
+    public
+    function destroy(Request $request, $packageName, $versionName)
     {
-        $version = (new AppVersion)->getVersion($packageName, $versionName);
+        $application = (new App)->getApp($packageName);
+        if ($application == null) {
+            return redirect()
+                ->route($this->getUserType() . '.app.index')
+                ->withErrors("Application not found");
+        }
 
-        if (!$version) return back()->withErrors('Target version not found');
-
-        $app = $version->app()->first();
+        $version = $application->getVersion($versionName);
+        if ($version == null) {
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.app.show',
+                    $packageName
+                )
+                ->withErrors('Version not found');
+        }
 
         if ($this->getUserType() == 'admin') $isAppOwner = true;
-        else $isAppOwner = Auth::user()->isOwnerOf($app);
+        else $isAppOwner = Auth::user()->isOwnerOf($application);
 
-        if (!$isAppOwner) return back()->withErrors("You can't delete this app version because you are not the app owner");
+        if (!$isAppOwner) {
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.version.show',
+                    $packageName
+                )
+                ->withErrors("You can't delete this app version because you are not the app owner");
+        }
 
         if ($version->delete()) {
             $this->service->handleDeletedVersion($version);
 
-            if ($request->routeIs($this->getUserType() . '.client.version.destroy')) {
-                return redirect()->route($this->getUserType() . '.client.show')
-                    ->with('messages', ['Successfully delete app version']);
-            } else {
-                return redirect()->route($this->getUserType() . '.app.show', $packageName)
-                    ->with('messages', ['Successfully delete app version']);
-            }
-        } else return back()->withErrors('Failed to delete data');
+            return redirect()->route($this->getUserType() . '.app.show', $packageName)
+                ->with('messages', ['Successfully delete app version']);
+        } else {
+            return redirect()
+                ->route(
+                    $this->getUserType() . '.version.show',
+                    $packageName
+                )
+                ->withErrors('Failed to delete data');
+        }
     }
 }

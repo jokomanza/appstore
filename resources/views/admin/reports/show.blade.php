@@ -4,18 +4,16 @@
 
 @php($isClientApp = $report->app->package_name == 'com.quick.quickappstore')
 
-@if($isClientApp)
-    @php($destroyReportRoute = 'admin.client.report.destroy')
-@else
-    @php($destroyReportRoute = 'admin.report.destroy')
-@endif
+@php($destroyReportRoute = 'admin.report.destroy')
 
 @section('breadcrumb')
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ route('admin.home') }}">Dashboard</a></li>
 
         @if($isClientApp)
-            <li class="breadcrumb-item"><a href="{{ route('admin.client.show') }}">Client</a></li>
+            <li class="breadcrumb-item"><a
+                        href="{{ route('admin.app.show', config('app.client_package_name')) }}">Client</a>
+            </li>
         @else
             <li class="breadcrumb-item"><a href="{{ route('admin.app.index') }}">Apps</a></li>
             <li class="breadcrumb-item"><a

@@ -11,7 +11,7 @@
 <body>
 <h1>Dear Developers</h1>
 
-<p>Your application {{ $report->package_name }} (version {{ $report->app_version_name }}
+<p>Your app {{ $report->package_name }} (version {{ $report->app_version_name }}
     ) {{ $report->is_silent ? 'has encountered an error on' : 'crashed at' }}
     {{ $report->created_at }}, with exception {{ $report->exception }}</p>
 <p>Crash occurs on {{ $report->brand . ' ' . $report->phone_model }} device with android version

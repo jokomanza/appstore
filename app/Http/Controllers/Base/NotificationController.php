@@ -27,10 +27,10 @@ abstract class NotificationController extends BaseController
             $data = $report->data;
             $exception = $data['exception'];
 
-            $app = App::find($data['app_id']);
+            $application = App::find($data['application_id']);
 
             $reportNotifications[] = [
-                'message' => "There is a new error report in the  $app->name application with a $exception exception, please check and fix it soon",
+                'message' => "There is a new error report in the  $application->name applicationlication with a $exception exception, please check and fix it soon",
                 'link' => route($this->getUserType() . '.notification.report.show', $report->id)
             ];
         }

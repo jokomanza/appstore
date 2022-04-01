@@ -19,7 +19,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 
 /**
@@ -47,13 +46,6 @@ abstract class BaseAppController extends BaseController
     protected $appService;
 
     /**
-     * The app service implementation.
-     *
-     * @var bool
-     */
-    protected $isClientRoute;
-
-    /**
      * Create a new controller instance.
      *
      * @param AppRepositoryInterface $appRepository
@@ -62,9 +54,8 @@ abstract class BaseAppController extends BaseController
      */
     public function __construct(AppRepositoryInterface $appRepository, AppServiceInterface $appService)
     {
-        $this->appRepository = $appRepository;
-        $this->appService = $appService;
-        $this->isClientRoute = Route::is('client.*');
+        $this->applicationRepository = $appRepository;
+        $this->applicationService = $appService;
     }
 
     /**
@@ -97,9 +88,9 @@ abstract class BaseAppController extends BaseController
     {
         $time = time();
 
-        $iconUrl = $this->appService->handleUploadedIcon($request->get('package_name'), $request->file('icon_file'), $time);
-        $userDocUrl = $this->appService->handleUploadedUserDocumentation($request->get('package_name'), $request->file('user_documentation_file'), $time);
-        $devDocUrl = $this->appService->handleUploadedDeveloperDocumentation($request->get('package_name'), $request->file('developer_documentation_file'), $time);
+        $iconUrl = $this->applicationService->handleUploadedIcon($request->get('package_name'), $request->file('icon_file'), $time);
+        $userDocUrl = $this->applicationService->handleUploadedUserDocumentation($request->get('package_name'), $request->file('user_documentation_file'), $time);
+        $devDocUrl = $this->applicationService->handleUploadedDeveloperDocumentation($request->get('package_name'), $request->file('developer_documentation_file'), $time);
 
         $app = new App();
         $app->fill($request->all());
@@ -113,21 +104,10 @@ abstract class BaseAppController extends BaseController
                 ->route($this->getUserType() . '.app.show', $app->package_name)
                 ->with('messages', ['Successfully create new app']);
         } else {
-            $this->appService->handleUploadedFileWhenFailed($request->package_name, $time);
+            $this->applicationService->handleUploadedFileWhenFailed($request->package_name, $time);
 
             return back()->withErrors('Failed to create new app')->withInput();
         }
-    }
-
-    /**
-     * Display detail page for client app.
-     *
-     * @param Request $request
-     * @return Factory|Application|RedirectResponse|View
-     */
-    public function showClient(Request $request)
-    {
-        return $this->show($request, config('app.client_package_name'));
     }
 
     /**
@@ -139,17 +119,11 @@ abstract class BaseAppController extends BaseController
      */
     public function show(Request $request, $packageName)
     {
-        if (!$request->routeIs($this->getUserType() . '.client.show')) {
-            if ($packageName == config('app.client_package_name')) {
-                return redirect()->route($this->getUserType() . '.client.show');
-            }
-        }
-
-        $app = App::with('app_versions')->where('package_name', $packageName)->first();
+        $app = App::with('versions')->where('package_name', $packageName)->first();
         if ($app == null) {
             return redirect()
-                ->route($this->getUserType() . ($this->isClientRoute ? 'client.show' : '.app.show'))
-                ->withErrors("App not found");
+                ->route($this->getUserType() . '.app.index')
+                ->withErrors("Application not found");
         }
 
         $isAppDeveloper = Auth::user()->isDeveloperOf($app);
@@ -164,17 +138,6 @@ abstract class BaseAppController extends BaseController
     }
 
     /**
-     * Display edit page for client app.
-     *
-     * @param Request $request
-     * @return Factory|Application|RedirectResponse|View
-     */
-    public function editClient(Request $request)
-    {
-        return $this->edit($request, config('app.client_package_name'));
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param Request $request
@@ -183,38 +146,27 @@ abstract class BaseAppController extends BaseController
      */
     public function edit(Request $request, $packageName)
     {
-
-        if (!$request->routeIs($this->getUserType() . '.client.edit')) {
-            if ($packageName == config('app.client_package_name')) {
-                return redirect()->route($this->getUserType() . '.client.edit');
-            }
-        }
-
         $app = (new App)->getApp($packageName);
         if ($app == null) {
             return redirect()
-                ->route($this->getUserType() . ($this->isClientRoute ? 'client.show' : '.app.show'))
-                ->withErrors("App not found");
+                ->route($this->getUserType() . '.app.index')
+                ->withErrors("Application not found");
         }
 
         $isAppDeveloper = Auth::user()->isDeveloperOf($app);
         if ($this->getUserType() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
 
-        if (!$isAppDeveloper && !$isAppOwner) return redirect()->route($this->getUserType() . '.app.', ['message' => "You don't have permission to perform this action"]);
+        if (!$isAppDeveloper && !$isAppOwner) {
+            return redirect()
+                ->route(
+                    $this->getUserType() . ($this->isClientRoute ? '.client.show' : '.app.show'),
+                    $this->isClientRoute ? [] : $packageName
+                )
+                ->withErrors("You can't edit this app because you're not owner or developer of this app");
+        }
 
-        return view($this->getUserType() . '.apps.edit', compact('app', 'isAppDeveloper', 'isAppOwner'));
-    }
-
-    /**
-     * Update client app.
-     *
-     * @param Request $request
-     * @return Factory|Application|RedirectResponse|View
-     */
-    public function updateClient(Request $request)
-    {
-        return $this->update($request);
+        return view($this->getUserType() . '.apps.edit', compact('applicationlication', 'isAppDeveloper', 'isAppOwner'));
     }
 
     /**
@@ -224,70 +176,74 @@ abstract class BaseAppController extends BaseController
      * @param null $packageName
      * @return Factory|Application|RedirectResponse|View
      */
-    public function update(Request $request, $packageName = null)
+    public function update(Request $request, $packageName)
     {
-        if (!$request->routeIs($this->getUserType() . '.client.update')) {
-            if ($packageName == config('app.client_package_name')) {
-                return redirect()->route($this->getUserType() . '.client.update');
-            }
-        }
-
         $app = (new App)->getApp($packageName);
         if ($app == null) {
             return redirect()
-                ->route($this->getUserType() . ($this->isClientRoute ? 'client.show' : '.app.show'))
-                ->withErrors("App not found");
+                ->route($this->getUserType() . '.app.index')
+                ->withErrors("Application not found");
         }
 
         $isAppDeveloper = Auth::user()->isDeveloperOf($app);
         if ($this->getUserType() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
 
-        if (!$isAppDeveloper && !$isAppOwner) return view($this->getUserType() . '.errors.403', ['message' => "You don't have permission to perform this action"]);
+        if (!$isAppDeveloper && !$isAppOwner) {
+            return view($this->getUserType() . '.errors.403', ['message' => "You don't have permission to perform this action"]);
+        }
 
         $time = time();
 
-        try {
-            $iconUrl = $this->appService->handleUploadedIcon($request->package_name, $request->file('icon_file'), $time);
-            $userDocUrl = $this->appService->handleUploadedUserDocumentation($request->package_name, $request->file('user_documentation_file'), $time);
-            $devDocUrl = $this->appService->handleUploadedDeveloperDocumentation($request->package_name, $request->file('developer_documentation_file'), $time);
+        $iconUrl = $this->applicationService->handleUploadedIcon($request->package_name, $request->file('icon_file'), $time);
+        $userDocUrl = $this->applicationService->handleUploadedUserDocumentation($request->package_name, $request->file('user_documentation_file'), $time);
+        $devDocUrl = $this->applicationService->handleUploadedDeveloperDocumentation($request->package_name, $request->file('developer_documentation_file'), $time);
 
-            if ($isAppOwner) $fields = $request->all();
-            else $fields = $request->except('package_name');
+        if ($isAppOwner) $fields = $request->all();
+        else $fields = $request->except('package_name');
 
-            $app->fill($fields);
-            if ($iconUrl) {
-                $oldIcon = $app->icon_url;
-                $app->icon_url = $iconUrl;
+        $app->fill($fields);
+        if ($iconUrl) {
+            $oldIcon = $app->icon_url;
+            $app->icon_url = $iconUrl;
+        }
+        if ($userDocUrl) {
+            $oldUserDoc = $app->user_documentation_url;
+            $app->user_documentation_url = $userDocUrl;
+        }
+        if ($devDocUrl) {
+            $oldDevDoc = $app->developer_documentation_url;
+            $app->developer_documentation_url = $devDocUrl;
+        }
+
+        if (!$app->isDirty()) {
+            return redirect()
+                ->route(
+                    $this->getUserType() . ($this->isClientRoute ? '.client.show' : '.app.show'),
+                    $this->isClientRoute ? $packageName : []
+                )
+                ->withErrors("Data has not changed")
+                ->withInput();
+        }
+
+        if ($app->update()) {
+            @unlink(public_path('/storage/') . $oldIcon);
+            @unlink(public_path('/storage/') . $oldUserDoc);
+            @unlink(public_path('/storage/') . $oldDevDoc);
+
+            if ($this->isClientRoute) {
+                return redirect()->route($this->getUserType() . '.client.show')
+                    ->with('messages', ['Successfully update app data']);
+            } else {
+                return redirect()->route($this->getUserType() . '.app.show', $app->package_name)
+                    ->with('messages', ['Successfully update app data']);
             }
-            if ($userDocUrl) {
-                $oldUserDoc = $app->user_documentation_url;
-                $app->user_documentation_url = $userDocUrl;
-            }
-            if ($devDocUrl) {
-                $oldDevDoc = $app->developer_documentation_url;
-                $app->developer_documentation_url = $devDocUrl;
-            }
+        } else {
+            $this->applicationService->handleUploadedFileWhenFailed($request->package_name, $time);
 
-            if (!$app->isDirty()) return back()->withInput()->withErrors("Data has not changed");
+            return redirect()->route($this->getUserType() . '.app.edit', $app->package_name)
+                ->withErrors("Failed to update applicationlications data");
 
-            if ($app->update()) {
-                @unlink(public_path('/storage/') . $oldIcon);
-                @unlink(public_path('/storage/') . $oldUserDoc);
-                @unlink(public_path('/storage/') . $oldDevDoc);
-
-                if ($request->routeIs($this->getUserType() . '.client.update')) {
-                    return redirect()->route('admin.client.show')
-                        ->with('messages', ['Successfully update app data']);
-                } else {
-                    return redirect()->route($this->getUserType() . '.app.show', $app->package_name)
-                        ->with('messages', ['Successfully update app data']);
-                }
-            } else throw new Exception("Failed to update data");
-        } catch (Exception $e) {
-            $this->appService->handleUploadedFileWhenFailed($request->package_name, $time);
-
-            return back()->withErrors($e->getMessage())->withInput();
         }
     }
 
@@ -307,18 +263,22 @@ abstract class BaseAppController extends BaseController
         $app = (new App)->getApp($packageName);
         if ($app == null) {
             return redirect()
-                ->route($this->getUserType() . ($this->isClientRoute ? 'client.show' : '.app.show'))
-                ->withErrors("App not found");
+                ->route($this->getUserType() . '.app.index')
+                ->withErrors("Application not found");
         }
 
         if ($this->getUserType() == 'admin') $isAppOwner = true;
         else $isAppOwner = Auth::user()->isOwnerOf($app);
-        if (!$isAppOwner) return back()->withErrors("You can't delete this app because you are not app owner");
+        if (!$isAppOwner) {
+            return redirect()
+                ->route($this->getUserType() . '.app.show', $packageName)
+                ->withErrors("You can't delete this app because you are not app owner");
+        }
 
         $versions = (new AppVersion)->getVersions($app->id);
 
-        if ($this->appRepository->deleteApp($app->id)) {
-            $this->appService->handleDeletedApp($app, $versions);
+        if ($this->applicationRepository->deleteApp($app->id)) {
+            $this->applicationService->handleDeletedApp($app, $versions);
 
             return redirect()->route($this->getUserType() . '.app.index')->with('messages', ['Successfully delete app']);
         } else return redirect($this->getUserType() . '.app.show', $packageName)->withErrors('Failed to delete data');
@@ -332,7 +292,7 @@ abstract class BaseAppController extends BaseController
      */
     public function addPermission(AddPermissionRequest $request)
     {
-        $alreadyExists = (new Permission)->hasPermission($request->get('app_id'), $request->get('user_registration_number'));
+        $alreadyExists = (new Permission)->hasPermission($request->get('application_id'), $request->get('user_registration_number'));
 
         if ($alreadyExists) return back()->withErrors('User already added');
 
@@ -375,7 +335,7 @@ abstract class BaseAppController extends BaseController
             3 => 'updated_at',
         ];
 
-        $totalData = App::where('package_name', '!=', config('app.client_package_name'))->count();
+        $totalData = App::count();
         $totalFiltered = $totalData;
 
         $limit = $request->input('length');
@@ -385,7 +345,6 @@ abstract class BaseAppController extends BaseController
 
         if (empty($request->input('search.value'))) {
             $apps = App::offset($start)
-                ->where('package_name', '!=', config('app.client_package_name'))
                 ->limit($limit)
                 ->orderBy($order, $dir)
                 ->get();
@@ -393,14 +352,12 @@ abstract class BaseAppController extends BaseController
             $search = $request->input('search.value');
 
             $apps = App::where('package_name', 'LIKE', "%$search%")
-                ->where('package_name', '!=', config('app.client_package_name'))
                 ->orWhere('name', 'LIKE', "%$search%")
                 ->offset($start)
                 ->limit($limit)
                 ->orderBy($order, $dir)
                 ->get();
             $totalFiltered = App::where('package_name', 'LIKE', "%$search%")
-                ->where('package_name', '!=', config('app.client_package_name'))
                 ->orWhere('name', 'LIKE', "%$search%")
                 ->count();
         }

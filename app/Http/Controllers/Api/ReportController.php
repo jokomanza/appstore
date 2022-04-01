@@ -26,9 +26,9 @@ class ReportController extends Controller
      */
     public function index(Request $request)
     {
-        $app = $request->user();
+        $application = $request->user();
 
-        $reports = Report::where('app_id', $app->id)->orderBy('created_at', 'DESC');
+        $reports = Report::where('application_id', $application->id)->orderBy('created_at', 'DESC');
 
         if (!isset($reports)) return ok($reports);
         else return not_found('this app does not have any reports yet');
@@ -44,9 +44,9 @@ class ReportController extends Controller
     public function store(Request $request)
     {
 
-        $app = $request->user();
+        $application = $request->user();
 
-        if ($app == null) return unauthenticated('app token invalid');
+        if ($application == null) return unauthenticated('app token invalid');
 
         $data = $this->array_change_key_case_recursive($request->all());
 
@@ -54,8 +54,8 @@ class ReportController extends Controller
 
         $validator = Validator::make($data, [
             'report_id' => 'required|string',
-            'app_version_code' => 'required|numeric',
-            'app_version_name' => 'required|string',
+            'application_version_code' => 'required|numeric',
+            'application_version_name' => 'required|string',
             'package_name' => 'required|string',
             'file_path' => 'required|string',
             'phone_model' => 'required|string',
@@ -74,7 +74,7 @@ class ReportController extends Controller
             'display' => 'required',
             'user_comment' => 'nullable|string',
             'user_email' => 'required|string',
-            'user_app_start_date' => 'required|string',
+            'user_application_start_date' => 'required|string',
             'user_crash_date' => 'required|string',
             'dumpsys_meminfo' => 'nullable|string',
             'logcat' => 'required|string',
@@ -108,11 +108,11 @@ class ReportController extends Controller
         $crash = new Report();
         $crash->fill($data);
 
-        $crash->app_id = $app->id;
+        $crash->application_id = $application->id;
 
         $crash->save();
 
-        $people = Permission::with('user')->where('app_id', $app->id)->get()->map(function ($value) {
+        $people = Permission::with('user')->where('application_id', $application->id)->get()->map(function ($value) {
             return $value->user;
         });
 

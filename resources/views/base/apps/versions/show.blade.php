@@ -50,10 +50,7 @@
                             <br><br>
 
                             <div class="buttons">
-                                @if ($isClientApp)
-                                    <a class="btn btn-primary"
-                                       href="{{ route($editVersionRoute, $version->version_name) }}">Edit</a>
-                                @else
+                                @if($isAppOwner || $isAppDeveloper)
                                     <a class="btn btn-primary"
                                        href="{{ route($editVersionRoute, [$app->package_name, $version->version_name]) }}">Edit</a>
                                 @endif

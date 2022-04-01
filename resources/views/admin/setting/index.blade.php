@@ -51,7 +51,7 @@
                                         <label class="mt-3 mb-2" for="document">User
                                             Manual</label>
                                         <input class="form-control" type="file" name="document"
-                                               required accept="application/pdf">
+                                               required accept="app/pdf">
                                     </div>
 
                                     <div class="form-group">
@@ -76,7 +76,7 @@
                                     <div class="form-group col-md-8">
                                         <label class="mt-3 mb-2" for="document">Development Standard</label>
                                         <input class="form-control" type="file" name="document"
-                                               required accept="application/pdf">
+                                               required accept="app/pdf">
                                     </div>
 
                                     <div class="form-group">
@@ -101,7 +101,7 @@
                                     <div class="form-group col-md-8">
                                         <label class="mt-3 mb-2" for="document">Development Guide</label>
                                         <input class="form-control" type="file" name="document"
-                                               required accept="application/pdf">
+                                               required accept="app/pdf">
                                     </div>
 
                                     <div class="form-group">

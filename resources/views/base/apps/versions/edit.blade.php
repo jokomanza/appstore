@@ -32,7 +32,7 @@
                                 @include('base.components.alerts.errors')
                             </div>
 
-                            <form action="{{ route($updateVersionRoute, $isClientApp ? $version->version_name : [$app->package_name, $version->version_name]) }}"
+                            <form action="{{ route($updateVersionRoute, [$app->package_name, $version->version_name]) }}"
                                   method="post"
                                   enctype="multipart/form-data">
                                 {{ method_field('PUT') }}

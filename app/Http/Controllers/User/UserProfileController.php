@@ -34,9 +34,9 @@ class UserProfileController extends Controller
     {
         $user = $request->user();
 
-        $apps = Permission::with('app')->where('user_registration_number', $user->registration_number)->get();
+        $applications = Permission::with('app')->where('user_registration_number', $user->registration_number)->get();
 
-        return view('user.profile.show', compact('user', 'apps'));
+        return view('user.profile.show', compact('user', 'applications'));
     }
 
     /**
