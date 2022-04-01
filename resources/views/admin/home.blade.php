@@ -31,6 +31,4 @@
     </div>
 @endsection
 
-{{ $app }}
-
 @include('base.home')
