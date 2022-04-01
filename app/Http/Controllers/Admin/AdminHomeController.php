@@ -13,7 +13,7 @@ class AdminHomeController extends BaseHomeController
      */
     public function __construct()
     {
-        $this->middleware('auth:admin');
+        $this->middleware('auth:admin')->only(['index']);
     }
 
     function getUserType()

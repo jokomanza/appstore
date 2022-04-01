@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
@@ -99,8 +100,11 @@ class Report extends Model
      */
     public function getChartData()
     {
-        return $this->select(DB::raw("TO_CHAR(DATE(created_at) :: DATE, 'Mon dd, yyyy') as x"), DB::raw('count(*) as y'))
+        return $this->select(DB::raw("DATE(created_at) as x"), DB::raw('count(*) as y'))
+            ->orderBy('x', 'ASC')
             ->groupBy('x')
-            ->get();
+            ->get()->map(function ($value) {
+                return ['x' => Carbon::parse($value->x)->toFormattedDateString(), 'y' => $value->y];
+            });
     }
 }
