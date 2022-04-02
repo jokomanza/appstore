@@ -1,8 +1,10 @@
 @push('head')
     <link href="{{ asset('select2-4.0.13/css/select2.css') }}" rel="stylesheet">
-    <script src="{{ asset('select2-4.0.13/js/select2.full.min.js') }}"></script>
     <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap5.datatables.css') }}"/>
+
+    <script src="{{ asset('select2-4.0.13/js/select2.full.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/datatables.js') }}"></script>
+    <script src="{{ asset('js/sweetalert.min.js') }}"></script>
     <script src="{{ asset('js/clipboard.min.js') }}"></script>
 @endpush
 
@@ -39,22 +41,19 @@
                     <div class="card-content">
                         <div class="card-body">
 
-                            <div class="mb-4">
-                                <img src="{{ str_contains($app->icon_url, 'http') ? $app->icon_url : asset("storage/$app->icon_url") }}"
-                                     width="100" height="100">
-                            </div>
-                            <div class="col">
-                                <p class="text">Name : {{ $app->name }}</p>
-                            </div>
+                            <img class="mb-4" src="{{ asset("storage/$app->icon_url") }}"
+                                 width="100" height="100">
+
+                            <p>Name : {{ $app->name }}</p>
                             <p>Package Name : {{ $app->package_name }}</p>
                             <p>Type : {{ $app->type }}</p>
                             <p>Description : {{ $app->description }}</p>
                             @if ($isAppDeveloper || $isAppOwner)
-                                <p>Api Token :
-                                <div disabled aria-disabled="true" id="token">{{ $app->api_token }}</div></p>
+                                <p>Api Token : <strong class="text-sm mb-3"
+                                                       id="token">{{ $app->api_token }}</strong></p>
 
                                 <button id="btn-token" class="btn btn-light-info mb-3">
-                                    Copy to clipboard
+                                    Copy Token
                                 </button>
                             @endif
 
@@ -172,6 +171,7 @@
                 </div>
             </div>
         </div>
+    </section>
 </div>
 
 @if($isAppDeveloper || $isAppOwner)
@@ -199,7 +199,6 @@
                         </tbody>
                     </table>
                 </div>
-
             </div>
         </div>
     </div>
@@ -261,7 +260,7 @@
                     </div>
 
                     @if ($isAppOwner)
-                        <h5>Add Person</h5>
+                        <h5 class="mt-4">Add Person</h5>
 
                         <form action="{{ route($storePermissionRoute, [$app->package_name]) }}" method="post"
                               enctype="multipart/form-data">
@@ -272,7 +271,6 @@
                                 <label class="mt-3 mb-2" for="user_registration_number">Registration
                                     Number</label>
                                 {{ Form::select('user_registration_number', $allowedPersons, old('user_registration_number'), ['class' => 'form-select','name' => 'user_registration_number']) }}
-
 
                                 <div class="form-group col-md-5">
                                     <label class="mt-3 mb-2" for="type">Type</label>
@@ -321,7 +319,6 @@
             });
             $('.form-select').select2()
 
-            $("#reports").dataTable().fnDestroy();
             $('#reports').DataTable({
                 "processing": true,
                 "serverSide": true,

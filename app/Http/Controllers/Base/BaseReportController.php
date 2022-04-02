@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Base;
 
 use App\Models\App;
 use App\Models\Report;
+use App\Notification;
 use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -89,13 +90,20 @@ abstract class BaseReportController extends BaseController
      */
     public function showReportFromNotification(Request $request, $notificationId)
     {
-        $report = \App\Notification::find($notificationId);
+        $report = Notification::find($notificationId);
 
-        $user = $report->notifiable()->getRelated();
-        $app = App::find($report->data['application_id']);
+        if ($report == null) return view($this->getUserType() . '.errors.404', ['message' => 'Notification not found, maybe you already read this notification']);
 
-        if ($user->first() != $request->user()) {
-            return view($this->getUserType() . '.errors.404');
+        $app = App::find($report->data['app_id']);
+
+        if ($this->getUserType() == 'admin') {
+            if ($report->admin()->first() != $request->user()) {
+                return view($this->getUserType() . '.errors.404');
+            }
+        } else {
+            if ($report->user()->first() != $request->user()) {
+                return view($this->getUserType() . '.errors.404');
+            }
         }
 
         $report->delete();
@@ -152,7 +160,7 @@ abstract class BaseReportController extends BaseController
 
         $columns = [
             0 => 'created_at',
-            1 => 'application_version_name',
+            1 => 'app_version_name',
             2 => 'android_version',
             3 => 'brand',
             4 => 'exception',
@@ -181,7 +189,7 @@ abstract class BaseReportController extends BaseController
 
             $reports = Report::with('app')->whereHas('app', function ($q) use ($app) {
                 $q->where('id', $app->id);
-            })->where('application_version_name', 'LIKE', "%$search%")
+            })->where('app_version_name', 'LIKE', "%$search%")
                 ->orWhere('android_version', 'LIKE', "%$search%")
                 ->orWhere('brand', 'LIKE', "%$search%")
                 ->orWhere('exception', 'LIKE', "%$search%")
@@ -191,7 +199,7 @@ abstract class BaseReportController extends BaseController
                 ->get();
             $totalFiltered = Report::with('app')->whereHas('app', function ($q) use ($app) {
                 $q->where('id', $app->id);
-            })->where('application_version_name', 'LIKE', "%$search%")
+            })->where('app_version_name', 'LIKE', "%$search%")
                 ->orWhere('android_version', 'LIKE', "%$search%")
                 ->orWhere('brand', 'LIKE', "%$search%")
                 ->orWhere('exception', 'LIKE', "%$search%")

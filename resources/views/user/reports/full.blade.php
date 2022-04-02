@@ -7,7 +7,8 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('user.home') }}">Dashboard</a></li>
             @if($isClientApp)
-                <li class="breadcrumb-item"><a href="{{ route('user.client.show') }}">Client</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('user.app.show', config('app.client_package_name')) }}">Client</a>
+                </li>
             @else
                 <li class="breadcrumb-item"><a href="{{ route('user.app.index') }}">Apps</a></li>
                 <li class="breadcrumb-item"><a

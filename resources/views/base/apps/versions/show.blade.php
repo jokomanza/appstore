@@ -29,10 +29,10 @@
                                 @include('base.components.alerts.errors')
                             </div>
 
-                            <div class="mb-4">
-                                <img src="{{ $version->icon_url ? asset("storage/$version->icon_url") : asset("storage/$app->icon_url") }}"
-                                     width="100" height="100">
-                            </div>
+                            <img class="mb-4"
+                                 src="{{ $version->icon_url ? asset("storage/$version->icon_url") : asset("storage/$app->icon_url") }}"
+                                 width="100" height="100">
+
                             <p class="text">Version Code : {{ $version->version_code }}</p>
                             <p>Version Name : {{ $version->version_name }}</p>
                             <p>Min SDK Level : {{ $version->min_sdk_level }}</p>

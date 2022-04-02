@@ -25,15 +25,15 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item {{ Route::is('user.app.*') ? 'active' : '' }}">
+                <li class="sidebar-item {{ Route::is('user.app.*') ? ( isset($app) && $app instanceof \App\Models\App ? ( $app->isClientApp() ? '' : 'active') : 'active') : '' }}">
                     <a href="{{ route('user.app.index') }}" class='sidebar-link'>
                         <i class="bi bi-stack"></i>
                         <span>Apps</span>
                     </a>
                 </li>
 
-                <li class="sidebar-item {{ Route::is('user.client.*') ? 'active' : '' }} ">
-                    <a href="{{ route('user.client.show') }}" class='sidebar-link'>
+                <li class="sidebar-item {{ isset($app) && $app instanceof \App\Models\App ? ( $app->isClientApp() ? 'active' : '') : '' }} ">
+                    <a href="{{ route('user.app.show', config('app.client_package_name')) }}" class='sidebar-link'>
                         <i class="bi bi-grid-fill"></i>
                         <span>Client Application</span>
                     </a>

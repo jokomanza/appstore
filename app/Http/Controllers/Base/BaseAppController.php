@@ -50,12 +50,11 @@ abstract class BaseAppController extends BaseController
      *
      * @param AppRepositoryInterface $appRepository
      * @param AppServiceInterface $appService
-     * @param Request $request
      */
     public function __construct(AppRepositoryInterface $appRepository, AppServiceInterface $appService)
     {
-        $this->applicationRepository = $appRepository;
-        $this->applicationService = $appService;
+        $this->appRepository = $appRepository;
+        $this->appService = $appService;
     }
 
     /**
@@ -88,9 +87,9 @@ abstract class BaseAppController extends BaseController
     {
         $time = time();
 
-        $iconUrl = $this->applicationService->handleUploadedIcon($request->get('package_name'), $request->file('icon_file'), $time);
-        $userDocUrl = $this->applicationService->handleUploadedUserDocumentation($request->get('package_name'), $request->file('user_documentation_file'), $time);
-        $devDocUrl = $this->applicationService->handleUploadedDeveloperDocumentation($request->get('package_name'), $request->file('developer_documentation_file'), $time);
+        $iconUrl = $this->appService->handleUploadedIcon($request->get('package_name'), $request->file('icon_file'), $time);
+        $userDocUrl = $this->appService->handleUploadedUserDocumentation($request->get('package_name'), $request->file('user_documentation_file'), $time);
+        $devDocUrl = $this->appService->handleUploadedDeveloperDocumentation($request->get('package_name'), $request->file('developer_documentation_file'), $time);
 
         $app = new App();
         $app->fill($request->all());
@@ -104,7 +103,7 @@ abstract class BaseAppController extends BaseController
                 ->route($this->getUserType() . '.app.show', $app->package_name)
                 ->with('messages', ['Successfully create new app']);
         } else {
-            $this->applicationService->handleUploadedFileWhenFailed($request->package_name, $time);
+            $this->appService->handleUploadedFileWhenFailed($request->package_name, $time);
 
             return back()->withErrors('Failed to create new app')->withInput();
         }
@@ -166,7 +165,7 @@ abstract class BaseAppController extends BaseController
                 ->withErrors("You can't edit this app because you're not owner or developer of this app");
         }
 
-        return view($this->getUserType() . '.apps.edit', compact('applicationlication', 'isAppDeveloper', 'isAppOwner'));
+        return view($this->getUserType() . '.apps.edit', compact('app', 'isAppDeveloper', 'isAppOwner'));
     }
 
     /**
@@ -195,9 +194,9 @@ abstract class BaseAppController extends BaseController
 
         $time = time();
 
-        $iconUrl = $this->applicationService->handleUploadedIcon($request->package_name, $request->file('icon_file'), $time);
-        $userDocUrl = $this->applicationService->handleUploadedUserDocumentation($request->package_name, $request->file('user_documentation_file'), $time);
-        $devDocUrl = $this->applicationService->handleUploadedDeveloperDocumentation($request->package_name, $request->file('developer_documentation_file'), $time);
+        $iconUrl = $this->appService->handleUploadedIcon($request->package_name, $request->file('icon_file'), $time);
+        $userDocUrl = $this->appService->handleUploadedUserDocumentation($request->package_name, $request->file('user_documentation_file'), $time);
+        $devDocUrl = $this->appService->handleUploadedDeveloperDocumentation($request->package_name, $request->file('developer_documentation_file'), $time);
 
         if ($isAppOwner) $fields = $request->all();
         else $fields = $request->except('package_name');
@@ -218,10 +217,7 @@ abstract class BaseAppController extends BaseController
 
         if (!$app->isDirty()) {
             return redirect()
-                ->route(
-                    $this->getUserType() . ($this->isClientRoute ? '.client.show' : '.app.show'),
-                    $this->isClientRoute ? $packageName : []
-                )
+                ->route($this->getUserType() . '.app.edit', $packageName)
                 ->withErrors("Data has not changed")
                 ->withInput();
         }
@@ -231,18 +227,14 @@ abstract class BaseAppController extends BaseController
             @unlink(public_path('/storage/') . $oldUserDoc);
             @unlink(public_path('/storage/') . $oldDevDoc);
 
-            if ($this->isClientRoute) {
-                return redirect()->route($this->getUserType() . '.client.show')
-                    ->with('messages', ['Successfully update app data']);
-            } else {
-                return redirect()->route($this->getUserType() . '.app.show', $app->package_name)
-                    ->with('messages', ['Successfully update app data']);
-            }
+
+            return redirect()->route($this->getUserType() . '.app.show', $app->package_name)
+                ->with('messages', ['Successfully update app data']);
         } else {
-            $this->applicationService->handleUploadedFileWhenFailed($request->package_name, $time);
+            $this->appService->handleUploadedFileWhenFailed($request->package_name, $time);
 
             return redirect()->route($this->getUserType() . '.app.edit', $app->package_name)
-                ->withErrors("Failed to update applicationlications data");
+                ->withErrors("Failed to update applications data");
 
         }
     }
@@ -277,8 +269,8 @@ abstract class BaseAppController extends BaseController
 
         $versions = (new AppVersion)->getVersions($app->id);
 
-        if ($this->applicationRepository->deleteApp($app->id)) {
-            $this->applicationService->handleDeletedApp($app, $versions);
+        if ($this->appRepository->deleteApp($app->id)) {
+            $this->appService->handleDeletedApp($app, $versions);
 
             return redirect()->route($this->getUserType() . '.app.index')->with('messages', ['Successfully delete app']);
         } else return redirect($this->getUserType() . '.app.show', $packageName)->withErrors('Failed to delete data');
@@ -292,7 +284,7 @@ abstract class BaseAppController extends BaseController
      */
     public function addPermission(AddPermissionRequest $request)
     {
-        $alreadyExists = (new Permission)->hasPermission($request->get('application_id'), $request->get('user_registration_number'));
+        $alreadyExists = (new Permission)->hasPermission($request->get('app_id'), $request->get('user_registration_number'));
 
         if ($alreadyExists) return back()->withErrors('User already added');
 

@@ -32,7 +32,7 @@
                                 @include('base.components.alerts.errors')
                             </div>
 
-                            <form action="{{ $isClientApp ? route($updateAppRoute) : route($updateAppRoute, [$app->package_name])  }}"
+                            <form action="{{ route($updateAppRoute, [$app->package_name])  }}"
                                   method="post" enctype="multipart/form-data">
                                 {{ method_field('PUT') }}
                                 {{ csrf_field() }}
@@ -40,7 +40,7 @@
                                 <div class="form-group">
                                     <label for="icon_file">Default Icon</label>
                                     <div>
-                                        <img src="{{ str_contains($app->icon_url, 'http') ? $app->icon_url : asset("storage/$app->icon_url") }}"
+                                        <img src="{{ asset("storage/$app->icon_url") }}"
                                              width="50" height="50">
                                     </div>
                                     <input class="form-control" type="file" name="icon_file"
@@ -81,28 +81,24 @@
                                     <label for="user_documentation_file">User Documentation</label>
                                     @if ($app->user_documentation_url)
                                         <a
-                                                href="{{ str_contains($app->user_documentation_url, 'http')? $app->user_documentation_url: asset('/storage/' . $app->user_documentation_url) }}">Previous
+                                                href="{{ asset('/storage/' . $app->user_documentation_url) }}">Previous
                                             user documentation</a>
                                     @endif
-                                    <input class="form-control" type="file" name="user_documentation_file"
-                                           value="{{ old('user_documentation_file') }}">
+                                    <input class="form-control" type="file" name="user_documentation_file">
                                 </div>
                                 <div class="form-group">
                                     <label for="developer_documentation_file">Developer Documentation</label>
                                     @if ($app->developer_documentation_url)
                                         <a
-                                                href="{{ str_contains($app->developer_documentation_url, 'http')? $app->developer_documentation_url: asset('/storage/' . $app->developer_documentation_url) }}">Previous
+                                                href="{{ asset('/storage/' . $app->developer_documentation_url) }}">Previous
                                             developer documentation</a>
                                     @endif
-                                    <input class="form-control" type="file" name="developer_documentation_file"
-                                           value="{{ old('developer_documentation_file') }}">
+                                    <input class="form-control" type="file" name="developer_documentation_file">
                                 </div>
                                 <div class="form-group">
                                     <input class="btn btn-primary" type="submit" value="Update">
                                 </div>
                             </form>
-
-
                         </div>
                     </div>
                 </div>

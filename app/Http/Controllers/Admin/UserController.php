@@ -73,9 +73,9 @@ class UserController extends Controller
 
         if ($user == null) return view('admin.errors.404');
 
-        $applications = Permission::with('app')->where('user_registration_number', $user->registration_number)->get();
+        $apps = Permission::with('app')->where('user_registration_number', $user->registration_number)->get();
 
-        return view('admin.users.show', compact('user', 'applications'));
+        return view('admin.users.show', compact('user', 'apps'));
     }
 
     /**

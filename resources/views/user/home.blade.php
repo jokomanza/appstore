@@ -8,7 +8,7 @@
         <div class="card-content pb-4">
 
             @foreach ($recentApps as $app)
-                <div onclick="location.href='{{ isClientApp($app) ? route('user.client.show') : route('user.app.show', $app->package_name) }}';"
+                <div onclick="location.href='{{ route('user.app.show', $app->package_name) }}';"
                      style="cursor: pointer;"
                      class="recent-message d-flex px-4 py-3 ripple">
                     <div class="avatar avatar-lg">

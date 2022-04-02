@@ -48,7 +48,6 @@
 @push('script')
     <script>
         $(document).ready(function () {
-            $("#apps").dataTable().fnDestroy();
 
             $('#apps').DataTable({
                 "processing": true,

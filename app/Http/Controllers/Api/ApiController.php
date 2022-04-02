@@ -48,10 +48,10 @@ class ApiController extends Controller
 
     /**
      * @param Request $request
-     * @param $applicationId
+     * @param $appId
      * @return JsonResponse
      */
-    public function checkAppUpdate(Request $request, $applicationId)
+    public function checkAppUpdate(Request $request, $appId)
     {
 
         $validator = Validator::make($request->all(), [
@@ -68,19 +68,19 @@ class ApiController extends Controller
             $requestKey = $key;
             $requestValue = $value;
             if ($key == 'versionId') {
-                $applicationVersion = AppVersion::where(['id' => $value, 'application_id' => $applicationId])->first();
+                $appVersion = AppVersion::where(['id' => $value, 'app_id' => $appId])->first();
             } else if ($key == 'versionNumber') {
-                $applicationVersion = AppVersion::where(['version_code' => $value, 'application_id' => $applicationId])->first();
+                $appVersion = AppVersion::where(['version_code' => $value, 'app_id' => $appId])->first();
             } else if ($key == 'versionName') {
-                $applicationVersion = AppVersion::where(['version_name' => $value, 'application_id' => $applicationId])->first();
+                $appVersion = AppVersion::where(['version_name' => $value, 'app_id' => $appId])->first();
             }
         }
 
-        if (!isset($applicationVersion)) {
-            return not_found("App version with app id $applicationId and $requestKey $requestValue not found");
+        if (!isset($appVersion)) {
+            return not_found("App version with app id $appId and $requestKey $requestValue not found");
         }
 
-        $update = AppVersion::where('version_code', '>', $applicationVersion->version_code)->orderBy('version_code', 'DESC')->first();
+        $update = AppVersion::where('version_code', '>', $appVersion->version_code)->orderBy('version_code', 'DESC')->first();
 
         if (!isset($update)) return not_found("this version has no update");
 
@@ -95,9 +95,9 @@ class ApiController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'applications' => 'required|array|min:1',
-            'applications.*.package_name' => 'required|string',
-            'applications.*.version_code' => 'required|numeric'
+            'apps' => 'required|array|min:1',
+            'apps.*.package_name' => 'required|string',
+            'apps.*.version_code' => 'required|numeric'
         ]);
 
         if ($validator->fails()) {
@@ -106,7 +106,7 @@ class ApiController extends Controller
 
         $hasUpdate = [];
 
-        foreach ($request->all()['applications'] as $key => $value) {
+        foreach ($request->all()['apps'] as $key => $value) {
 
             $newest = AppVersion::with("app")->where('version_code', '>', $value['version_code'])
                 ->whereHas('app', function ($q) use ($value) {
@@ -133,8 +133,8 @@ class ApiController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'applications' => 'required|array|min:1',
-            'applications.*.package_name' => 'required|string'
+            'apps' => 'required|array|min:1',
+            'apps.*.package_name' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -143,25 +143,25 @@ class ApiController extends Controller
 
         $data = [];
 
-        foreach ($request->all()['applications'] as $key => $value) {
+        foreach ($request->all()['apps'] as $key => $value) {
 
-            $application = App::where('package_name', $value['package_name'])
+            $app = App::where('package_name', $value['package_name'])
                 ->orderBy('updated_at', 'DESC')->first();
 
-            if (isset($application)) $data[] = $application;
+            if (isset($app)) $data[] = $app;
         }
 
-        if (empty($data)) return ok("no applicationlications found in database");
+        if (empty($data)) return ok("no applications found in database");
 
         return ok($data);
     }
 
     /**
      * @param Request $request
-     * @param $applicationId
+     * @param $appId
      * @return JsonResponse
      */
-    public function getUpdate(Request $request, $applicationId)
+    public function getUpdate(Request $request, $appId)
     {
 
         $validator = Validator::make($request->all(), [
@@ -178,19 +178,19 @@ class ApiController extends Controller
             $requestKey = $key;
             $requestValue = $value;
             if ($key == 'versionId') {
-                $applicationVersion = AppVersion::where(['id' => $value, 'application_id' => $applicationId])->first();
+                $appVersion = AppVersion::where(['id' => $value, 'app_id' => $appId])->first();
             } else if ($key == 'versionNumber') {
-                $applicationVersion = AppVersion::where(['version_code' => $value, 'application_id' => $applicationId])->first();
+                $appVersion = AppVersion::where(['version_code' => $value, 'app_id' => $appId])->first();
             } else if ($key == 'versionName') {
-                $applicationVersion = AppVersion::where(['version_name' => $value, 'application_id' => $applicationId])->first();
+                $appVersion = AppVersion::where(['version_name' => $value, 'app_id' => $appId])->first();
             }
         }
 
-        if (!isset($applicationVersion)) {
-            return not_found("App version with app id $applicationId and $requestKey $requestValue not found");
+        if (!isset($appVersion)) {
+            return not_found("App version with app id $appId and $requestKey $requestValue not found");
         }
 
-        $newest = AppVersion::where('version_code', '>', $applicationVersion->version_code)->where('application_id', $applicationId)->orderBy('version_code', 'DESC')->first();
+        $newest = AppVersion::where('version_code', '>', $appVersion->version_code)->where('app_id', $appId)->orderBy('version_code', 'DESC')->first();
 
         if ($newest == null) return not_found();
 
@@ -206,15 +206,15 @@ class ApiController extends Controller
     public function checkUpdate(Request $request, $packageName, $versionCode)
     {
 
-        $applicationVersion = AppVersion::with(['app' => function ($query) use ($packageName) {
+        $appVersion = AppVersion::with(['app' => function ($query) use ($packageName) {
             $query->where('package_name', '=', $packageName);
         }])->where(['version_code' => $versionCode])->first();
 
-        if (!isset($applicationVersion)) {
+        if (!isset($appVersion)) {
             return not_found("App version with app $packageName and version code $versionCode not found");
         }
 
-        $newest = AppVersion::where('version_code', '>', $applicationVersion->version_code)->whereHas('app', function ($q) use ($packageName) {
+        $newest = AppVersion::where('version_code', '>', $appVersion->version_code)->whereHas('app', function ($q) use ($packageName) {
             $q->where('package_name', $packageName);
         })->orderBy('version_code', 'DESC')->first();
 
@@ -226,17 +226,17 @@ class ApiController extends Controller
     }
 
     /**
-     * @param $applicationId
+     * @param $appId
      * @return JsonResponse
      */
-    public function getAppVersions($applicationId)
+    public function getAppVersions($appId)
     {
-        $data = AppVersion::where('application_id', $applicationId)
+        $data = AppVersion::where('app_id', $appId)
             ->orderBy('updated_at', 'DESC')
             ->get();
 
         if ($data->isEmpty())
-            return not_found("Version for app with id $applicationId not found");
+            return not_found("Version for app with id $appId not found");
 
         return ok($data);
     }
@@ -257,11 +257,11 @@ class ApiController extends Controller
         }
 
         foreach ($data as $key => $value) {
-            $data[$key]['latest'] = AppVersion::where('application_id', $value->id)
+            $data[$key]['latest'] = AppVersion::where('app_id', $value->id)
                 ->orderBy('version_code', 'DESC')
                 ->first();
 
-            $data[$key]['developers'] = Permission::with('user')->where('application_id', $value->id)->get()
+            $data[$key]['developers'] = Permission::with('user')->where('app_id', $value->id)->get()
                 ->map(function ($value) {
                     return $value->user;
                 });
@@ -287,11 +287,11 @@ class ApiController extends Controller
             return not_found();
         }
 
-        $data['latest'] = AppVersion::where('application_id', $data->id)
+        $data['latest'] = AppVersion::where('app_id', $data->id)
             ->orderBy('version_code', 'DESC')
             ->first();
 
-        $data['developers'] = Permission::with('user')->where('application_id', $data->id)->get()
+        $data['developers'] = Permission::with('user')->where('app_id', $data->id)->get()
             ->map(function ($value) {
                 return $value->user;
             });
@@ -308,13 +308,13 @@ class ApiController extends Controller
     public function downloadClient(Request $request)
     {
 
-        $application = App::where('package_name', 'com.quick.quickapplicationstore')->first();
+        $app = App::where('package_name', 'com.quick.quickappstore')->first();
 
-        if (!isset($application)) return not_found('Client applicationlication not found, contact developer.');
+        if (!isset($app)) return not_found('Client application not found, contact developer.');
 
-        $latest = AppVersion::where('application_id', $application->id)->orderBy('version_code', 'DESC')->first();
+        $latest = AppVersion::where('app_id', $app->id)->orderBy('version_code', 'DESC')->first();
 
-        if (!isset($latest)) return not_found("Client applicationlication doesn't have latest version");
+        if (!isset($latest)) return not_found("Client application doesn't have latest version");
 
         return redirect(asset('storage/' . $latest->apk_file_url));
 
@@ -326,7 +326,7 @@ class ApiController extends Controller
         $type = File::mimeType($path);
 
         $response = Response::make($file, 200);
-        $response->header("Content-Type", 'applicationlication\vdn.android.package-archive');
+        $response->header("Content-Type", 'application\vdn.android.package-archive');
         $response->header('Content-Disposition', 'attachment; filename="' . $latest->apk_file_url . '"');
 
         return $response;*/

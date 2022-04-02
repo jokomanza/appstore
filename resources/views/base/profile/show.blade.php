@@ -59,7 +59,7 @@
                                     {{ csrf_field() }}
                                     {{ method_field('DELETE') }}
 
-                                    <input type="submit" class="delete-app btn btn-danger"
+                                    <input type="submit" class="delete-account btn btn-danger"
                                            value="Delete Account">
                                 </form>
                             </div>
@@ -100,7 +100,7 @@
                                                 <td class="text-bold-500">
                                                     <div class="buttons">
                                                         <a class="btn btn-primary"
-                                                           href="{{ isCLientApp($value->app) ? route($showClientAppRoute) : route($showAppRoute, [$value->app->package_name]) }}">View</a>
+                                                           href="{{ route($showAppRoute, [$value->app->package_name]) }}">View</a>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -127,9 +127,8 @@
 @push('script')
     <script>
         $(document).ready(function () {
-            $("#reports").dataTable().fnDestroy();
 
-            $('.delete-app').click(function (e) {
+            $('.delete-account').click(function (e) {
                 e.preventDefault() // Don't post the form, unless confirmed
 
                 swal({
@@ -156,7 +155,6 @@
                         }
                     });
             });
-            $('.form-select').select2()
         })
     </script>
 @endpush
