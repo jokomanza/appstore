@@ -18,6 +18,9 @@ Route::post('/settings/development/standard', 'AdminSettingController@storeDevSt
 Route::post('/settings/development/guide', 'AdminSettingController@storeDevGuide')
     ->name('setting.development.guide.store');
 
+Route::post('/settings/notification/toggle', 'AdminSettingController@toggleSendMailNotification')
+    ->name('setting.notification.toggle');
+
 
 // profile
 /*----------------------------------------------------------------------------------------------------------------*/
