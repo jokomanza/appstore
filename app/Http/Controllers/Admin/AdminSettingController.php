@@ -7,6 +7,7 @@ use App\Http\Requests\StoreDocumentRequest;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\View\View;
 
@@ -38,7 +39,9 @@ class AdminSettingController extends Controller
         if (File::exists(public_path('storage/android_development_standard.pdf'))) $devStandard = asset('/storage/android_development_standard.pdf');
         if (File::exists(public_path('storage/android_development_guide.pdf'))) $devGuide = asset('/storage/android_development_guide.pdf');
 
-        return view('admin.setting.index', compact('userManual', 'devStandard', 'devGuide'));
+        $emailNotification = setting('send_email_notification', true);
+
+        return view('admin.setting.index', compact('userManual', 'devStandard', 'devGuide', 'emailNotification'));
     }
 
     /**
@@ -90,5 +93,14 @@ class AdminSettingController extends Controller
         if ($request->file('document')->move(public_path('/storage/'), 'android_development_guide.pdf')) {
             return back()->with('messages', ["Successfully $message the android development guide"]);
         } else return back()->withErrors("Failed to upload android development guide");
+    }
+
+    public function toggleSendMailNotification(Request $request)
+    {
+        if (!$request->has('value')) return bad_request();
+
+        setting(['send_email_notification' => $request->get('value')]);
+
+        return response()->json(['send_email_notification' => setting('send_email_notification', true)]);
     }
 }

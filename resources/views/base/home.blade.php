@@ -1,6 +1,7 @@
 @push('head')
     <link rel="stylesheet" href="{{ asset('vendor/iconly/bold.css') }}">
     <script src="{{ asset('js/apexcharts.js') }}"></script>
+    <script src="{{ asset('js/sweetalert.min.js') }}"></script>
 @endpush
 
 @section('content')
@@ -197,6 +198,20 @@
                     data: response,
                 }])
             });
+
+            @if($hasNotification)
+                swal("You have some notifications that haven't been viewed, check it now!", {
+                    buttons: {
+                        cancel: "I will see it later",
+                        success: "See now",
+                    },
+                })
+                    .then((value) => {
+                        if (value === 'success') {
+                            window.location.href = "{{ $notificationRoute }}"
+                        }
+                    });
+            @endif
         })
 
     </script>

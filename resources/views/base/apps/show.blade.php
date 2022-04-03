@@ -132,7 +132,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @forelse ($app->versions as $key => $value)
+                                    @forelse ($versions as $key => $value)
                                         <tr>
                                             <td>
                                                 <img src="{{ $value->icon_url ? asset("storage/$value->icon_url") : asset("storage/$app->icon_url") }}"

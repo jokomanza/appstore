@@ -3,12 +3,10 @@
 @php($editAppRoute = 'admin.app.edit')
 @php($destroyAppRoute = 'admin.app.destroy')
 @php($showVersionRoute = 'admin.version.show')
-@php($createVersionRoute = 'admin.app.version.create')
+@php($createVersionRoute = 'admin.version.create')
 @php($destroyPermissionRoute = 'admin.app.permission.destroy')
 @php($storePermissionRoute = 'admin.app.permission.store')
 @php($reportDataTablesRoute = 'admin.app.report.datatables')
-
-@php($createClientVersionRoute = 'admin.client.version.create')
 
 @php($isAppDeveloper = false)
 @php($isAppOwner = true)

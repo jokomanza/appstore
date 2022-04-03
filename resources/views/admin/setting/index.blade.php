@@ -1,5 +1,10 @@
 @extends('admin.layouts.admin')
 
+@push('head')
+    <link href="{{ asset('css/bootstrap4-toggle.min.css') }}" rel="stylesheet">
+    <script src="{{ asset('js/bootstrap4-toggle.min.js') }}"></script>
+@endpush
+
 @section('content')
 
     <div class="page-heading">
@@ -116,6 +121,19 @@
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-header">
+                            <h4 class="card-title">Notification</h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body">
+
+                                    <p>Send mail notification : </p>
+                                    <input id="notification-toggle" value="{{ $emailNotification }}" type="checkbox" checked data-toggle="toggle" data-onstyle="success">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
                             <h4 class="card-title">Security</h4>
                         </div>
                         <div class="card-content">
@@ -131,3 +149,30 @@
     </div>
 
 @endsection
+
+@push('script')
+
+    <script>
+        $(document).ready(function () {
+            $('#notification-toggle').change(function () {
+                const value = $(this).is(':checked');
+
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: '{{ route('admin.setting.notification.toggle') }}',
+                    data: {
+                      _token : '{{ csrf_token() }}',
+                        value : value
+                    },
+                    success: function (data) {
+                        console.log(data)
+                    }
+                });
+            });
+        });
+
+    </script>
+
+
+@endpush

@@ -111,7 +111,7 @@
                                                 <td class="text-bold-500">
                                                     <div class="buttons">
                                                         <a class="btn btn-primary"
-                                                           href="{{ isClientApp($value->app) ? route('admin.client.show') : route('admin.app.show', [$value->app->package_name]) }}">View</a>
+                                                           href="{{ route('admin.app.show', [$value->app->package_name]) }}">View</a>
                                                     </div>
                                                 </td>
                                             </tr>

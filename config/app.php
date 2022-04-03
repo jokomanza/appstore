@@ -189,6 +189,7 @@ return [
         App\Providers\RepositoryServiceProvider::class,    
         Collective\Html\HtmlServiceProvider::class,
         Barryvdh\Debugbar\ServiceProvider::class,
+        Akaunting\Setting\Provider::class,
 
     ],
 
@@ -243,6 +244,7 @@ return [
         'Html' => Collective\Html\HtmlFacade::class,
         'AppModel' => App\Models\App::class,
         'Developer' => App\Models\Permission::class,
+        'Setting' => Akaunting\Setting\Facade::class,
     ],
 
 ];

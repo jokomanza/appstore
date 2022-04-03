@@ -18,6 +18,9 @@ Route::post('/settings/development/standard', 'AdminSettingController@storeDevSt
 Route::post('/settings/development/guide', 'AdminSettingController@storeDevGuide')
     ->name('setting.development.guide.store');
 
+Route::post('/settings/notification/toggle', 'AdminSettingController@toggleSendMailNotification')
+    ->name('setting.notification.toggle');
+
 
 // profile
 /*----------------------------------------------------------------------------------------------------------------*/
@@ -124,7 +127,7 @@ Route::post('app/{packageName}/reports/datatables', 'AdminReportController@getDa
 /*----------------------------------------------------------------------------------------------------------------*/
 Route::get('/app/{packageName}/version', 'AdminAppVersionController@create')
     ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
-    ->name('app.version.create');
+    ->name('version.create');
 
 Route::post('/app/{packageName}/version', 'AdminAppVersionController@store')
     ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
