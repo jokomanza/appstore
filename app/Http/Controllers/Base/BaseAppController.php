@@ -128,12 +128,14 @@ abstract class BaseAppController extends BaseController
         $isAppDeveloper = Auth::user()->isDeveloperOf($app);
         $isAppOwner = Auth::user()->isOwnerOf($app);
 
+        $versions = $app->versions()->orderBy('version_code', 'DESC')->get();
+
         $permissions = (new Permission)->getPermissionsWithUser($app->id);
         $allowedPersons = (new User)->getAllRegistrationNumbers();
 
         $reports = (new Report)->getReportsByAppId($app->id);
 
-        return view($this->getUserType() . '.apps.show', compact('app', 'permissions', 'allowedPersons', 'reports', 'isAppDeveloper', 'isAppOwner'));
+        return view($this->getUserType() . '.apps.show', compact('app', 'permissions', 'allowedPersons', 'reports', 'isAppDeveloper', 'isAppOwner', 'versions'));
     }
 
     /**
@@ -159,8 +161,8 @@ abstract class BaseAppController extends BaseController
         if (!$isAppDeveloper && !$isAppOwner) {
             return redirect()
                 ->route(
-                    $this->getUserType() . ($this->isClientRoute ? '.client.show' : '.app.show'),
-                    $this->isClientRoute ? [] : $packageName
+                    $this->getUserType() .'.app.show',
+                    $packageName
                 )
                 ->withErrors("You can't edit this app because you're not owner or developer of this app");
         }

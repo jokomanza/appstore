@@ -1,5 +1,7 @@
 @extends('user.layouts.user')
 
+@php($notificationRoute = route('user.notification.index'))
+
 @section('recent-apps-card')
     <div class="card">
         <div class="card-header">

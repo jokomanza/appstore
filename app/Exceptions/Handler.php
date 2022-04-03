@@ -51,7 +51,7 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $e)
     {
         if ($e instanceof BaseException) {
-            if ($e->shouldRedirectBack) return back()->withErrors($e->getMessage());
+            // if ($e->shouldRedirectBack) return back()->withErrors($e->getMessage());
         }
 
         if ($e->getCode() == 7) {

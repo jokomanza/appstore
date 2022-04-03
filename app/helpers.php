@@ -15,6 +15,14 @@ if (!function_exists('isClientDeveloper')) {
     }
 }
 
+if (!function_exists('hasUnreadNotification')) {
+    function hasUnreadNotification()
+    {
+        return Auth::user()->unreadNotifications
+                ->where('type', NewReportNotification::class)->first() != null;
+    }
+}
+
 if (!function_exists('isClientApp')) {
     function isClientApp(App $app)
     {

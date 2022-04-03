@@ -3,7 +3,7 @@
 @php($editAppRoute = 'user.app.edit')
 @php($destroyAppRoute = 'user.app.destroy')
 @php($showVersionRoute = 'user.version.show')
-@php($createVersionRoute = 'user.app.version.create')
+@php($createVersionRoute = 'user.version.create')
 @php($destroyPermissionRoute = 'user.app.permission.destroy')
 @php($storePermissionRoute = 'user.app.permission.store')
 @php($reportDataTablesRoute = 'user.app.report.datatables')

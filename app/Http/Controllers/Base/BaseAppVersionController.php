@@ -126,7 +126,7 @@ abstract class BaseAppVersionController extends BaseController
 
             return redirect()
                 ->route(
-                    $this->getUserType() . '.app.version.create',
+                    $this->getUserType() . '.version.create',
                     $packageName
                 )
                 ->withErrors($e->getMessage())
@@ -171,7 +171,7 @@ abstract class BaseAppVersionController extends BaseController
 
             return redirect()
                 ->route(
-                    $this->getUserType() . '.app.version.create',
+                    $this->getUserType() . '.version.create',
                     $packageName
                 )
                 ->withErrors($additionalError)
@@ -204,7 +204,7 @@ abstract class BaseAppVersionController extends BaseController
 
             return redirect()
                 ->route(
-                    $this->getUserType() . '.app.version.create',
+                    $this->getUserType() . '.version.create',
                     $packageName
                 )
                 ->withErrors("Failed to save new version")

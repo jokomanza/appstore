@@ -124,7 +124,7 @@ Route::post('app/{packageName}/reports/datatables', 'AdminReportController@getDa
 /*----------------------------------------------------------------------------------------------------------------*/
 Route::get('/app/{packageName}/version', 'AdminAppVersionController@create')
     ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
-    ->name('app.version.create');
+    ->name('version.create');
 
 Route::post('/app/{packageName}/version', 'AdminAppVersionController@store')
     ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')

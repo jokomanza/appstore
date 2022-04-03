@@ -24,10 +24,11 @@ abstract class BaseHomeController extends BaseController
         $usersCount = User::count();
         $adminsCount = Admin::count();
         $errorsCount = Report::count();
+        $hasNotification = hasUnreadNotification();
 
         return view(
             $this->getUserType() . '.home',
-            compact('recentApps', 'appsCount', 'usersCount', 'adminsCount', 'errorsCount')
+            compact('recentApps', 'appsCount', 'usersCount', 'adminsCount', 'errorsCount', 'hasNotification')
         );
     }
 
