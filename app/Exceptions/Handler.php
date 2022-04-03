@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -51,6 +52,14 @@ class Handler extends ExceptionHandler
     {
         if ($e instanceof BaseException) {
             if ($e->shouldRedirectBack) return back()->withErrors($e->getMessage());
+        }
+
+        if ($e->getCode() == 7) {
+            $message = "Website can't connect to database. Try again later or contact the developer.";
+        }
+
+        if (isset($message)) {
+            if (!config('app.debug', false)) return response()->view('base.messages.error', compact('message'));
         }
 
         return parent::render($request, $e);

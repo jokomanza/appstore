@@ -26,6 +26,9 @@
 </head>
 
 <body>
+
+@yield('error')
+
 <div id="app">
 
     @yield('sidebar')

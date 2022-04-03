@@ -68,10 +68,10 @@
 <body>
 <div class="flex-center position-ref full-height">
     <div class="top-right links">
-        @if(Auth::guard('user')->check())
+        @if(loggedAsUser())
             <a href="{{ route('user.home') }}">User Home</a>
         @endif
-        @if(Auth::guard('admin')->check())
+        @if(loggedAsAdmin())
             <a href="{{ route('admin.home') }}">Admin Home</a>
         @endif
     </div>

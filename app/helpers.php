@@ -22,10 +22,30 @@ if (!function_exists('isClientApp')) {
     }
 }
 
-if (!function_exists('hasUnreadNotification')) {
-    function hasUnreadNotification()
+if (!function_exists('loggedAsAdmin')) {
+    /**
+     * @return bool
+     */
+    function loggedAsAdmin()
     {
-        return Auth::user()->unreadNotifications
-                ->where('type', NewReportNotification::class)->first() != null;
+        try {
+            return Auth::guard('admin')->check();
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+}
+
+if (!function_exists('loggedAsUser')) {
+    /**
+     * @return bool
+     */
+    function loggedAsUser()
+    {
+        try {
+            return Auth::guard('user')->check();
+        } catch (Exception $e) {
+            return false;
+        }
     }
 }
