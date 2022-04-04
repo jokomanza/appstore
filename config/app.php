@@ -130,7 +130,13 @@ return [
     |
     */
 
-    'log' => env('APP_LOG', 'single'),
+    'log' => env('APP_LOG', 'daily'),
+
+    /**
+     * When using the daily log mode, Laravel will only retain five days of log files by default. Using this steting
+     * to change that behaviour.
+     */
+    'log_max_files' => 30,
 
     'log_level' => env('APP_LOG_LEVEL', 'debug'),
 

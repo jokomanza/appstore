@@ -9,6 +9,10 @@
                 <p class="fs-5 text-gray-600">{{ isset($message) ? $message : "The website is currently unavailable. Try again later or contact the
                     developer."}}</p>
 
+                @if(isset($additionalInfo))
+                    <p class="fs-5 text-gray-600">Additional info : {{ $additionalInfo }}</p>
+                @endif
+
                 <a href="{{ route('welcome')}}" class="btn btn-lg btn-outline-primary mt-3">Go Home</a>
             </div>
         </div>
