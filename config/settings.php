@@ -68,6 +68,6 @@ return [
     |
     */
     'defaults' => [
-        "send_email_notification" => true,
+        "send_email_notification" => "true",
     ]
 ];

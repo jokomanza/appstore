@@ -6,6 +6,7 @@
     <script type="text/javascript" src="{{ asset('js/datatables.js') }}"></script>
     <script src="{{ asset('js/sweetalert.min.js') }}"></script>
     <script src="{{ asset('js/clipboard.min.js') }}"></script>
+    <script src="{{ asset('js/notify.min.js') }}"></script>
 @endpush
 
 <div class="page-heading">
@@ -298,6 +299,10 @@
                     return document.getElementById("token").textContent.trim();
                 }
             });
+
+            $("#btn-token").click(function () {
+                $(this).notify("Copied", "success");
+            })
 
             $('.delete-app').click(function (e) {
                 e.preventDefault() // Don't post the form, unless confirmed
