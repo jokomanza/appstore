@@ -25,12 +25,12 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item  has-sub {{ Route::is('admin.app.*') ? ( isset($app) && $app instanceof \App\Models\App ? ( $app->isClientApp() ? '' : 'active') : 'active') : '' }}">
+                <li class="sidebar-item  has-sub {{ Route::is('admin.app.*') ? ( (isset($app) && $app instanceof \App\Models\App) ? ( $app->isClientApp() ? '' : 'active') : 'active') : '' }}">
                     <a href="#" class='sidebar-link'>
                         <i class="bi bi-stack"></i>
                         <span>Apps</span>
                     </a>
-                    <ul class="submenu {{ Route::is('admin.app.*') ? ( isset($app) && $app instanceof \App\Models\App ? ( $app->isClientApp() ? '' : 'active') : 'active') : '' }}">
+                    <ul class="submenu {{ Route::is('admin.app.*') ? ( (isset($app) && $app instanceof \App\Models\App) ? ( $app->isClientApp() ? '' : 'active') : 'active') : '' }}">
                         <li class="submenu-item {{ Route::is('admin.app.index') ? 'active' : '' }}">
                             <a href="{{ route('admin.app.index') }}">All</a>
                         </li>
@@ -70,7 +70,7 @@
                     </ul>
                 </li>
 
-                <li class="sidebar-item {{ isset($app) && $app instanceof \App\Models\App ? ( $app->isClientApp() ? 'active' : '') : '' }} ">
+                <li class="sidebar-item {{ (isset($app) && $app instanceof \App\Models\App) ? ( $app->isClientApp() ? 'active' : '') : '' }} ">
                     <a href="{{ route('admin.app.show', config('app.client_package_name')) }}"
                        class='sidebar-link'>
                         <i class="bi bi-grid-fill"></i>
