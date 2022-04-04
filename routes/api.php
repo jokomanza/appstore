@@ -28,7 +28,7 @@ Route::get("/app/{appId}/versions", 'Api\ApiController@getAppVersions');
 Route::get("/app/{appId}/version/{versionId}/update", 'Api\ApiController@checkAppUpdate');
 
 Route::get("/app/{packageName}/version/{versionCode}/library/update", 'Api\ApiController@checkUpdate')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->where('versionCode', '^[0-9]*$');
 
 Route::get("/app/{appId}/version/update", 'Api\ApiController@getUpdate');

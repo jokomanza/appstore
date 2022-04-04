@@ -89,30 +89,30 @@ Route::post('/app', 'AdminAppController@store')
     ->name('app.store');
 
 Route::get('/app/{packageName}', 'AdminAppController@show')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->name('app.show');
 
 Route::get('/app/{packageName}/edit', 'AdminAppController@edit')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->name('app.edit');
 
 Route::put('/app/{packageName}', 'AdminAppController@update')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->name('app.update');
 
 Route::delete('/app/{packageName}', 'AdminAppController@destroy')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->name('app.destroy');
 
 
 // apps permission
 /*----------------------------------------------------------------------------------------------------------------*/
 Route::post('/app/{packageName}/permission', 'AdminAppController@addPermission')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->name('app.permission.store');
 
 Route::delete('/app/{packageName}/permission/{registrationNumber}', 'AdminAppController@removePermission')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->where('registrationNumber', '[A-Z]{1}[0-9]{4}$')
     ->name('app.permission.destroy');
 
@@ -122,34 +122,34 @@ Route::delete('/app/{packageName}/permission/{registrationNumber}', 'AdminAppCon
 Route::post('apps/datatables', 'AdminAppController@getDataTables')
     ->name('app.datatables');
 Route::post('app/{packageName}/reports/datatables', 'AdminReportController@getDataTables')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->name('app.report.datatables');
 
 
 // app versions
 /*----------------------------------------------------------------------------------------------------------------*/
 Route::get('/app/{packageName}/version', 'AdminAppVersionController@create')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->name('version.create');
 
 Route::post('/app/{packageName}/version', 'AdminAppVersionController@store')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->name('version.store');
 
 Route::get('/app/{packageName}/version/{versionName}', 'AdminAppVersionController@show')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->name('version.show');
 
 Route::get('/app/{packageName}/version/{versionName}/edit', 'AdminAppVersionController@edit')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->name('version.edit');
 
 Route::put('/app/{packageName}/version/{versionName}', 'AdminAppVersionController@update')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->name('version.update');
 
 Route::delete('/app/{packageName}/version/{versionName}', 'AdminAppVersionController@destroy')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->name('version.destroy');
 
 
@@ -160,12 +160,12 @@ Route::get('/notifications/report/{id}', 'AdminReportController@showReportFromNo
     ->name('notification.report.show');
 
 Route::get('/app/{packageName}/report/{id}', 'AdminReportController@show')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->where('id', '^[0-9]*$')
     ->name('report.show');
 
 Route::delete('/app/{packageName}/report/{id}', 'AdminReportController@destroy')
-    ->where('packageName', 'com.quick.[a-z0-9]{3,30}$')
+    ->where('packageName', 'com.quick.[a-z0-9_]{3,30}$')
     ->where('id', '^[0-9]*$')
     ->name('report.destroy');
 
