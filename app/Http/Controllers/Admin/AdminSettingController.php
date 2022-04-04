@@ -39,7 +39,7 @@ class AdminSettingController extends Controller
         if (File::exists(public_path('storage/android_development_standard.pdf'))) $devStandard = asset('/storage/android_development_standard.pdf');
         if (File::exists(public_path('storage/android_development_guide.pdf'))) $devGuide = asset('/storage/android_development_guide.pdf');
 
-        $emailNotification = setting('send_email_notification', true);
+        $emailNotification = setting('send_email_notification', 'false') == 'true';
 
         return view('admin.setting.index', compact('userManual', 'devStandard', 'devGuide', 'emailNotification'));
     }
@@ -99,7 +99,7 @@ class AdminSettingController extends Controller
     {
         if (!$request->has('value')) return bad_request();
 
-        setting(['send_email_notification' => $request->get('value')]);
+        setting(['send_email_notification' => $request->get('value')])->save();
 
         return response()->json(['send_email_notification' => setting('send_email_notification', true)]);
     }

@@ -11,6 +11,14 @@ class NewReportNotification extends Notification
 {
     use Queueable;
 
+    /**
+     * @var string
+     */
+    private $userType;
+
+    /**
+     * @var Report
+     */
     private $report;
 
     /**
@@ -18,8 +26,9 @@ class NewReportNotification extends Notification
      *
      * @return void
      */
-    public function __construct(Report $report)
+    public function __construct($userType, Report $report)
     {
+        $this->userType = $userType;
         $this->report = $report;
     }
 
@@ -31,6 +40,9 @@ class NewReportNotification extends Notification
      */
     public function via($notifiable)
     {
+        if (setting('send_email_notification') == 'true') {
+            return ['mail', 'database'];
+        }
         return ['database'];
     }
 
@@ -46,7 +58,7 @@ class NewReportNotification extends Notification
         return (new MailMessage)
             ->greeting(sprintf('Hello %s!', $notifiable->name))
             ->line(sprintf('Your application %s (version %s) %s %s, with exception %s', $this->report->package_name, $this->report->app_version_name, $this->report->is_silent ? 'has encountered an error on' : 'crashed at', $this->report->created_at->toDateTimeString(), $this->report->exception))
-            ->action('View on Quick App Store', route('user.report.show', [$this->report->app->package_name, $this->report->id]))
+            ->action('View on Quick App Store', route($this->userType . '.report.show', [$this->report->app->package_name, $this->report->id]))
             ->line('Please check immediately and fix the problem');
     }
 

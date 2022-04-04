@@ -112,15 +112,17 @@ class ReportController extends Controller
 
         $crash->save();
 
+        $userType = 'user';
         $people = Permission::with('user')->where('app_id', $app->id)->get()->map(function ($value) {
             return $value->user;
         });
 
         if ($people->isEmpty()) {
             $people = Admin::all();
+            $userType = 'admin';
         }
 
-        Notification::send($people, new NewReportNotification($crash));
+        Notification::send($people, new NewReportNotification($userType, $crash));
 
         return ok($request->all());
     }

@@ -186,10 +186,10 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\RepositoryServiceProvider::class,    
+        App\Providers\RepositoryServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
         Barryvdh\Debugbar\ServiceProvider::class,
-        Akaunting\Setting\Provider::class,
+        anlutro\LaravelSettings\ServiceProvider::class,
 
     ],
 
@@ -244,7 +244,7 @@ return [
         'Html' => Collective\Html\HtmlFacade::class,
         'AppModel' => App\Models\App::class,
         'Developer' => App\Models\Permission::class,
-        'Setting' => Akaunting\Setting\Facade::class,
+        'Setting' => anlutro\LaravelSettings\Facade::class,
     ],
 
 ];

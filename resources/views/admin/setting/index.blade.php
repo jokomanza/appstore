@@ -126,8 +126,10 @@
                         <div class="card-content">
                             <div class="card-body">
 
-                                    <p>Send mail notification : </p>
-                                    <input id="notification-toggle" value="{{ $emailNotification }}" type="checkbox" checked data-toggle="toggle" data-onstyle="success">
+                                <p>Send email notification : </p>
+                                <input id="notification-toggle" type="checkbox"
+                                       {{ $emailNotification ? 'checked' : '' }}
+                                       data-toggle="toggle" data-onstyle="success">
 
                             </div>
                         </div>
@@ -162,8 +164,8 @@
                     dataType: "json",
                     url: '{{ route('admin.setting.notification.toggle') }}',
                     data: {
-                      _token : '{{ csrf_token() }}',
-                        value : value
+                        _token: '{{ csrf_token() }}',
+                        value: value
                     },
                     success: function (data) {
                         console.log(data)
@@ -173,6 +175,5 @@
         });
 
     </script>
-
 
 @endpush
