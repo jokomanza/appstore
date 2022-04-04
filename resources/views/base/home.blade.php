@@ -4,6 +4,8 @@
     <script src="{{ asset('js/sweetalert.min.js') }}"></script>
 @endpush
 
+@php($app = null)
+
 @section('content')
     <div class="page-heading">
         <h3>Quick App Store Statistics</h3>
@@ -200,17 +202,17 @@
             });
 
             @if($hasNotification)
-                swal("You have some notifications that haven't been viewed, check it now!", {
-                    buttons: {
-                        cancel: "I will see it later",
-                        success: "See now",
-                    },
-                })
-                    .then((value) => {
-                        if (value === 'success') {
-                            window.location.href = "{{ $notificationRoute }}"
-                        }
-                    });
+            swal("You have some notifications that haven't been viewed, check it now!", {
+                buttons: {
+                    cancel: "I will see it later",
+                    success: "See now",
+                },
+            })
+                .then((value) => {
+                    if (value === 'success') {
+                        window.location.href = "{{ $notificationRoute }}"
+                    }
+                });
             @endif
         })
 
