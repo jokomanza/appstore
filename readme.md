@@ -1,4 +1,4 @@
-<p align="center"><img  style="height: 100px; width: 100px; align-self: center;" src="public/images/logo.png"></p>
+<p align="center"><img  height="100px" width="100px" src="public/images/logo.png"></p>
 
 <h1 align="center">Quick App Store</h1>
 
