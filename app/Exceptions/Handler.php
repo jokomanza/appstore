@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 
 class Handler extends ExceptionHandler
 {
@@ -59,7 +60,9 @@ class Handler extends ExceptionHandler
         }
 
         if (config('app.env') == 'production') {
-            return response()->view('base.messages.error', ['additionalInfo' => 'Error occurred on ' . Carbon::now()->toDateTimeString()]);
+            if ($e instanceof ValidationException) {
+
+            } else return response()->view('base.messages.error', ['additionalInfo' => 'Error occurred on ' . Carbon::now()->toDateTimeString()]);
         }
 
         return parent::render($request, $e);
