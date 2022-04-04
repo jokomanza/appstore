@@ -144,12 +144,6 @@ abstract class BaseAppVersionController extends BaseController
             }
         }
 
-        if (!preg_match("/^\d{1,5}.\d{1,5}.\d{1,5}$/", $version_code)) {
-            $additionalError['version_code'] = [
-                "Version code ($version_code) invalid"
-            ];
-        }
-
         if (!empty(AppVersion::where(['app_id' => $app->id, 'version_code' => $version_code])->first())) {
             $additionalError['version_code'] = [
                 "Version number " . $version_code . " for app $app->name already exists"
@@ -159,6 +153,12 @@ abstract class BaseAppVersionController extends BaseController
         if ($maxVersionNumber >= $version_code) {
             $additionalError['version_code'] = [
                 "Version number " . $version_code . " for app $app->name must greater than $maxVersionNumber "
+            ];
+        }
+
+        if (!preg_match("/^\d{1,5}.\d{1,5}.\d{1,5}$/", $version_name)) {
+            $additionalError['version_name'] = [
+                "Version name ($version_name) invalid"
             ];
         }
         if (!empty(AppVersion::where(['app_id' => $app->id, 'version_name' => $version_name])->first())) {
