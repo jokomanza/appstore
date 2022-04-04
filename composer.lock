@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1aaea06b7708a26bfec4fc6b57e411f1",
+    "content-hash": "abdfd9dcf478ac7aea9f4926361bac74",
     "packages": [
         {
             "name": "anlutro/l4-settings",
@@ -68,6 +68,134 @@
                 "source": "https://github.com/anlutro/laravel-settings/tree/v1.1.1"
             },
             "time": "2022-02-11T13:01:17+00:00"
+        },
+        {
+            "name": "arcanedev/log-viewer",
+            "version": "4.3.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ARCANEDEV/LogViewer.git",
+                "reference": "4aa77325008f7111f6a482de77eeb3fe8193ae11"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ARCANEDEV/LogViewer/zipball/4aa77325008f7111f6a482de77eeb3fe8193ae11",
+                "reference": "4aa77325008f7111f6a482de77eeb3fe8193ae11",
+                "shasum": ""
+            },
+            "require": {
+                "arcanedev/support": "~4.1.0",
+                "ext-json": "*",
+                "php": ">=5.6",
+                "psr/log": "~1.0"
+            },
+            "require-dev": {
+                "orchestra/testbench-browser-kit": "~3.4.0",
+                "phpunit/phpcov": "~3.0",
+                "phpunit/phpunit": "~5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "constants.php",
+                    "helpers.php"
+                ],
+                "psr-4": {
+                    "Arcanedev\\LogViewer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "ARCANEDEV",
+                    "email": "arcanedev.maroc@gmail.com",
+                    "homepage": "https://github.com/arcanedev-maroc",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Provides a Log Viewer for Laravel 5",
+            "homepage": "https://github.com/ARCANEDEV/LogViewer",
+            "keywords": [
+                "arcanedev",
+                "arcanesoft",
+                "laravel",
+                "log",
+                "log viewer",
+                "log-viewer",
+                "logviewer"
+            ],
+            "support": {
+                "issues": "https://github.com/ARCANEDEV/LogViewer/issues",
+                "source": "https://github.com/ARCANEDEV/LogViewer/tree/4.3.12"
+            },
+            "time": "2019-09-12T19:06:00+00:00"
+        },
+        {
+            "name": "arcanedev/support",
+            "version": "4.1.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ARCANEDEV/Support.git",
+                "reference": "50bf6c1e6aabf7c5c4e1cea0d6028b0622d5ce2d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ARCANEDEV/Support/zipball/50bf6c1e6aabf7c5c4e1cea0d6028b0622d5ce2d",
+                "reference": "50bf6c1e6aabf7c5c4e1cea0d6028b0622d5ce2d",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/filesystem": "~5.4.0",
+                "illuminate/support": "~5.4.0",
+                "php": ">=5.6.4"
+            },
+            "require-dev": {
+                "orchestra/testbench-browser-kit": "~3.4.0",
+                "phpunit/phpcov": "~3.0",
+                "phpunit/phpunit": "~5.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.0-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "constants.php",
+                    "helpers.php"
+                ],
+                "psr-4": {
+                    "Arcanedev\\Support\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "ARCANEDEV",
+                    "email": "arcanedev.maroc@gmail.com",
+                    "homepage": "https://github.com/arcanedev-maroc"
+                }
+            ],
+            "description": "ARCANEDEV Support Helpers",
+            "homepage": "https://github.com/ARCANEDEV/Support",
+            "keywords": [
+                "arcanedev",
+                "arcanesoft",
+                "laravel",
+                "support"
+            ],
+            "support": {
+                "issues": "https://github.com/ARCANEDEV/Support/issues",
+                "source": "https://github.com/ARCANEDEV/Support/tree/master"
+            },
+            "time": "2017-05-08T12:18:25+00:00"
         },
         {
             "name": "dees040/laravel-api-responses",

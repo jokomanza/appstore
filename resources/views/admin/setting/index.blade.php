@@ -141,6 +141,20 @@
                         <div class="card-content">
                             <div class="card-body">
 
+                                <p>There are currently no settings for security.</p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Logs</h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body">
+
+                                <p>Manage all the logs in this application.</p>
+                                <a class="btn btn-primary" href="{{ route('log-viewer::dashboard') }}">See Logs</a>
 
                             </div>
                         </div>
