@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Base;
 
 use App\Http\Requests\AddPermissionRequest;
 use App\Http\Requests\CreateAppRequest;
+use App\Http\Requests\UpdateAppRequest;
 use App\Interfaces\AppRepositoryInterface;
 use App\Interfaces\AppServiceInterface;
 use App\Models\App;
@@ -161,7 +162,7 @@ abstract class BaseAppController extends BaseController
         if (!$isAppDeveloper && !$isAppOwner) {
             return redirect()
                 ->route(
-                    $this->getUserType() .'.app.show',
+                    $this->getUserType() . '.app.show',
                     $packageName
                 )
                 ->withErrors("You can't edit this app because you're not owner or developer of this app");
@@ -171,13 +172,11 @@ abstract class BaseAppController extends BaseController
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param null $packageName
+     * @param UpdateAppRequest $request
+     * @param $packageName
      * @return Factory|Application|RedirectResponse|View
      */
-    public function update(Request $request, $packageName)
+    public function update(UpdateAppRequest $request, $packageName)
     {
         $app = (new App)->getApp($packageName);
         if ($app == null) {
