@@ -1,3 +1,5 @@
+@php($app = null)
+
 @extends('admin.layouts.admin')
 
 @php($notificationRoute = route('admin.notification.index'))

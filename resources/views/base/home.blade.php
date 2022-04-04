@@ -4,8 +4,6 @@
     <script src="{{ asset('js/sweetalert.min.js') }}"></script>
 @endpush
 
-@php($app = null)
-
 @section('content')
     <div class="page-heading">
         <h3>Quick App Store Statistics</h3>
