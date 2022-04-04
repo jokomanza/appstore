@@ -41,6 +41,10 @@
                         <div class="card-content">
                             <div class="card-body">
 
+                                <h5>Cache</h5>
+                                <p>Clear all cache</p>
+                                <a class="btn btn-danger mb-5" href="{{ route('admin.setting.cache.reset') }}">Clear</a>
+
                                 <h5>User Manual</h5>
                                 <form action="{{ route('admin.setting.manual.store') }}" method="post"
                                       enctype="multipart/form-data">

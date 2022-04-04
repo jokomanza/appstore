@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDocumentRequest;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\View\View;
 
@@ -95,6 +97,10 @@ class AdminSettingController extends Controller
         } else return back()->withErrors("Failed to upload android development guide");
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function toggleSendMailNotification(Request $request)
     {
         if (!$request->has('value')) return bad_request();
@@ -102,5 +108,20 @@ class AdminSettingController extends Controller
         setting(['send_email_notification' => $request->get('value')])->save();
 
         return response()->json(['send_email_notification' => setting('send_email_notification', true)]);
+    }
+
+
+    /**
+     * @return RedirectResponse
+     */
+    public function clearCache()
+    {
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+        Artisan::call('config:cache');
+        Artisan::call('view:clear');
+        Artisan::call('route:clear');
+
+        return redirect()->route('admin.setting.index')->with('messages', ['Successfully clear all cache']);
     }
 }

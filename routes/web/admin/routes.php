@@ -21,6 +21,9 @@ Route::post('/settings/development/guide', 'AdminSettingController@storeDevGuide
 Route::post('/settings/notification/toggle', 'AdminSettingController@toggleSendMailNotification')
     ->name('setting.notification.toggle');
 
+Route::get('/settings/cache/reset', 'AdminSettingController@clearCache')
+    ->name('setting.cache.reset');
+
 
 // profile
 /*----------------------------------------------------------------------------------------------------------------*/
