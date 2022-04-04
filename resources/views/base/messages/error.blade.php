@@ -13,6 +13,10 @@
                     <p class="fs-5 text-gray-600">Additional info : {{ $additionalInfo }}</p>
                 @endif
 
+                @if(isset($error))
+                    <p class="fs-5 text-danger">Error : {{ $error }}</p>
+                @endif
+
                 <a href="{{ route('welcome')}}" class="btn btn-lg btn-outline-primary mt-3">Go Home</a>
             </div>
         </div>
