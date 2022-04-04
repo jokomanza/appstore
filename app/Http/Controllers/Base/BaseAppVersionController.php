@@ -146,7 +146,7 @@ abstract class BaseAppVersionController extends BaseController
 
         if (!preg_match("/^\d{1,5}.\d{1,5}.\d{1,5}$/", $version_code)) {
             $additionalError['version_code'] = [
-                "Version code invalid"
+                "Version code ($version_code) invalid"
             ];
         }
 
