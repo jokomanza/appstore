@@ -136,11 +136,13 @@ abstract class BaseAppVersionController extends BaseController
         $additionalError = [];
 
         // Additional validation
-        /*if ($app->package_name != $package_name) {
-            $additionalError['package_name'] = [
-                "package name uploaded file (" . $package_name . ") not match with current app package name (" . $app->package_name . ")"
-            ];
-        }*/
+        if ($this->getUserType() == 'user') {
+            if ($app->package_name != $package_name) {
+                $additionalError['package_name'] = [
+                    "package name uploaded file (" . $package_name . ") not match with current app package name (" . $app->package_name . ")"
+                ];
+            }
+        }
 
         if (!preg_match("/^\d{1,5}.\d{1,5}.\d{1,5}$/", $version_code)) {
             $additionalError['version_code'] = [
