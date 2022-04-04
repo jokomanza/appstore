@@ -2,7 +2,7 @@
 
 @php($isAppDeveloper = false)
 @php($isAppOwner = true)
-@php($isClientApp = $app->package_name == 'com.quick.quickappstore')
+@php($isClientApp = $app->isClientApp())
 
 @php($updateAppRoute = 'admin.app.update')
 

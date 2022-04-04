@@ -1,6 +1,6 @@
 @extends('user.layouts.user')
 
-@php($isClientApp = $app->package_name == 'com.quick.quickappstore')
+@php($isClientApp = $app->isClientApp())
 
 @php($updateAppRoute = 'user.app.update')
 

@@ -250,7 +250,7 @@ abstract class BaseAppController extends BaseController
     public function destroy(Request $request, $packageName)
     {
         if ($packageName == config('app.client_package_name')) {
-            return redirect()->route($this->getUserType() . '.client.show')->withErrors("You can't delete client app");
+            return redirect()->route($this->getUserType() . '.app.show', $packageName)->withErrors("You can't delete client app");
         }
 
         $app = (new App)->getApp($packageName);

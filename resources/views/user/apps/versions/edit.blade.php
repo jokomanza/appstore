@@ -2,7 +2,7 @@
 
 @php($storeVersionRoute = 'user.version.store')
 
-@php($isClientApp = $app->package_name == 'com.quick.quickappstore')
+@php($isClientApp = $app->isClientApp())
 
 @php($updateVersionRoute = 'user.version.update')
 

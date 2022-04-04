@@ -1,6 +1,6 @@
 @extends('admin.layouts.admin')
 
-@php($isClientApp = $app->package_name == 'com.quick.quickappstore')
+@php($isClientApp = $app->isClientApp())
 
 @php($storeVersionRoute = 'admin.version.store')
 

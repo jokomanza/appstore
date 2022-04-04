@@ -8,9 +8,7 @@
 @php($storePermissionRoute = 'user.app.permission.store')
 @php($reportDataTablesRoute = 'user.app.report.datatables')
 
-@php($createClientVersionRoute = 'user.client.version.create')
-
-@php($isClientApp = $app->package_name == 'com.quick.quickappstore')
+@php($isClientApp = $app->isClientApp())
 
 @section('breadcrumb')
     <ol class="breadcrumb">

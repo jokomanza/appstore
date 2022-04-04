@@ -1,9 +1,8 @@
 <?php
 
+use App\Models\App;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\App;
-use Illuminate\Pagination\PaginationServiceProvider;
 
 class DatabaseSeeder extends Seeder
 {
@@ -43,7 +42,7 @@ class DatabaseSeeder extends Seeder
             $app->description = 'Apliaksi mobile untuk sistem quick app store';
             $app->type = 'Client App';
             $app->icon_url = 'com.quick.quickappstore.icon.default.png';
-            $app->repository_url = 'http:git.quick.com/production/quick-appstore-mobile.git';
+            $app->repository_url = 'http://git.quick.com/production/quick-appstore-mobile.git';
             $app->api_token = str_random(128);
 
             $app->save();

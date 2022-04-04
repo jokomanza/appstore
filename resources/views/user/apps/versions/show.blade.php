@@ -3,19 +3,16 @@
 @php($destroyVersionRoute = 'user.version.destroy')
 @php($storeVersionRoute = 'user.version.store')
 
-@php($isClientApp = $app->package_name == 'com.quick.quickappstore')
+@php($isClientApp = $app->isClientApp())
 
-@if ($isClientApp)
-    @php($editVersionRoute = 'user.client.version.edit')
-@else
-    @php($editVersionRoute = 'user.version.edit')
-@endif
+@php($editVersionRoute = 'user.version.edit')
 
 @section('breadcrumb')
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ route('user.home') }}">Dashboard</a></li>
         @if ($isClientApp)
-            <li class="breadcrumb-item active" aria-current="page"><a href="{{route('user.client.show')}}">Client
+            <li class="breadcrumb-item active" aria-current="page"><a
+                        href="{{route('user.app.show', config('app.client_package_name'))}}">Client
                     App</a></li>
         @else
             <li class="breadcrumb-item"><a href="{{ route('user.app.index') }}">Apps</a></li>

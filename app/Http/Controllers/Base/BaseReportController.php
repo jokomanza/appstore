@@ -108,7 +108,7 @@ abstract class BaseReportController extends BaseController
 
         $report->delete();
 
-        $isClientApp = isClientApp($app);
+        $isClientApp = $app->isClientApp();
 
         return redirect()->route($this->getUserType() . '.report.show', [$app->package_name, $report->data['report_id']]);
     }
@@ -156,7 +156,7 @@ abstract class BaseReportController extends BaseController
 
         if (!$app) return not_found();
 
-        $isClientApp = $app->package_name == config('app.client_package_name');
+        $isClientApp = $app->isClientApp();
 
         $columns = [
             0 => 'created_at',

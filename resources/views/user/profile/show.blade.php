@@ -4,7 +4,6 @@
 @php($changeUserPasswordRoute = 'user.profile.password.edit')
 @php($destroyUserRoute = 'user.profile.destroy')
 @php($showAppRoute = 'user.app.show')
-@php($showClientAppRoute = 'user.client.show')
 
 @php($isUser = true)
 
