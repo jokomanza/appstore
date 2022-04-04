@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
 /* |-------------------------------------------------------------------------- | API Routes |-------------------------------------------------------------------------- | | Here is where you can register API routes for your app. These | routes are loaded by the RouteServiceProvider within a group which | is assigned the "api" middleware group. Enjoy building your API! | */
@@ -12,7 +13,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 
 Route::get('/documentation', function () {
-    return "Under development";
+    if (File::exists(public_path('storage/user_manual.pdf'))) $userManual = asset('/storage/user_manual.pdf');
+
+    if ($userManual) return redirect()->to($userManual);
+    else return "There are no documentation yet";
 })->name('api.docs');
 
 Route::get('/client/download', 'Api\ApiController@downloadClient')->name('api.client.download');
