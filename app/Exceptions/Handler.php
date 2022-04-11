@@ -60,7 +60,7 @@ class Handler extends ExceptionHandler
         }
 
         if (config('app.env') == 'production') {
-            if (!$e instanceof ValidationException) {
+            if (!$e instanceof ValidationException && !$e instanceof AuthenticationException) {
                 return response()
                     ->view('base.messages.error', [
                         'additionalInfo' => 'Error occurred on ' . Carbon::now()->toDateTimeString(),
