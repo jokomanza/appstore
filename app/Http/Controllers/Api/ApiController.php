@@ -300,6 +300,27 @@ class ApiController extends Controller
     }
 
     /**
+     * @param $packageName
+     * @return JsonResponse
+     */
+    public function getLatestVersion($packageName)
+    {
+        // DB::enableQueryLog();
+
+        $data = App::where('package_name', $packageName)->first();
+
+        if (!isset($data)) {
+            return not_found();
+        }
+
+        $data = AppVersion::where('app_id', $data->id)
+            ->orderBy('version_code', 'DESC')
+            ->first();
+
+        return ok($data);
+    }
+
+    /**
      * Download the latest version of client app
      *
      * @param Request $request

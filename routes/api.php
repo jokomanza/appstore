@@ -25,6 +25,8 @@ Route::get('apps', 'Api\ApiController@getAllApps');
 
 Route::get('app/{packageName}/latest', 'Api\ApiController@getLatestApp');
 
+Route::get('app/{packageName}/version/latest', 'Api\ApiController@getLatestVersion');
+
 Route::get('/download/{fileName}', 'Api\ApiController@download');
 
 Route::get("/app/{appId}/versions", 'Api\ApiController@getAppVersions');
