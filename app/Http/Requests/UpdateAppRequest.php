@@ -25,7 +25,7 @@ class UpdateAppRequest extends FormRequest
     {
         return [
             'name' => 'nullable|string|min:3|max:30',
-            'package_name' => 'nullable|string|regex:/com.quick.[a-z0-9_]{3,30}$/',
+            'package_name' => 'nullable|string',
             'description' => 'nullable|string|max:300',
             'repository_url' => 'nullable|url',
             'icon_file' => 'nullable|mimes:jpeg,jpg,png|max:10000',

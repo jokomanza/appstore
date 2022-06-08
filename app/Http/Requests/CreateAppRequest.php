@@ -25,7 +25,7 @@ class CreateAppRequest extends FormRequest
     {
         return [
             'name' => 'required|unique:apps,name|min:3|max:30',
-            'package_name' => 'required|unique:apps,package_name|regex:/com.quick.[a-z0-9_]{3,30}$/',
+            'package_name' => 'required|unique:apps,package_name',
             'type' => 'required|min:3|max:20',
             'description' => 'required|string|min:3|max:300',
             'repository_url' => ['nullable', 'url', 'regex:/(?:git|ssh|https?|git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/'],
