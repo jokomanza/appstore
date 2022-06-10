@@ -9,6 +9,7 @@
         "anlutro/l4-settings": "^1.1",
         "arcanedev/log-viewer": "^4.3",
         "dees040/laravel-api-responses": "^0.2.7",
+        "doctrine/dbal": "^2.5",
         "intervention/image": "^2.7",
         "laravel/framework": "5.4.*",
         "laravel/passport": "~4.0",
