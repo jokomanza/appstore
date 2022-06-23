@@ -206,15 +206,7 @@ class ApiController extends Controller
     public function checkUpdate(Request $request, $packageName, $versionCode)
     {
 
-        $appVersion = AppVersion::with(['app' => function ($query) use ($packageName) {
-            $query->where('package_name', '=', $packageName);
-        }])->where(['version_code' => $versionCode])->first();
-
-        if (!isset($appVersion)) {
-            return not_found("App version with app $packageName and version code $versionCode not found");
-        }
-
-        $newest = AppVersion::where('version_code', '>', $appVersion->version_code)->whereHas('app', function ($q) use ($packageName) {
+        $newest = AppVersion::where('version_code', '>', $versionCode)->whereHas('app', function ($q) use ($packageName) {
             $q->where('package_name', $packageName);
         })->orderBy('version_code', 'DESC')->first();
 
